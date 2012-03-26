@@ -1,0 +1,165 @@
+/*
+ * JBoss, Home of Professional Open Source.
+ * Copyright 2012, Red Hat, Inc., and individual contributors
+ * as indicated by the @author tags. See the copyright.txt file in the
+ * distribution for a full listing of individual contributors.
+ *
+ * This is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation; either version 2.1 of
+ * the License, or (at your option) any later version.
+ *
+ * This software is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this software; if not, write to the Free
+ * Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
+ * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
+ */
+
+package org.picketlink.as.console.client.shared.subsys.model;
+
+import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.READ_CHILDREN_RESOURCES_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+
+import java.util.List;
+
+import javax.inject.Inject;
+
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
+import org.jboss.as.console.client.shared.dispatch.impl.DMRAction;
+import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
+import org.jboss.as.console.client.shared.subsys.Baseadress;
+import org.jboss.as.console.client.widgets.forms.AddressBinding;
+import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
+import org.jboss.as.console.client.widgets.forms.BeanMetaData;
+import org.jboss.as.console.client.widgets.forms.EntityAdapter;
+import org.jboss.dmr.client.ModelNode;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+/**
+ * <p>
+ * Implementation of {@link FederationStore}.
+ * </p>
+ * 
+ * @author Pedro Silva
+ * @since Mar 14, 2012
+ */
+public class FederationStoreImpl implements FederationStore {
+
+    private final DispatchAsync dispatcher;
+    private final ApplicationMetaData metaData;
+    private final EntityAdapter<Federation> federationAdapter;
+    private final EntityAdapter<IdentityProvider> identityProviderAdapter;
+    private final EntityAdapter<ServiceProvider> serviceProviderAdapter;
+
+    private BeanMetaData federationMetaData;
+    private Baseadress baseadress;
+    private BeanMetaData identityProviderMetaData;
+    private BeanMetaData serviceProviderMetaData;
+
+    @Inject
+    public FederationStoreImpl(DispatchAsync dispatcher, ApplicationMetaData propertyMetaData, Baseadress baseadress) {
+        this.dispatcher = dispatcher;
+        this.metaData = propertyMetaData;
+        this.baseadress = baseadress;
+        this.federationMetaData = metaData.getBeanMetaData(Federation.class);
+        this.identityProviderMetaData = metaData.getBeanMetaData(IdentityProvider.class);
+        this.serviceProviderMetaData = metaData.getBeanMetaData(ServiceProvider.class);
+        this.federationAdapter = new EntityAdapter<Federation>(Federation.class, propertyMetaData);
+        this.identityProviderAdapter = new EntityAdapter<IdentityProvider>(IdentityProvider.class, propertyMetaData);
+        this.serviceProviderAdapter = new EntityAdapter<ServiceProvider>(ServiceProvider.class, propertyMetaData);
+    }
+
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#loadFederations(com.google.gwt.user.client.rpc.AsyncCallback)
+     */
+    @Override
+    public void loadFederations(final AsyncCallback<List<Federation>> callback) {
+        AddressBinding address = federationMetaData.getAddress();
+        ModelNode operation = address.asSubresource(baseadress.getAdress());
+        operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
+
+        dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode response = result.get();
+
+                if (response.isFailure()) {
+                    callback.onFailure(new RuntimeException(response.getFailureDescription()));
+                } else {
+                    List<Federation> datasources = federationAdapter.fromDMRList(response.get(RESULT).asList());
+                    callback.onSuccess(datasources);
+                }
+            }
+        });
+    }
+    
+    public void loadIdentityProviders(Federation federation, final AsyncCallback<List<IdentityProvider>> callback) {
+        AddressBinding address = this.identityProviderMetaData.getAddress();
+        
+        ModelNode operation = address.asSubresource(federation.getAlias());
+        operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
+
+        dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode response = result.get();
+
+                if (response.isFailure()) {
+                    callback.onFailure(new RuntimeException(response.getFailureDescription()));
+                } else {
+                    List<IdentityProvider> datasources = identityProviderAdapter.fromDMRList(response.get(RESULT).asList());
+                    callback.onSuccess(datasources);
+                }
+            }
+        });
+    }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#loadServiceProviders(org.picketlink.as.console.client.shared.subsys.model.Federation, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void loadServiceProviders(Federation federation, final SimpleCallback<List<ServiceProvider>> callback) {
+        AddressBinding address = this.serviceProviderMetaData.getAddress();
+        
+        ModelNode operation = address.asSubresource(federation.getAlias());
+        operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
+
+        dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode response = result.get();
+
+                if (response.isFailure()) {
+                    callback.onFailure(new RuntimeException(response.getFailureDescription()));
+                } else {
+                    List<ServiceProvider> datasources = serviceProviderAdapter.fromDMRList(response.get(RESULT).asList());
+                    callback.onSuccess(datasources);
+                }
+            }
+        });
+    }
+
+}

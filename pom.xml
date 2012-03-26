@@ -1,0 +1,253 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.picketlink.as</groupId>
+	<artifactId>picketlink-console-parent</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>PicketLink AS7 Console Parent</name>
+	
+	<organization>
+		<name>JBoss, a division of Red Hat</name>
+		<url>http://www.jboss.org</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>lgpl</name>
+			<url>http://repository.jboss.org/licenses/lgpl-2.1.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<modules>
+		<module>gui</module>
+		<module>app</module>
+	</modules>
+	<properties>
+		<gwt.version>2.3.0</gwt.version>
+		<gwtp.version>0.6</gwtp.version>
+		<gin.version>1.5_past22</gin.version>
+		<gwt-log.version>3.1.3</gwt-log.version>
+		<gwt-vis.version>1.1.1</gwt-vis.version>
+		<guice.version>3.0</guice.version>
+		<ballroom.version>1.1.0-SNAPSHOT</ballroom.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.picketlink.as</groupId>
+				<artifactId>picketlink-console-extension</artifactId>
+				<version>1.0.0-SNAPSHOT</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<!-- GWT Common Dependencies -->
+			<dependency>
+				<groupId>com.google.gwt</groupId>
+				<artifactId>gwt-user</artifactId>
+				<version>${gwt.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.google.gwt</groupId>
+				<artifactId>gwt-servlet</artifactId>
+				<version>${gwt.version}</version>
+				<scope>provided</scope>
+			</dependency>
+			<dependency>
+				<groupId>com.google.gwt</groupId>
+				<artifactId>gwt-dev</artifactId>
+				<version>${gwt.version}</version>
+			</dependency>
+
+			<!-- GWTP Dependencies -->
+			<dependency>
+				<groupId>com.gwtplatform</groupId>
+				<artifactId>gwtp-mvp-client</artifactId>
+				<version>${gwtp.version}</version>
+				<scope>provided</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>com.gwtplatform</groupId>
+				<artifactId>gwtp-dispatch-server</artifactId>
+				<version>${gwtp.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.gwtplatform</groupId>
+				<artifactId>gwtp-dispatch-server-guice</artifactId>
+				<version>${gwtp.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.gwtplatform</groupId>
+				<artifactId>gwtp-dispatch-client</artifactId>
+				<version>${gwtp.version}</version>
+				<scope>provided</scope> <!-- Remove for GWTP 0.5.1 and earlier -->
+			</dependency>
+
+
+			<!-- GWT DI Dependencies -->
+			<dependency>
+				<groupId>com.google.inject</groupId>
+				<artifactId>guice</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-servlet</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-persist</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.inject.extensions</groupId>
+				<artifactId>guice-assistedinject</artifactId>
+				<version>${guice.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.gwt.inject</groupId>
+				<artifactId>gin</artifactId>
+				<version>${gin.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.code</groupId>
+				<artifactId>gwt-visualization</artifactId>
+				<version>${gwt-vis.version}</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.code.gwt-log</groupId>
+				<artifactId>gwt-log</artifactId>
+				<version>${gwt-log.version}</version>
+			</dependency>
+
+			<!-- JBoss Ballroom Dependencies -->
+			<dependency>
+				<groupId>org.jboss.ballroom</groupId>
+				<artifactId>widgets</artifactId>
+				<version>${ballroom.version}</version>
+			</dependency>
+
+			<!-- SY AS7 Extension Dependency -->
+			<dependency>
+				<groupId>org.switchyard.console</groupId>
+				<artifactId>switchyard-console-as7-core</artifactId>
+				<version>0.4.0-SNAPSHOT</version>
+				<scope>compile</scope>
+			</dependency>
+			<!-- Need to include the source files for GWT compilation. -->
+			<dependency>
+				<groupId>org.switchyard.console</groupId>
+				<artifactId>switchyard-console-as7-core</artifactId>
+				<version>0.4.0-SNAPSHOT</version>
+				<classifier>sources</classifier>
+				<scope>provided</scope>
+			</dependency>
+
+			<!-- Testing dependencies -->
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.8.2</version>
+				<scope>test</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<showDeprecation>false</showDeprecation>
+					<showWarnings>true</showWarnings>
+					<optimize>true</optimize>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<configuration>
+					<skipTests>true</skipTests>
+					<failIfNoTests>false</failIfNoTests>
+					<trimStackTrace>false</trimStackTrace>
+					<systemProperties>
+						<property>
+							<name>log4j.output.dir</name>
+							<value>${project.build.directory}</value>
+						</property>
+					</systemProperties>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.1</version>
+				<configuration>
+					<tagBase>https://svn.jboss.org/repos/picketlink/console/trunk/tags</tagBase>
+					<connectionUrl>scm:svn:https://svn.jboss.org/repos/picketlink/console/trunk</connectionUrl>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- Repositories -->
+	<repositories>
+		<repository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+			<layout>default</layout>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+			<layout>default</layout>
+			<releases>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+			<snapshots>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+		</pluginRepository>
+		<pluginRepository>
+			<id>gwtplatform.plugin</id>
+			<name>Gwtplatform custom plugin repository</name>
+			<url>http://maven.gwt-platform.googlecode.com/hg/</url>
+			<layout>default</layout>
+		</pluginRepository>
+	</pluginRepositories>
+</project>
