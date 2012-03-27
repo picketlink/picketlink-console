@@ -129,8 +129,8 @@
 					<mode>htmlunit</mode>
 					<runTarget>App.html</runTarget>
 					<module>org.picketlink.as.console.application.App</module>
-					<extraJvmArgs>-Xmx512m</extraJvmArgs>
-					<localWorkers>2</localWorkers>
+					<extraJvmArgs>-Xmx1024m -Xms1024m -Xss1024k</extraJvmArgs>
+					<localWorkers>4</localWorkers>
 				</configuration>
 			</plugin>
 			<!-- Copy static web files before executing gwt:run -->
@@ -229,8 +229,8 @@
 							<mode>htmlunit</mode>
 							<runTarget>App.html</runTarget>
 							<module>org.picketlink.as.console.application.Development</module>
-							<extraJvmArgs>-Xmx512m</extraJvmArgs>
-							<localWorkers>2</localWorkers>
+							<extraJvmArgs>-Xmx1024m -Xms1024m -Xss1024k</extraJvmArgs>
+							<localWorkers>4</localWorkers>
 						</configuration>
 					</plugin>
 					<!-- Copy static web files before executing gwt:run -->

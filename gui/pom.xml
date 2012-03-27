@@ -8,7 +8,7 @@
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>picketlink-console-extension</artifactId>
-	
+	<description>PicketLink: Extension for the AS7 Console</description>
 	<packaging>jar</packaging>
 	
 	<organization>
