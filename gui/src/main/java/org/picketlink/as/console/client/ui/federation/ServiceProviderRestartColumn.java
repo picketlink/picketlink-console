@@ -20,30 +20,32 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client;
+package org.picketlink.as.console.client.ui.federation;
 
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.jboss.as.console.client.shared.deployment.DeployCommandExecutor;
+import org.jboss.as.console.client.shared.deployment.DeploymentCommand;
+import org.jboss.as.console.client.shared.deployment.DeploymentCommandCell;
+import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
-import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 
-import com.google.gwt.autobean.shared.AutoBean;
+import com.google.gwt.user.cellview.client.Column;
 
 /**
- * <p><code>com.google.gwt.autobean.shared.AutoBeanFactory</code> for the PicketLink module.</p>
- * <p>This class extends the AS7 Console AutoBeanFactory as an extension to allow the PicketLink module reuse all
- * bean definitions from the AS7 Console.</p>
- * 
- * @author Pedro Silva
- * @since Mar 13, 2012
+ * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
+ * @since Mar 23, 2012
  */
-public interface BeanFactory extends org.jboss.as.console.client.shared.BeanFactory {
+public class ServiceProviderRestartColumn extends Column<DeploymentRecord, DeploymentRecord> {
 
-    AutoBean<Federation> federation();
+    public ServiceProviderRestartColumn(DeployCommandExecutor executor, DeploymentCommand command) {
+        super(new DeploymentCommandCell(executor, command));
+    }
     
-    AutoBean<IdentityProvider> identityProvider();
-    
-    AutoBean<ServiceProvider> serviceProvider();
-    
-    AutoBean<TrustDomain> trustDomain();
+    /* (non-Javadoc)
+     * @see com.google.gwt.user.cellview.client.Column#getValue(java.lang.Object)
+     */
+    @Override
+    public DeploymentRecord getValue(DeploymentRecord object) {
+        return object;
+    }
+
 }

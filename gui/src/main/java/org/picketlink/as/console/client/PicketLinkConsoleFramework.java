@@ -22,28 +22,34 @@
 
 package org.picketlink.as.console.client;
 
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
-import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
+import org.jboss.as.console.client.Console;
+import org.jboss.ballroom.client.spi.Framework;
 
-import com.google.gwt.autobean.shared.AutoBean;
+import com.google.gwt.autobean.shared.AutoBeanFactory;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.EventBus;
+import com.gwtplatform.mvp.client.proxy.PlaceManager;
 
 /**
- * <p><code>com.google.gwt.autobean.shared.AutoBeanFactory</code> for the PicketLink module.</p>
- * <p>This class extends the AS7 Console AutoBeanFactory as an extension to allow the PicketLink module reuse all
- * bean definitions from the AS7 Console.</p>
- * 
- * @author Pedro Silva
- * @since Mar 13, 2012
+ * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
+ * @since Mar 20, 2012
  */
-public interface BeanFactory extends org.jboss.as.console.client.shared.BeanFactory {
+public class PicketLinkConsoleFramework implements Framework {
 
-    AutoBean<Federation> federation();
-    
-    AutoBean<IdentityProvider> identityProvider();
-    
-    AutoBean<ServiceProvider> serviceProvider();
-    
-    AutoBean<TrustDomain> trustDomain();
+    private final static BeanFactory factory = GWT.create(BeanFactory.class);
+
+    @Override
+    public EventBus getEventBus() {
+        return Console.MODULES.getEventBus();
+    }
+
+    @Override
+    public PlaceManager getPlaceManager() {
+        return Console.MODULES.getPlaceManager();
+    }
+
+    @Override
+    public AutoBeanFactory getBeanFactory() {
+        return factory;
+    }
 }

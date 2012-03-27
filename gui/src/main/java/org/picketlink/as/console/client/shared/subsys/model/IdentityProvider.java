@@ -22,6 +22,7 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
+import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.widgets.forms.Address;
 import org.jboss.as.console.client.widgets.forms.Binding;
 
@@ -33,7 +34,7 @@ import org.jboss.as.console.client.widgets.forms.Binding;
  * @since Mar 14, 2012
  */
 @Address("/subsystem=picketlink/federation={0}/identity-provider={1}")
-public interface IdentityProvider {
+public interface IdentityProvider extends DeploymentRecord {
 
     @Binding(key = true)
     String getAlias();
@@ -44,11 +45,11 @@ public interface IdentityProvider {
     void setUrl(String url);
 
     @Binding (detypedName="signOutgoingMessages")
-    String getSignOutgoingMessages();
-    void setSignOutgoingMessages(String url);
+    boolean isSignOutgoingMessages();
+    void setSignOutgoingMessages(boolean url);
 
     @Binding (detypedName="ignoreIncomingSignatures")
-    String getIgnoreIncomingSignatures();
-    void setIgnoreIncomingSignatures(String url);
+    boolean isIgnoreIncomingSignatures();
+    void setIgnoreIncomingSignatures(boolean url);
 
 }

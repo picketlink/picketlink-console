@@ -25,8 +25,12 @@ package org.picketlink.as.console.client.ui.federation;
 import java.util.List;
 
 import org.jboss.as.console.client.widgets.ContentDescription;
+import org.jboss.ballroom.client.widgets.tools.ToolButton;
+import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,19 +46,57 @@ import com.google.gwt.user.client.ui.Widget;
 public class ServiceProviderDetails {
 
     private ServiceProviderTable serviceProviderTable;
+    private FederationPresenter presenter;
+    private NewServiceProviderWizard serviceProviderWizard;
 
+    public ServiceProviderDetails(FederationPresenter presenter) {
+        this.presenter = presenter;
+    }
+    
     public Widget asWidget() {
         VerticalPanel layout = new VerticalPanel();
         
         layout.setStyleName("rhs-content-panel");
         
-        HorizontalPanel horizontalPanel = new HorizontalPanel();
+//        HorizontalPanel horizontalPanel = new HorizontalPanel();
+//        
+//        horizontalPanel.setHeight("10px");
+//        
+//        layout.add(horizontalPanel);
         
-        horizontalPanel.setHeight("10px");
+        ToolStrip trustDomainTools = new ToolStrip();
         
-        layout.add(horizontalPanel);
-        layout.add(new ContentDescription("Avaiable Service Providers"));
-        layout.add(getFederationTable().asWidget());
+        trustDomainTools.setStyleName("fill-layout-width");
+        
+        ToolButton editBtn = new ToolButton("Add");
+        
+        editBtn.addClickHandler(new ClickHandler() {
+            
+            @Override
+            public void onClick(ClickEvent event) {
+                getServiceProviderWizard().lunch();
+            }
+        });
+        
+        trustDomainTools.add(editBtn);
+        
+        ToolButton removeBtn = new ToolButton("Remove");
+        
+        removeBtn.addClickHandler(new ClickHandler() {
+            
+            @Override
+            public void onClick(ClickEvent event) {
+                presenter.onRemoveServiceProvider(getServiceProviderTable().getSelectedServiceProvider());
+            }
+        });
+        
+        trustDomainTools.add(removeBtn);
+        
+        layout.add(trustDomainTools);
+        
+        layout.add(new ContentDescription(""));
+        
+        layout.add(getServiceProviderTable().asWidget());
         
         return layout;
     }
@@ -64,9 +106,9 @@ public class ServiceProviderDetails {
      * 
      * @return
      */
-    private ServiceProviderTable getFederationTable() {
+    private ServiceProviderTable getServiceProviderTable() {
         if (this.serviceProviderTable == null) {
-            this.serviceProviderTable = new ServiceProviderTable();
+            this.serviceProviderTable = new ServiceProviderTable(this.presenter);
         }
 
         return this.serviceProviderTable;
@@ -76,7 +118,15 @@ public class ServiceProviderDetails {
      * @param result
      */
     public void updateServiceProviders(List<ServiceProvider> result) {
-        this.getFederationTable().getDataProvider().setList(result);
+        this.getServiceProviderTable().setList(result);
+    }
+    
+    public NewServiceProviderWizard getServiceProviderWizard() {
+        if (this.serviceProviderWizard == null) {
+            this.serviceProviderWizard = new NewServiceProviderWizard(this.presenter);
+        }
+
+        return this.serviceProviderWizard;
     }
 
 }

@@ -20,30 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client;
+package org.picketlink.as.console.client.ui.federation;
 
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
-import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
-
-import com.google.gwt.autobean.shared.AutoBean;
+import com.gwtplatform.mvp.client.Presenter;
 
 /**
- * <p><code>com.google.gwt.autobean.shared.AutoBeanFactory</code> for the PicketLink module.</p>
- * <p>This class extends the AS7 Console AutoBeanFactory as an extension to allow the PicketLink module reuse all
- * bean definitions from the AS7 Console.</p>
- * 
- * @author Pedro Silva
- * @since Mar 13, 2012
+ * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
+ * @since Mar 23, 2012
  */
-public interface BeanFactory extends org.jboss.as.console.client.shared.BeanFactory {
+public interface WizardView<P extends Presenter, T> {
 
-    AutoBean<Federation> federation();
-    
-    AutoBean<IdentityProvider> identityProvider();
-    
-    AutoBean<ServiceProvider> serviceProvider();
-    
-    AutoBean<TrustDomain> trustDomain();
+    /**
+     * <p>
+     * Lunchs the wizard.
+     * </p>
+     */
+    void lunch();
+
+    /**
+     * @param updatedEntity
+     */
+    void onSave(T updatedEntity);
+
+    /**
+     * 
+     */
+    void onClose();
+
 }

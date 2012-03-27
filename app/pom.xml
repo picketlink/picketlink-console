@@ -99,11 +99,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
 			<groupId>com.google.gwt</groupId>
 			<artifactId>gwt-dev</artifactId>
 			<scope>provided</scope>
@@ -142,6 +137,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
+				<version>2.2</version>
 				<executions>
 					<execution>
 						<phase>compile</phase>
@@ -152,7 +148,7 @@
 				</executions>
 				<configuration>
 					<failOnMissingWebXml>false</failOnMissingWebXml>
-					<packagingExcludes>WEB-INF/**</packagingExcludes>
+					<packagingExcludes>WEB-INF/lib/**</packagingExcludes>
 					<overlays>
 						<overlay>
 							<id>core-web-resources</id>
@@ -251,7 +247,7 @@
 						</executions>
 						<configuration>
 							<failOnMissingWebXml>false</failOnMissingWebXml>
-							<packagingExcludes>WEB-INF/**</packagingExcludes>
+							<packagingExcludes>WEB-INF/lib/**</packagingExcludes>
 							<overlays>
 								<overlay>
 									<id>core-web-resources</id>

@@ -25,13 +25,21 @@ package org.picketlink.as.console.client.ui.federation;
 import org.jboss.as.console.client.shared.help.FormHelpPanel;
 import org.jboss.as.console.client.shared.subsys.Baseadress;
 import org.jboss.as.console.client.shared.viewframework.builder.FormLayout;
+import org.jboss.as.console.client.widgets.ContentDescription;
+import org.jboss.ballroom.client.widgets.ContentGroupLabel;
 import org.jboss.ballroom.client.widgets.forms.Form;
+import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.ballroom.client.widgets.forms.TextItem;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
+import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.dmr.client.ModelNode;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
+import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -46,13 +54,15 @@ import com.google.gwt.user.client.ui.Widget;
 public class FederationDetails {
 
     private Form<Federation> form;
+    private Form<TrustDomain> trustDomainForm;
+    private TrustDomainTable trustDomainTable;
     private FederationPresenter presenter;
-    private ToolButton disableBtn;
 
-    public FederationDetails(FederationPresenter presenter) {
+    public FederationDetails(CellTable<Federation> table, FederationPresenter presenter) {
+        this.form = new Form<Federation>(Federation.class);
+        this.form.setNumColumns(2);
+        this.form.bind(table);
         this.presenter = presenter;
-        form = new Form(Federation.class);
-        form.setNumColumns(2);
     }
 
     public Widget asWidget() {
@@ -65,8 +75,68 @@ public class FederationDetails {
         
         form.setEnabled(false);
         
-        Widget formWidget = form.asWidget();
+        final FormHelpPanel helpPanel = createHelpPanel();
+
+        detailPanel.add(new FormLayout().setHelp(helpPanel).setForm(form).build());
         
+        VerticalPanel trustDomainsHeader = new VerticalPanel();
+        
+        trustDomainsHeader.setStyleName("fill-layout-width");
+        
+        trustDomainsHeader.add(new ContentGroupLabel("Trusted Domains"));
+
+        this.trustDomainForm = new Form<TrustDomain>(TrustDomain.class);
+        
+        this.trustDomainForm.setFields(new TextBoxItem("name", "Name"));
+        
+        trustDomainsHeader.add(this.trustDomainForm.asWidget());
+
+        ToolStrip trustDomainTools = new ToolStrip();
+        
+        ToolButton addTrustedDomainBtn = new ToolButton("Add");
+        
+        addTrustedDomainBtn.addClickHandler(new ClickHandler() {
+            
+            @Override
+            public void onClick(ClickEvent event) {
+                presenter.onCreateTrustDomain(trustDomainForm.getUpdatedEntity());
+            }
+        });
+
+        trustDomainTools.addToolButtonRight(addTrustedDomainBtn);
+
+        ToolButton removeTrustedDomainBtn = new ToolButton("Remove");
+        
+        removeTrustedDomainBtn.addClickHandler(new ClickHandler() {
+            
+            @Override
+            public void onClick(ClickEvent event) {
+                presenter.onRemoveTrustDomain(getTrustDomainTable().getSelectedTrustedDomain());
+            }
+        });
+
+        trustDomainTools.addToolButtonRight(removeTrustedDomainBtn);
+
+        trustDomainTools.setStyleName("fill-layout-width");
+        
+        trustDomainsHeader.add(trustDomainTools);
+        
+        trustDomainsHeader.add(new ContentDescription(""));
+        
+        detailPanel.add(trustDomainsHeader);
+        detailPanel.add(getTrustDomainTable().asWidget());
+
+        return detailPanel;
+    }
+
+    /**
+     * <p>
+     * Creates a instance of {@link FormHelpPanel} to show descriptions about the federation. 
+     * </p>
+     * 
+     * @return
+     */
+    private FormHelpPanel createHelpPanel() {
         final FormHelpPanel helpPanel = new FormHelpPanel(new FormHelpPanel.AddressCallback() {
             @Override
             public ModelNode getAddress() {
@@ -76,22 +146,16 @@ public class FederationDetails {
                 return address;
             }
         }, form);
-
-        detailPanel.add(formWidget);
-
-        return new FormLayout().setHelp(helpPanel).setForm(form).build();
+        
+        return helpPanel;
     }
+    
+    public TrustDomainTable getTrustDomainTable() {
+        if (this.trustDomainTable == null) {
+            this.trustDomainTable = new TrustDomainTable();
+        }
 
-    public void bind(CellTable<Federation> dataSourceTable) {
-        form.bind(dataSourceTable);
-    }
-
-    public void setEnabled(boolean b) {
-        form.setEnabled(b);
-    }
-
-    public Federation getCurrentSelection() {
-        return form.getEditedEntity();
+        return this.trustDomainTable;
     }
 
 }

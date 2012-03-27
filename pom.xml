@@ -5,7 +5,7 @@
 	<artifactId>picketlink-console-parent</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>PicketLink AS7 Console Parent</name>
+	<name>PicketLink:  AS7 Console Parent</name>
 	
 	<organization>
 		<name>JBoss, a division of Red Hat</name>
@@ -31,7 +31,8 @@
 		<gwt-log.version>3.1.3</gwt-log.version>
 		<gwt-vis.version>1.1.1</gwt-vis.version>
 		<guice.version>3.0</guice.version>
-		<ballroom.version>1.1.0-SNAPSHOT</ballroom.version>
+		<ballroom.version>1.2.0.Final</ballroom.version>
+		<sy-as7-core.version>0.4.0.Final</sy-as7-core.version>
 	</properties>
 
 	<dependencyManagement>
@@ -140,27 +141,19 @@
 			</dependency>
 
 			<!-- SY AS7 Extension Dependency -->
-			<dependency>
+			<dependency> 
 				<groupId>org.switchyard.console</groupId>
 				<artifactId>switchyard-console-as7-core</artifactId>
-				<version>0.4.0-SNAPSHOT</version>
-				<scope>compile</scope>
+				<version>${sy-as7-core.version}</version>
+				<scope>compile</scope> 
 			</dependency>
 			<!-- Need to include the source files for GWT compilation. -->
 			<dependency>
 				<groupId>org.switchyard.console</groupId>
 				<artifactId>switchyard-console-as7-core</artifactId>
-				<version>0.4.0-SNAPSHOT</version>
+				<version>${sy-as7-core.version}</version>
 				<classifier>sources</classifier>
 				<scope>provided</scope>
-			</dependency>
-
-			<!-- Testing dependencies -->
-			<dependency>
-				<groupId>junit</groupId>
-				<artifactId>junit</artifactId>
-				<version>4.8.2</version>
-				<scope>test</scope>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
@@ -169,6 +162,7 @@
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
@@ -179,6 +173,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12</version>
 				<configuration>
 					<skipTests>true</skipTests>
 					<failIfNoTests>false</failIfNoTests>
@@ -202,6 +197,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>

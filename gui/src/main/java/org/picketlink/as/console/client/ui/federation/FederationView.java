@@ -29,6 +29,7 @@ import org.jboss.as.console.client.widgets.tabs.DefaultTabLayoutPanel;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
+import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.Widget;
@@ -45,28 +46,43 @@ public class FederationView extends SuspendableViewImpl implements FederationPre
 
     private FederationPresenter presenter;
     private FederationEditor federationEditor;
-
+    
     /* (non-Javadoc)
      * @see org.jboss.as.console.client.core.SuspendableView#createWidget()
      */
     @Override
     public Widget createWidget() {
-        this.federationEditor = new FederationEditor(presenter, this.presenter.getBeanFactory());
         DefaultTabLayoutPanel tabLayoutpanel = new DefaultTabLayoutPanel(40, Style.Unit.PX);
         
         tabLayoutpanel.addStyleName("default-tabpanel");
-        tabLayoutpanel.add(federationEditor.asWidget(), "PicketLink Federation", true);
+        tabLayoutpanel.add(getFederationEditor().asWidget(), "PicketLink Federation", true);
         tabLayoutpanel.selectTab(0);
 
         return tabLayoutpanel;
     }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#getCurrentFederation()
+     */
+    @Override
+    public Federation getCurrentFederation() {
+        return this.getFederationEditor().getCurrentFederation().getSelectedObject();
+    }
 
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#getIdentityProvider()
+     */
+    @Override
+    public IdentityProvider getIdentityProvider() {
+        return this.getFederationEditor().getIdentityProvider();
+    }
+    
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#updateFederations(java.util.List)
      */
     @Override
     public void updateFederations(List<Federation> federations) {
-        this.federationEditor.updateFederations(federations);
+        getFederationEditor().updateFederations(federations);
     }
 
     /* (non-Javadoc)
@@ -74,7 +90,7 @@ public class FederationView extends SuspendableViewImpl implements FederationPre
      */
     @Override
     public void updateIdentityProviders(List<IdentityProvider> federations) {
-        this.federationEditor.updateIdentityProviders(federations);
+        getFederationEditor().updateIdentityProviders(federations);
     }
     
     /* (non-Javadoc)
@@ -82,15 +98,34 @@ public class FederationView extends SuspendableViewImpl implements FederationPre
      */
     @Override
     public void updateServiceProviders(List<ServiceProvider> result) {
-        this.federationEditor.updateServiceProviders(result);
+        getFederationEditor().updateServiceProviders(result);
     }
-
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#updateTrustDomains(java.util.List)
+     */
+    @Override
+    public void updateTrustDomains(List<TrustDomain> result) {
+        getFederationEditor().updateTrustDomains(result);
+    }
+    
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#setPresenter(org.picketlink.as.console.client.ui.federation.FederationPresenter)
      */
     @Override
     public void setPresenter(FederationPresenter presenter) {
         this.presenter = presenter;
+    }
+
+    /**
+     * @return
+     */
+    private FederationEditor getFederationEditor() {
+        if (this.federationEditor == null) {
+            this.federationEditor = new FederationEditor(presenter);
+        }
+
+        return this.federationEditor;
     }
 
 }

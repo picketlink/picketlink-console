@@ -41,7 +41,7 @@ import com.google.gwt.user.client.ui.Widget;
 /**
  * This class defines the widget to be displayed when a federation instance is selected.
  * 
- * @author Pedro Silva
+ * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 14, 2012
  */
 public class EditableFederationDetails {

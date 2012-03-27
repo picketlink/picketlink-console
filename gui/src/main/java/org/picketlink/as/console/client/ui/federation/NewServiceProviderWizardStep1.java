@@ -22,11 +22,16 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
+import java.util.List;
+
+import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.subsys.Baseadress;
+import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
+import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.dmr.client.ModelNode;
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 
 /**
  * <p>
@@ -36,18 +41,36 @@ import org.picketlink.as.console.client.shared.subsys.model.Federation;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 19, 2012
  */
-public class NewFederationWizardStep1 extends AbstractWizardStep<Federation> {
+public class NewServiceProviderWizardStep1 extends AbstractWizardStep<ServiceProvider> {
 
-    public NewFederationWizardStep1(NewFederationWizard wizard) {
-        super("New Federation", wizard, Federation.class);
+    private List<DeploymentRecord> deployments;
+    private FederationPresenter presenter;
+
+    public NewServiceProviderWizardStep1(NewServiceProviderWizard wizard, FederationPresenter presenter) {
+        super("New Service Provider", wizard, ServiceProvider.class);
+        this.presenter = presenter;
     }
-
+    
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.ui.federation.AbstractWizardStep#doAddFormItems(org.jboss.ballroom.client.widgets.forms.Form)
      */
     @Override
-    protected void doAddFormItems(Form<Federation> form) {
-        addFormItem(new TextBoxItem("alias", "Alias"));
+    protected void doAddFormItems(Form<ServiceProvider> form) {
+        ComboBoxItem aliasesItem = new ComboBoxItem("alias", "Alias");
+        
+        aliasesItem.setRequired(true);
+        
+        String[] aliases = new String[this.presenter.getAvailableDeployments().size()];
+        
+        for (int i = 0; i < this.presenter.getAvailableDeployments().size(); i++) {
+            aliases[i] = this.presenter.getAvailableDeployments().get(i).getName();
+        }
+        
+        aliasesItem.setValueMap(aliases);
+        
+        addFormItem(aliasesItem);
+        addFormItem(new TextBoxItem("url", "URL"));
+        addFormItem(new CheckBoxItem("postBinding", "HTTP-Post Binding"));
     }
     
     /* (non-Javadoc)
@@ -57,8 +80,8 @@ public class NewFederationWizardStep1 extends AbstractWizardStep<Federation> {
         ModelNode address = Baseadress.get();
         address.add("subsystem", "picketlink");
         address.add("federation", "*");
+        address.add("service-provider", "*");
         return address;
     }
-
 
 }

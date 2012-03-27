@@ -42,8 +42,8 @@ import com.google.gwt.inject.client.Ginjector;
  * @author Pedro Silva
  * @author Rob Cernich
  */
-@SubsystemExtension(@SubsystemGroupDefinition(subsystem="picketlink", name = ItemMenuText.PICKETLINK, items = {
-        @SubsystemItemDefinition(presenter = NameTokens.FEDERATION, name = ItemMenuText.FEDERATION)}))
+@SubsystemExtension(subsystem="picketlink", groups={@SubsystemGroupDefinition(name = ItemMenuText.PICKETLINK, items = {
+        @SubsystemItemDefinition(presenter = NameTokens.FEDERATION, name = ItemMenuText.FEDERATION)})}, runtime={})
 @GinModules(PicketLinkClientModule.class)
 public interface PicketLinkGinjector extends Ginjector {
 

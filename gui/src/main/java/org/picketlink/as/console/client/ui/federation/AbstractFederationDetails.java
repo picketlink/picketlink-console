@@ -23,9 +23,11 @@
 package org.picketlink.as.console.client.ui.federation;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.as.console.client.shared.help.FormHelpPanel;
 import org.jboss.as.console.client.shared.viewframework.builder.FormLayout;
+import org.jboss.as.console.client.widgets.forms.FormToolStrip;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.dmr.client.ModelNode;
@@ -42,7 +44,8 @@ public abstract class AbstractFederationDetails<T> {
 
     private Form<T> form;
     private IdentityProvider entityInstance;
-
+    private VerticalPanel detailPanel;
+    
     public AbstractFederationDetails() {
         this.form = new Form(getEntityClass());
         this.form.setNumColumns(2);
@@ -54,8 +57,8 @@ public abstract class AbstractFederationDetails<T> {
     protected abstract Class<?> getEntityClass();
 
     public Widget asWidget() {
-        VerticalPanel detailPanel = new VerticalPanel();
-        detailPanel.setStyleName("fill-layout-width");
+        this.detailPanel = new VerticalPanel();
+        this.detailPanel.setStyleName("fill-layout-width");
 
         List<FormItem<?>> formItems = getFormItems();
         
@@ -65,6 +68,24 @@ public abstract class AbstractFederationDetails<T> {
         
         Widget formWidget = form.asWidget();
         
+        FormToolStrip<T> toolStrip = new FormToolStrip<T>(
+                form,
+                new FormToolStrip.FormCallback<T>() {
+                    @Override
+                    public void onSave(Map<String, Object> changeset) {
+                        doOnSave(changeset);
+                    }
+
+                    @Override
+                    public void onDelete(T entity) {
+
+                    }
+                });
+        
+        toolStrip.providesDeleteOp(false);
+        
+        detailPanel.add(toolStrip.asWidget());
+        
         final FormHelpPanel helpPanel = new FormHelpPanel(new FormHelpPanel.AddressCallback() {
             @Override
             public ModelNode getAddress() {
@@ -73,9 +94,13 @@ public abstract class AbstractFederationDetails<T> {
 
         }, form);
 
-        detailPanel.add(formWidget);
+        this.detailPanel.add(formWidget);
 
-        return new FormLayout().setHelp(helpPanel).setForm(form).build();
+        return new FormLayout().setHelp(helpPanel).setForm(form).setSetTools(toolStrip).build();
+    }
+
+    protected void doOnSave(Map<String, Object> changeset) {
+        
     }
 
     protected abstract ModelNode getHelpModelAddress();

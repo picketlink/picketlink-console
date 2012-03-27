@@ -22,9 +22,7 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.List;
-
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
+import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -40,23 +38,21 @@ import com.google.gwt.view.client.SingleSelectionModel;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 19, 2012
  */
-public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvider> {
+public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
 
-    private FederationPresenter presenter;
-    private ServiceProvider selectedServiceProvider;
+    private TrustDomain selectedTrustedDomain;
     
-    public ServiceProviderTable(FederationPresenter presenter) {
-        this.presenter = presenter;
+    public TrustDomainTable() {
     }
-    
+
     /*
      * (non-Javadoc)
      * 
      * @see org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doGetKey(java.lang.Object)
      */
     @Override
-    protected Object doGetKey(ServiceProvider item) {
-        return item.getAlias();
+    protected Object doGetKey(TrustDomain item) {
+        return item.getName();
     }
 
     /*
@@ -68,34 +64,25 @@ public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvi
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected void doAddConlumns(CellTable federationTable) {
-        TextColumn<ServiceProvider> aliasColumn = new TextColumn<ServiceProvider>() {
+    protected void doAddConlumns(CellTable table) {
+        TextColumn<TrustDomain> nameColumn = new TextColumn<TrustDomain>() {
             @Override
-            public String getValue(ServiceProvider record) {
-                return record.getAlias();
+            public String getValue(TrustDomain record) {
+                return record.getName();
             }
         };
 
-        federationTable.addColumn(aliasColumn, "Name");
+        table.addColumn(nameColumn, "Name");
 
-        TextColumn<ServiceProvider> urlColumn = new TextColumn<ServiceProvider>() {
-            @Override
-            public String getValue(ServiceProvider record) {
-                return record.getUrl();
-            }
-        };
-
-        federationTable.addColumn(aliasColumn, "URL");
-
-        final SingleSelectionModel<ServiceProvider> selectionModel = new SingleSelectionModel<ServiceProvider>();
+        final SingleSelectionModel<TrustDomain> selectionModel = new SingleSelectionModel<TrustDomain>();
 
         Handler selectionHandler = new SelectionChangeEvent.Handler() {
 
             @Override
             public void onSelectionChange(com.google.gwt.view.client.SelectionChangeEvent event) {
-                SingleSelectionModel<ServiceProvider> selection = (SingleSelectionModel<ServiceProvider>) event.getSource();
+                SingleSelectionModel<TrustDomain> selection = (SingleSelectionModel<TrustDomain>) event.getSource();
                 
-                selectedServiceProvider = selection.getSelectedObject();
+                selectedTrustedDomain = selection.getSelectedObject();
             }
 
         };
@@ -105,25 +92,10 @@ public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvi
         this.getCellTable().setSelectionModel(selectionModel);
     }
     
-    /* (non-Javadoc)
-     * @see org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#setList(java.util.List)
-     */
-    @Override
-    public void setList(List<ServiceProvider> items) {
-        for (ServiceProvider serviceProvider : items) {
-            serviceProvider.setName(serviceProvider.getAlias());
-            serviceProvider.setRuntimeName(serviceProvider.getRuntimeName());
-            serviceProvider.setEnabled(true);
-        }
-        
-        super.setList(items);
-    }
-    
     /**
-     * @return the selectedServiceProvider
+     * @return the selectedTrustedDomain
      */
-    public ServiceProvider getSelectedServiceProvider() {
-        return selectedServiceProvider;
+    public TrustDomain getSelectedTrustedDomain() {
+        return selectedTrustedDomain;
     }
-
 }

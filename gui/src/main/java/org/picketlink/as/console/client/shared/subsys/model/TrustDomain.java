@@ -20,30 +20,23 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client;
+package org.picketlink.as.console.client.shared.subsys.model;
 
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
-import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
-
-import com.google.gwt.autobean.shared.AutoBean;
+import org.jboss.as.console.client.widgets.forms.Address;
+import org.jboss.as.console.client.widgets.forms.Binding;
 
 /**
- * <p><code>com.google.gwt.autobean.shared.AutoBeanFactory</code> for the PicketLink module.</p>
- * <p>This class extends the AS7 Console AutoBeanFactory as an extension to allow the PicketLink module reuse all
- * bean definitions from the AS7 Console.</p>
+ * <p>TrustDomain bean definition.</p>
+ * <p>This interface also defines the address to be used when using the AS7 management API.</p>
  * 
- * @author Pedro Silva
- * @since Mar 13, 2012
+ * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
+ * @since Mar 14, 2012
  */
-public interface BeanFactory extends org.jboss.as.console.client.shared.BeanFactory {
+@Address("/subsystem=picketlink/federation={0}/identity-provider={0}/trust-domain={0}")
+public interface TrustDomain {
 
-    AutoBean<Federation> federation();
+    @Binding(key = true)
+    String getName();
+    void setName(String name);
     
-    AutoBean<IdentityProvider> identityProvider();
-    
-    AutoBean<ServiceProvider> serviceProvider();
-    
-    AutoBean<TrustDomain> trustDomain();
 }

@@ -22,6 +22,7 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
+import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.widgets.forms.Address;
 import org.jboss.as.console.client.widgets.forms.Binding;
 
@@ -29,18 +30,22 @@ import org.jboss.as.console.client.widgets.forms.Binding;
  * <p>Federation bean definition.</p>
  * <p>This interface also defines the address to be used when using the AS7 management API.</p>
  * 
- * @author Pedro Silva
+ * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 14, 2012
  */
 @Address("/subsystem=picketlink/federation={0}/service-provider={0}")
-public interface ServiceProvider {
+public interface ServiceProvider extends DeploymentRecord {
 
     @Binding(key = true)
     String getAlias();
     void setAlias(String alias);
 
-    @Binding(key = true)
+    @Binding
     String getUrl();
     void setUrl(String url);
+    
+    @Binding (detypedName="post-binding")
+    boolean isPostBinding();
+    void setPostBinding(boolean postBinding);
 
 }

@@ -23,8 +23,10 @@
 package org.picketlink.as.console.client.shared.subsys.model;
 
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.shared.model.ResponseWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -54,9 +56,87 @@ public interface FederationStore {
     void loadIdentityProviders(Federation federation, final AsyncCallback<List<IdentityProvider>> callback);
 
     /**
+     * <p>
+     * Loads the service providers configurations given a federation instance.
+     * </p>
+     * 
      * @param federation
      * @param simpleCallback
      */
     void loadServiceProviders(Federation federation, SimpleCallback<List<ServiceProvider>> simpleCallback);
+
+    /**
+     * <p>
+     * Create a new federation element configuration in the subsystem.
+     * </p>
+     * 
+     * @param datasource
+     * @param callback
+     */
+    void createFederation(Federation federation, AsyncCallback<ResponseWrapper<Boolean>> callback);
+
+    /**
+     * <p>
+     * Deletes a federation element configuration from the subsystem.
+     * </p>
+     * 
+     * @param federation
+     * @param simpleCallback
+     */
+    void deleteFederation(Federation federation, SimpleCallback<Boolean> simpleCallback);
+
+    /**
+     * @param identityProvider
+     * @param simpleCallback
+     */
+    void createIdentityProvider(Federation federation, IdentityProvider identityProvider, SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    /**
+     * @param federation
+     * @param changedValues
+     * @param simpleCallback
+     */
+    void updateIdentityProvider(Federation federation, IdentityProvider identityProvider, Map<String, Object> changedValues,
+            SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    /**
+     * @param currentFederation
+     * @param serviceProvider
+     * @param simpleCallback
+     */
+    void createServiceProvider(Federation currentFederation, ServiceProvider serviceProvider,
+            SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    /**
+     * @param currentFederation
+     * @param trustDomain
+     * @param simpleCallback
+     */
+    void createTrustDomain(Federation currentFederation, IdentityProvider identityProvider, TrustDomain trustDomain,
+            SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    /**
+     * @param currentFederation
+     * @param identityProvider
+     * @param simpleCallback
+     */
+    void loadTrustDomains(Federation currentFederation, IdentityProvider identityProvider,
+            SimpleCallback<List<TrustDomain>> simpleCallback);
+
+    /**
+     * @param currentFederation
+     * @param identityProvider
+     * @param simpleCallback
+     */
+    void deleteTrustDomain(Federation currentFederation, IdentityProvider identityProvider, TrustDomain trustDomain,
+            SimpleCallback<Boolean> callback);
+
+    /**
+     * @param currentFederation
+     * @param serviceProvider
+     * @param simpleCallback
+     */
+    void deleteServiceProvider(Federation currentFederation, ServiceProvider serviceProvider,
+            SimpleCallback<Boolean> simpleCallback);
     
 }

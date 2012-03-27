@@ -24,12 +24,17 @@ package org.picketlink.as.console.client.ui.federation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.jboss.as.console.client.shared.subsys.Baseadress;
+import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
+import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
-import org.jboss.ballroom.client.widgets.forms.TextItem;
+import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.dmr.client.ModelNode;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+
+import com.google.gwt.core.client.GWT;
 
 /**
  * <p>
@@ -41,17 +46,35 @@ import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
  */
 public class IdentityProviderDetails extends AbstractFederationDetails<IdentityProvider> {
 
+    private FederationPresenter presenter;
+    private IdentityProvider identityProvider;
+    List<FormItem<?>> items;
+
     public IdentityProviderDetails(FederationPresenter presenter) {
         super();
+        this.presenter = presenter;
     }
 
     protected List<FormItem<?>> getFormItems() {
-        List<FormItem<?>> items = new ArrayList<FormItem<?>>();
+        items = new ArrayList<FormItem<?>>();
 
-        items.add(new TextItem("alias", "Alias"));
-        items.add(new TextItem("url", "Identity URL"));
-        items.add(new TextItem("signOutgoingMessages", "Sign Outgoing Messages"));
-        items.add(new TextItem("ignoreIncomingSignatures", "Ignore Incoming Signatures"));
+        ComboBoxItem aliasesItem = new ComboBoxItem("alias", "Alias");
+
+        aliasesItem.setRequired(true);
+        
+        String[] aliases = new String[this.presenter.getAvailableDeployments().size()];
+        
+        for (int i = 0; i < this.presenter.getAvailableDeployments().size(); i++) {
+            aliases[i] = this.presenter.getAvailableDeployments().get(i).getName();
+        }
+        
+        aliasesItem.setValueMap(aliases);
+
+        
+        items.add(aliasesItem);
+        items.add(new TextBoxItem("url", "Identity URL", true));
+        items.add(new CheckBoxItem("signOutgoingMessages", "Sign Outgoing Messages"));
+        items.add(new CheckBoxItem("ignoreIncomingSignatures", "Ignore Incoming Signatures"));
 
         return items;
     }
@@ -84,8 +107,78 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
      * @param identityProviders
      */
     public void updateIdentityProvider(List<IdentityProvider> identityProviders) {
-        setEntityInstance(identityProviders.get(0));
-        getForm().edit(identityProviders.get(0));
+        if (!identityProviders.isEmpty()) {
+            this.identityProvider = identityProviders.get(0);
+            setEntityInstance(this.identityProvider);
+            getForm().edit(identityProviders.get(0));
+        } else {
+            this.identityProvider = null;
+            getForm().clearValues();
+            
+            IdentityProvider as = this.presenter.getBeanFactory().identityProvider().as();
+            
+            as.setUrl(getBaseUrl() + "/CONTEXT");
+            as.setIgnoreIncomingSignatures(false);
+            as.setSignOutgoingMessages(false);
+            
+            getForm().edit(as);
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.ui.federation.AbstractFederationDetails#doOnSave(java.util.Map)
+     */
+    @Override
+    protected void doOnSave(Map<String, Object> changeset) {
+        if (this.identityProvider == null) {
+            this.presenter.onCreateIdentityProvider(this.getForm().getUpdatedEntity());
+        } else {
+            this.presenter.onUpdateIdentityProvider(this.identityProvider, changeset);
+        }
+    }
+    
+    private String getBaseUrl() {
+        // extract host
+        String base = GWT.getHostPageBaseURL();
+        return extractHttpEndpointUrl(base);
+
     }
 
+    public static String extractHttpEndpointUrl(String base) {
+        String protocol = base.substring(0, base.indexOf("//")+2);
+        String remainder = base.substring(base.indexOf(protocol)+protocol.length(), base.length());
+
+        String host = null;
+        String port = null;
+
+        int portDelim = remainder.indexOf(":");
+        if(portDelim !=-1 )
+        {
+            host = remainder.substring(0, portDelim);
+            String portRemainder = remainder.substring(portDelim+1, remainder.length());
+            if(portRemainder.indexOf("/")!=-1)
+            {
+                port = portRemainder.substring(0, portRemainder.indexOf("/"));
+            }
+            else
+            {
+                port = portRemainder;
+            }
+        }
+        else
+        {
+            host = remainder.substring(0, remainder.indexOf("/"));
+            port = "80";
+        }
+
+        // default url
+        return protocol + host + ":" + port + "/";
+    }
+
+    /**
+     * @return the identityProvider
+     */
+    public IdentityProvider getIdentityProvider() {
+        return identityProvider;
+    }
 }

@@ -25,26 +25,22 @@ package org.picketlink.as.console.client.ui.federation;
 import java.util.List;
 
 import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.shared.subsys.jca.DataSourcePresenter;
-import org.jboss.as.console.client.shared.subsys.jca.wizard.NewDatasourceWizard;
 import org.jboss.as.console.client.widgets.ContentDescription;
 import org.jboss.ballroom.client.widgets.ContentGroupLabel;
 import org.jboss.ballroom.client.widgets.ContentHeaderLabel;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
 import org.jboss.ballroom.client.widgets.window.Feedback;
-import org.picketlink.as.console.client.BeanFactory;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
+import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -64,35 +60,34 @@ import com.google.gwt.view.client.SingleSelectionModel;
  */
 public class FederationEditor {
 
-    /**
-     * 
-     */
     private static final String EDITOR_DESCRIPTION = "The PicketLink Federation provides the configurations for IDPs and SPs given a federation configuration.";
-
     private static final String EDITOR_LABEL_TEXT = "Federation";
 
     private FederationPresenter presenter;
-    private FederationTable federationTable;
     private FederationDetails federationDetails;
-
     private IdentityProviderDetails identityProviderDetails;
-
     private ServiceProviderDetails serviceProviderDetails;
 
-    private DefaultWindow window;
+    private WizardView newFederationWizard;
 
-    private BeanFactory beanFactory;
+    private FederationTable federationTable;
 
-    public FederationEditor(FederationPresenter presenter, BeanFactory beanFactory) {
+    public FederationEditor(FederationPresenter presenter) {
         this.presenter = presenter;
-        this.beanFactory = beanFactory;
     }
 
+    /**
+     * <p>
+     * Creates the widget for this component.
+     * </p>
+     * 
+     * @return
+     */
     public Widget asWidget() {
         LayoutPanel layout = new LayoutPanel();
 
         VerticalPanel vpanel = new VerticalPanel();
-        
+
         vpanel.setStyleName("rhs-content-panel");
 
         ScrollPanel scroll = new ScrollPanel(vpanel);
@@ -120,7 +115,7 @@ public class FederationEditor {
      */
     private void addSelectionWidgets(VerticalPanel vpanel) {
         vpanel.add(new ContentGroupLabel(Console.CONSTANTS.common_label_selection()));
-        
+
         TabPanel bottomPanel = new TabPanel();
 
         bottomPanel.setStyleName("default-tabpanel");
@@ -128,9 +123,8 @@ public class FederationEditor {
         bottomPanel.add(getFederationDetails().asWidget(), "General");
         bottomPanel.add(getIdentityProvidersDetails().asWidget(), "Identity Provider");
         bottomPanel.add(getServiceProviderDetails().asWidget(), "Service Providers");
-        bottomPanel.add(new SimplePanel(), "Digital Certificates");
         bottomPanel.selectTab(0);
-        
+
         addSelectionChangeHandler();
 
         vpanel.add(bottomPanel);
@@ -141,7 +135,7 @@ public class FederationEditor {
      */
     private ServiceProviderDetails getServiceProviderDetails() {
         if (this.serviceProviderDetails == null) {
-            this.serviceProviderDetails = new ServiceProviderDetails();
+            this.serviceProviderDetails = new ServiceProviderDetails(this.presenter);
         }
 
         return this.serviceProviderDetails;
@@ -149,18 +143,17 @@ public class FederationEditor {
 
     /**
      * <p>
-     * Adds a {@link SelectionChangeEvent.Handler} to handle selection from the table.
-     * This method must be called after the <code>addSelectionWidgets</code>.
+     * Adds a {@link SelectionChangeEvent.Handler} to handle selection from the table. This method must be called after the
+     * <code>addSelectionWidgets</code>.
      * </p>
      */
     private void addSelectionChangeHandler() {
-        SingleSelectionModel<Federation> selectionModel = (SingleSelectionModel<Federation>) this.getFederationTable()
-                .getCellTable().getSelectionModel();
+        SingleSelectionModel<Federation> selectionModel = getCurrentFederation();
 
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
+            @SuppressWarnings("unchecked")
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
-                getFederationDetails().setEnabled(false);
                 presenter.loadIdentityProvider(((SingleSelectionModel<Federation>) event.getSource()).getSelectedObject());
                 presenter.loadServiceProviders(((SingleSelectionModel<Federation>) event.getSource()).getSelectedObject());
             }
@@ -168,7 +161,24 @@ public class FederationEditor {
     }
 
     /**
-     * Adds the widgtes related with the table from which items can be selected, addes or removed.
+     * Returns the selected federation instance from the table.
+     * 
+     * @return
+     */
+    @SuppressWarnings("unchecked")
+    public SingleSelectionModel<Federation> getCurrentFederation() {
+        SingleSelectionModel<Federation> selectionModel = (SingleSelectionModel<Federation>) this.getFederationTable()
+                .getCellTable().getSelectionModel();
+        
+        if (selectionModel.getSelectedObject() == null && !this.getFederationTable().getDataProvider().getList().isEmpty()) {
+            selectionModel.setSelected(this.getFederationTable().getDataProvider().getList().get(0), true);
+        }
+        
+        return selectionModel;
+    }
+
+    /**
+     * Adds the widgtes related with the table from which items can be selected, added or removed.
      * 
      * @param vpanel
      */
@@ -181,11 +191,9 @@ public class FederationEditor {
     /**
      * @return
      */
-    @SuppressWarnings("unchecked")
     private FederationDetails getFederationDetails() {
         if (this.federationDetails == null) {
-            this.federationDetails = new FederationDetails(this.presenter);
-            this.federationDetails.bind(getFederationTable().getCellTable());
+            this.federationDetails = new FederationDetails(getFederationTable().getCellTable(), this.presenter);
         }
 
         return this.federationDetails;
@@ -203,6 +211,11 @@ public class FederationEditor {
     }
 
     /**
+     * <p>
+     * Creates the top level actions that can be used to maintain the federation table items.
+     * Basically add and remove federation instances.
+     * </p>
+     * 
      * @return
      */
     private ToolStrip createTopLevelActions() {
@@ -210,7 +223,7 @@ public class FederationEditor {
 
         topLevelTools.addToolButtonRight(createAddFederationButton());
         topLevelTools.addToolButtonRight(createDeleteFederationButton());
-        
+
         return topLevelTools;
     }
 
@@ -226,22 +239,9 @@ public class FederationEditor {
 
             @Override
             public void onClick(ClickEvent event) {
-                lunchNewFederationWizard();
+                getNewFederationWizard().lunch();
             }
         });
-    }
-
-    private void lunchNewFederationWizard() {
-        window = new DefaultWindow(Console.MESSAGES.createTitle("Federation"));
-        window.setWidth(480);
-        window.setHeight(450);
-
-        window.setWidget(
-                new NewFederationWizard(this.presenter, this).asWidget()
-        );
-
-        window.setGlassEnabled(true);
-        window.center();
     }
 
     /**
@@ -256,7 +256,7 @@ public class FederationEditor {
             @Override
             public void onClick(ClickEvent event) {
 
-                final Federation currentSelection = getFederationDetails().getCurrentSelection();
+                final Federation currentSelection = getCurrentFederation().getSelectedObject();
 
                 if (currentSelection != null) {
                     Feedback.confirm(Console.MESSAGES.deleteTitle(EDITOR_LABEL_TEXT),
@@ -265,7 +265,7 @@ public class FederationEditor {
                                 @Override
                                 public void onConfirmation(boolean isConfirmed) {
                                     if (isConfirmed) {
-                                        presenter.onDelete(currentSelection);
+                                        presenter.onRemoveFederation(currentSelection);
                                     }
                                 }
                             });
@@ -281,17 +281,54 @@ public class FederationEditor {
     }
 
     /**
-     * Updates the table wich the federation instances are listed.
+     * <p>
+     * Updates the table from which the federation instances are listed.
+     * </p>
      * 
      * @param datasources
      */
     public void updateFederations(List<Federation> datasources) {
-        getFederationTable().getDataProvider().setList(datasources);
+        getFederationTable().setList(datasources);
         getFederationTable().getCellTable().selectDefaultEntity();
     }
 
     /**
-     * Returns a instance of the table to be used to show the federation instances.
+     * <p>
+     * Updates the informations about a identity provider for a selected federation instance.
+     * </p>
+     * 
+     * @param identityProviders
+     */
+    public void updateIdentityProviders(List<IdentityProvider> identityProviders) {
+        this.getIdentityProvidersDetails().updateIdentityProvider(identityProviders);
+    }
+
+    /**
+     * <p>
+     * Updates the informations about service providers for a selected federation instance.
+     * </p>
+     * 
+     * @param result
+     */
+    public void updateServiceProviders(List<ServiceProvider> result) {
+        this.getServiceProviderDetails().updateServiceProviders(result);
+    }
+    
+    /**
+     * <p>
+     * Updates the informations about the trusted domains.
+     * </p>
+     * 
+     * @param result
+     */
+    public void updateTrustDomains(List<TrustDomain> result) {
+        this.getFederationDetails().getTrustDomainTable().setList(result);
+        getFederationDetails().getTrustDomainTable().getCellTable().selectDefaultEntity();
+    }
+
+
+    /**
+     * Returns a instance of the table used to show the federation instances.
      * 
      * @return
      */
@@ -304,30 +341,21 @@ public class FederationEditor {
     }
 
     /**
-     * @param identityProviders
+     * @return the newFederationWizard
      */
-    public void updateIdentityProviders(List<IdentityProvider> identityProviders) {
-        this.getIdentityProvidersDetails().updateIdentityProvider(identityProviders);
+    public WizardView getNewFederationWizard() {
+        if (this.newFederationWizard == null) {
+            this.newFederationWizard = new NewFederationWizard(this.presenter);
+        }
+
+        return this.newFederationWizard;
     }
 
     /**
-     * @param result
+     * @return
      */
-    public void updateServiceProviders(List<ServiceProvider> result) {
-        this.getServiceProviderDetails().updateServiceProviders(result);
+    public IdentityProvider getIdentityProvider() {
+        return this.getIdentityProvidersDetails().getIdentityProvider();
     }
 
-    /**
-     * 
-     */
-    public void closeDialogue() {
-        window.hide();
-    }
-
-    /**
-     * @return the beanFactory
-     */
-    public BeanFactory getBeanFactory() {
-        return this.beanFactory;
-    }
 }

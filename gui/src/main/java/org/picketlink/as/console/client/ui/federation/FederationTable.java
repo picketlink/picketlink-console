@@ -22,15 +22,17 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import org.jboss.ballroom.client.widgets.tables.DefaultCellTable;
+import java.util.List;
+
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 
 /**
  * This class defines the widget to be displayed for the table of federations.
  * 
- * @author Pedro Silva
+ * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 14, 2012
  */public class FederationTable extends AbstractModelElementTable<Federation> {
 
@@ -45,8 +47,9 @@ import com.google.gwt.user.cellview.client.TextColumn;
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doAddConlumns(org.jboss.ballroom.client.widgets.tables.DefaultCellTable)
      */
+    @SuppressWarnings("unchecked")
     @Override
-    protected void doAddConlumns(DefaultCellTable<Federation> federationTable) {
+    protected void doAddConlumns(CellTable federationTable) {
         TextColumn<Federation> aliasColumn = new TextColumn<Federation>() {
             @Override
             public String getValue(Federation record) {
@@ -56,4 +59,5 @@ import com.google.gwt.user.cellview.client.TextColumn;
 
         federationTable.addColumn(aliasColumn, "Name");        
     }
+
 }

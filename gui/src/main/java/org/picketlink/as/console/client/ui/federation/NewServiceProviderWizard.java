@@ -22,40 +22,44 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 
 import com.google.gwt.user.client.ui.DeckPanel;
 
 /**
  * <p>
- * A wizard to be used when creating a new federation configuration.
+ * A wizard to be used when creating a new service provider configuration.
  * </p>
  * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 19, 2012
  */
-public class NewFederationWizard extends AbstractWizardView<FederationPresenter, Federation> {
+public class NewServiceProviderWizard extends AbstractWizardView<FederationPresenter, ServiceProvider>{
 
-    public NewFederationWizard(FederationPresenter presenter) {
-        super("Federation", presenter);
+    private NewServiceProviderWizardStep1 newServiceProviderWizardStep1;
+
+    public NewServiceProviderWizard(
+            FederationPresenter presenter) {
+        super("Service Provider", presenter);
     }
-
+    
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.ui.federation.AbstractWizardView#doAddSteps(com.google.gwt.user.client.ui.DeckPanel)
      */
     @Override
     protected void doAddSteps(DeckPanel deck) {
-        deck.add(new NewFederationWizardStep1(this).asWidget());
+        deck.add(new NewServiceProviderWizardStep1(this, this.getPresenter()).asWidget());
     }
 
     /**
-     * <p>
-     * Callback method called when the user wants to save a new federation instance.
-     * </p>
-     * 
-     * @param newFederation
+     * @return
      */
-    public void onSave(Federation newFederation) {
-        this.getPresenter().onCreateFederation(newFederation);
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.ui.federation.WizardView#onSave(java.lang.Object)
+     */
+    @Override
+    public void onSave(ServiceProvider updatedEntity) {
+        this.getPresenter().onCreateServiceProvider(updatedEntity);        
     }
+    
 }

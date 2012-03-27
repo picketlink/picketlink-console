@@ -22,11 +22,17 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADD;
+import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
 import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
+import static org.jboss.dmr.client.ModelDescriptionConstants.OUTCOME;
 import static org.jboss.dmr.client.ModelDescriptionConstants.READ_CHILDREN_RESOURCES_OPERATION;
+import static org.jboss.dmr.client.ModelDescriptionConstants.REMOVE;
 import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
+import static org.jboss.dmr.client.ModelDescriptionConstants.SUCCESS;
 
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -34,6 +40,8 @@ import org.jboss.as.console.client.domain.model.SimpleCallback;
 import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
 import org.jboss.as.console.client.shared.dispatch.impl.DMRAction;
 import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
+import org.jboss.as.console.client.shared.model.ModelAdapter;
+import org.jboss.as.console.client.shared.model.ResponseWrapper;
 import org.jboss.as.console.client.shared.subsys.Baseadress;
 import org.jboss.as.console.client.widgets.forms.AddressBinding;
 import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
@@ -63,6 +71,8 @@ public class FederationStoreImpl implements FederationStore {
     private Baseadress baseadress;
     private BeanMetaData identityProviderMetaData;
     private BeanMetaData serviceProviderMetaData;
+    private BeanMetaData trustDomainMetaData;
+    private EntityAdapter<TrustDomain> trustDomainAdapter;
 
     @Inject
     public FederationStoreImpl(DispatchAsync dispatcher, ApplicationMetaData propertyMetaData, Baseadress baseadress) {
@@ -72,11 +82,243 @@ public class FederationStoreImpl implements FederationStore {
         this.federationMetaData = metaData.getBeanMetaData(Federation.class);
         this.identityProviderMetaData = metaData.getBeanMetaData(IdentityProvider.class);
         this.serviceProviderMetaData = metaData.getBeanMetaData(ServiceProvider.class);
+        this.trustDomainMetaData = metaData.getBeanMetaData(TrustDomain.class);
         this.federationAdapter = new EntityAdapter<Federation>(Federation.class, propertyMetaData);
         this.identityProviderAdapter = new EntityAdapter<IdentityProvider>(IdentityProvider.class, propertyMetaData);
         this.serviceProviderAdapter = new EntityAdapter<ServiceProvider>(ServiceProvider.class, propertyMetaData);
+        this.trustDomainAdapter = new EntityAdapter<TrustDomain>(TrustDomain.class, propertyMetaData);
+    }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#createFederation(org.picketlink.as.console.client.shared.subsys.model.Federation, com.google.gwt.user.client.rpc.AsyncCallback)
+     */
+    @Override
+    public void createFederation(final Federation federation, final AsyncCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = federationMetaData.getAddress();
+        ModelNode addressModel =  address.asResource(baseadress.getAdress(), federation.getAlias());
+
+        ModelNode operation = federationAdapter.fromEntity(federation);
+        operation.get(OP).set(ADD);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });
+    }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#createIdentityProvider(org.picketlink.as.console.client.shared.subsys.model.IdentityProvider, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void createIdentityProvider(Federation federation, final IdentityProvider identityProvider,
+            final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = identityProviderMetaData.getAddress();
+        ModelNode addressModel =  address.asResource(baseadress.getAdress(), federation.getAlias(), identityProvider.getAlias());
+
+        ModelNode operation = identityProviderAdapter.fromEntity(identityProvider);
+        operation.get(OP).set(ADD);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });
     }
 
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#createServiceProvider(org.picketlink.as.console.client.shared.subsys.model.Federation, org.picketlink.as.console.client.shared.subsys.model.ServiceProvider, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void createServiceProvider(Federation federation, final ServiceProvider serviceProvider,
+            final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = serviceProviderMetaData.getAddress();
+        ModelNode addressModel =  address.asResource(baseadress.getAdress(), federation.getAlias(), serviceProvider.getAlias());
+
+        ModelNode operation = serviceProviderAdapter.fromEntity(serviceProvider);
+        operation.get(OP).set(ADD);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });
+    }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#createTrustDomain(org.picketlink.as.console.client.shared.subsys.model.Federation, org.picketlink.as.console.client.shared.subsys.model.TrustDomain, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void createTrustDomain(Federation federation, IdentityProvider identityProvider, TrustDomain trustDomain,
+            final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = trustDomainMetaData.getAddress();
+        ModelNode addressModel =  address.asResource(baseadress.getAdress(), federation.getAlias(), identityProvider.getAlias(), trustDomain.getName());
+
+        ModelNode operation = trustDomainAdapter.fromEntity(trustDomain);
+        operation.get(OP).set(ADD);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });
+    }
+
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#updateIdentityProvider(org.picketlink.as.console.client.shared.subsys.model.Federation, java.util.Map, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void updateIdentityProvider(Federation federation, IdentityProvider identityProvider, Map<String, Object> changedValues,
+            final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = this.identityProviderMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getAlias(), identityProvider.getAlias());
+        ModelNode operation = this.identityProviderAdapter.fromChangeset(changedValues, addressModel);
+
+        dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+
+                callback.onSuccess(ModelAdapter.wrapBooleanResponse(result));
+            }
+        });
+    }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#deleteFederation(org.picketlink.as.console.client.shared.subsys.model.Federation, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void deleteFederation(Federation federation, final SimpleCallback<Boolean> callback) {
+        AddressBinding address = this.federationMetaData.getAddress();
+        ModelNode addressModel =  address.asResource(baseadress.getAdress(), federation.getAlias());
+
+        ModelNode operation = federationAdapter.fromEntity(federation);
+        operation.get(OP).set(REMOVE);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+                callback.onSuccess(wasSuccessful);
+            }
+        });
+    }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#deleteTrustDomain(org.picketlink.as.console.client.shared.subsys.model.Federation, org.picketlink.as.console.client.shared.subsys.model.IdentityProvider, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void deleteTrustDomain(Federation federation, IdentityProvider identityProvider, TrustDomain trustDomain,
+            final SimpleCallback<Boolean> callback) {
+        AddressBinding address = this.trustDomainMetaData.getAddress();
+        ModelNode addressModel =  address.asResource(baseadress.getAdress(), federation.getAlias(), identityProvider.getAlias(), trustDomain.getName());
+
+        ModelNode operation = trustDomainAdapter.fromEntity(trustDomain);
+        operation.get(OP).set(REMOVE);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+                callback.onSuccess(wasSuccessful);
+            }
+        });
+    }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#deleteServiceProvider(org.picketlink.as.console.client.shared.subsys.model.Federation, org.picketlink.as.console.client.shared.subsys.model.ServiceProvider, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void deleteServiceProvider(Federation federation, ServiceProvider serviceProvider,
+            final SimpleCallback<Boolean> callback) {
+        AddressBinding address = this.serviceProviderMetaData.getAddress();
+        ModelNode addressModel =  address.asResource(baseadress.getAdress(), federation.getAlias(), serviceProvider.getAlias());
+
+        ModelNode operation = serviceProviderAdapter.fromEntity(serviceProvider);
+        operation.get(OP).set(REMOVE);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+                callback.onSuccess(wasSuccessful);
+            }
+        });
+    }
+    
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#loadFederations(com.google.gwt.user.client.rpc.AsyncCallback)
      */
@@ -162,4 +404,34 @@ public class FederationStoreImpl implements FederationStore {
         });
     }
 
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#loadTrustDomains(org.picketlink.as.console.client.shared.subsys.model.Federation, org.picketlink.as.console.client.shared.subsys.model.IdentityProvider, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void loadTrustDomains(Federation federation, IdentityProvider identityProvider,
+            final SimpleCallback<List<TrustDomain>> callback) {
+        AddressBinding address = this.trustDomainMetaData.getAddress();
+        
+        ModelNode operation = address.asSubresource(federation.getAlias(), identityProvider.getAlias());
+        operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
+
+        dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode response = result.get();
+
+                if (response.isFailure()) {
+                    callback.onFailure(new RuntimeException(response.getFailureDescription()));
+                } else {
+                    List<TrustDomain> datasources = trustDomainAdapter.fromDMRList(response.get(RESULT).asList());
+                    callback.onSuccess(datasources);
+                }
+            }
+        });
+    }
 }

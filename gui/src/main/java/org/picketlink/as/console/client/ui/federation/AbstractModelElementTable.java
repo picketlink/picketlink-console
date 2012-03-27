@@ -22,10 +22,13 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
+import java.util.List;
+
 import org.jboss.ballroom.client.widgets.tables.DefaultCellTable;
 import org.jboss.ballroom.client.widgets.tables.DefaultPager;
+import org.picketlink.as.console.client.shared.subsys.model.Federation;
 
-import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
@@ -61,6 +64,7 @@ public abstract class AbstractModelElementTable<T> {
      * 
      * @return
      */
+    @SuppressWarnings("unchecked")
     public DefaultCellTable<T> getCellTable() {
         if (this.dataTable == null) {
             this.dataTable = new DefaultCellTable<T>(
@@ -71,9 +75,7 @@ public abstract class AbstractModelElementTable<T> {
                             return doGetKey(item);
                         }
                     });
-            
             doAddConlumns(this.dataTable);
-
         }
 
         return this.dataTable;
@@ -84,7 +86,7 @@ public abstract class AbstractModelElementTable<T> {
     /**
      * @param federationTable2
      */
-    protected abstract void doAddConlumns(DefaultCellTable<T> federationTable);
+    protected abstract void doAddConlumns(CellTable federationTable);
 
     /**
      * Returns a instance of {@link ListDataProvider} to be used to manipulate table items.
@@ -99,5 +101,13 @@ public abstract class AbstractModelElementTable<T> {
 
         return this.dataProvider;
     }
+    
+    /**
+     * @param datasources
+     */
+    public void setList(List<T> items) {
+        this.getDataProvider().setList(items);
+    }
+
 
 }
