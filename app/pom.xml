@@ -125,12 +125,12 @@
 					<compileReport>false</compileReport>
 					<hostedWebapp>${webappDirectory}</hostedWebapp>
 					<htmlunit>FF3,IE7</htmlunit>
-					<logLevel>TRACE</logLevel>
+					<logLevel>INFO</logLevel>
 					<mode>htmlunit</mode>
 					<runTarget>App.html</runTarget>
 					<module>org.picketlink.as.console.application.App</module>
-					<extraJvmArgs>-Xmx1024m -Xms1024m -Xss1024k</extraJvmArgs>
-					<localWorkers>4</localWorkers>
+					<extraJvmArgs>-Xmx1024m -Xms1024m -Xss256k</extraJvmArgs>
+					<localWorkers>2</localWorkers>
 				</configuration>
 			</plugin>
 			<!-- Copy static web files before executing gwt:run -->
@@ -225,11 +225,11 @@
 							<compileReport>false</compileReport>
 							<hostedWebapp>${webappDirectory}</hostedWebapp>
 							<htmlunit>FF3,IE7</htmlunit>
-							<logLevel>TRACE</logLevel>
+							<logLevel>INFO</logLevel>
 							<mode>htmlunit</mode>
 							<runTarget>App.html</runTarget>
 							<module>org.picketlink.as.console.application.Development</module>
-							<extraJvmArgs>-Xmx1024m -Xms1024m -Xss1024k</extraJvmArgs>
+							<extraJvmArgs>-Xmx1024m -Xms1024m -Xss256k</extraJvmArgs>
 							<localWorkers>4</localWorkers>
 						</configuration>
 					</plugin>
