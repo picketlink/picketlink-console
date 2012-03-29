@@ -114,7 +114,7 @@ public class FederationEditor {
      * @return
      */
     private void addSelectionWidgets(VerticalPanel vpanel) {
-        vpanel.add(new ContentGroupLabel(Console.CONSTANTS.common_label_selection()));
+        vpanel.add(new ContentGroupLabel("Federation Details"));
 
         TabPanel bottomPanel = new TabPanel();
 
@@ -148,7 +148,7 @@ public class FederationEditor {
      * </p>
      */
     private void addSelectionChangeHandler() {
-        SingleSelectionModel<Federation> selectionModel = getCurrentFederation();
+        SingleSelectionModel<Federation> selectionModel = (SingleSelectionModel<Federation>) getFederationTable().getCellTable().getSelectionModel();
 
         selectionModel.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @SuppressWarnings("unchecked")
@@ -166,15 +166,21 @@ public class FederationEditor {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public SingleSelectionModel<Federation> getCurrentFederation() {
-        SingleSelectionModel<Federation> selectionModel = (SingleSelectionModel<Federation>) this.getFederationTable()
-                .getCellTable().getSelectionModel();
-        
-        if (selectionModel.getSelectedObject() == null && !this.getFederationTable().getDataProvider().getList().isEmpty()) {
-            selectionModel.setSelected(this.getFederationTable().getDataProvider().getList().get(0), true);
+    public Federation getCurrentFederation() {
+        if (this.getFederationTable().getDataProvider().getList().isEmpty()) {
+            this.getFederationTable().getCellTable().getSelectionModel().setSelected(null, false);
+        } else {
+            SingleSelectionModel<Federation> selectionModel = (SingleSelectionModel<Federation>) this.getFederationTable()
+                    .getCellTable().getSelectionModel();
+
+            if (selectionModel.getSelectedObject() == null && !this.getFederationTable().getDataProvider().getList().isEmpty()) {
+                selectionModel.setSelected(this.getFederationTable().getDataProvider().getList().get(0), true);
+            } else {
+                return selectionModel.getSelectedObject();
+            }
         }
         
-        return selectionModel;
+        return null;
     }
 
     /**
@@ -256,7 +262,7 @@ public class FederationEditor {
             @Override
             public void onClick(ClickEvent event) {
 
-                final Federation currentSelection = getCurrentFederation().getSelectedObject();
+                final Federation currentSelection = getCurrentFederation();
 
                 if (currentSelection != null) {
                     Feedback.confirm(Console.MESSAGES.deleteTitle(EDITOR_LABEL_TEXT),

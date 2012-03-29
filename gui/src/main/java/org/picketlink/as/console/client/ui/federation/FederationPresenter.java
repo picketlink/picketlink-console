@@ -21,6 +21,7 @@
  */
 package org.picketlink.as.console.client.ui.federation;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -227,6 +228,13 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
      * </p>
      */
     public void loadIdentityProvider(Federation federation) {
+        if (federation == null) {
+            getView().updateIdentityProviders(Collections.EMPTY_LIST);
+            getView().updateTrustDomains(Collections.EMPTY_LIST);
+            getView().updateServiceProviders(Collections.EMPTY_LIST);
+            return;
+        }
+        
         this.federationStore.loadIdentityProviders(federation, new SimpleCallback<List<IdentityProvider>>() {
             @Override
             public void onSuccess(List<IdentityProvider> result) {

@@ -87,6 +87,15 @@ public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvi
 
         federationTable.addColumn(aliasColumn, "URL");
 
+        TextColumn<ServiceProvider> bindingColumn = new TextColumn<ServiceProvider>() {
+            @Override
+            public String getValue(ServiceProvider record) {
+                return String.valueOf(record.isPostBinding());
+            }
+        };
+
+        federationTable.addColumn(bindingColumn, "is Post Binding ?");
+
         final SingleSelectionModel<ServiceProvider> selectionModel = new SingleSelectionModel<ServiceProvider>();
 
         Handler selectionHandler = new SelectionChangeEvent.Handler() {

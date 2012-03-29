@@ -61,16 +61,15 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
         ComboBoxItem aliasesItem = new ComboBoxItem("alias", "Alias");
 
         aliasesItem.setRequired(true);
-        
+
         String[] aliases = new String[this.presenter.getAvailableDeployments().size()];
-        
+
         for (int i = 0; i < this.presenter.getAvailableDeployments().size(); i++) {
             aliases[i] = this.presenter.getAvailableDeployments().get(i).getName();
         }
-        
+
         aliasesItem.setValueMap(aliases);
 
-        
         items.add(aliasesItem);
         items.add(new TextBoxItem("url", "Identity URL", true));
         items.add(new CheckBoxItem("signOutgoingMessages", "Sign Outgoing Messages"));
@@ -87,22 +86,24 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
     @Override
     protected ModelNode getHelpModelAddress() {
         ModelNode address = Baseadress.get();
-        
+
         address.add("subsystem", "picketlink");
         address.add("federation", "*");
         address.add("identity-provider", "*");
-        
+
         return address;
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.picketlink.as.console.client.ui.federation.AbstractFederationDetails#getEntityClass()
      */
     @Override
     protected Class<?> getEntityClass() {
         return IdentityProvider.class;
     }
-    
+
     /**
      * @param identityProviders
      */
@@ -110,22 +111,27 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
         if (!identityProviders.isEmpty()) {
             this.identityProvider = identityProviders.get(0);
             setEntityInstance(this.identityProvider);
+            getForm().setEnabled(false);
             getForm().edit(identityProviders.get(0));
         } else {
             this.identityProvider = null;
             getForm().clearValues();
-            
-            IdentityProvider as = this.presenter.getBeanFactory().identityProvider().as();
-            
-            as.setUrl(getBaseUrl() + "/CONTEXT");
-            as.setIgnoreIncomingSignatures(false);
-            as.setSignOutgoingMessages(false);
-            
-            getForm().edit(as);
+            getForm().setEnabled(false);
+            if (this.presenter.getView().getCurrentFederation() != null) {
+                IdentityProvider as = this.presenter.getBeanFactory().identityProvider().as();
+
+                as.setUrl(getBaseUrl() + "/");
+                as.setIgnoreIncomingSignatures(false);
+                as.setSignOutgoingMessages(false);
+
+                getForm().edit(as);
+            } 
         }
     }
-    
-    /* (non-Javadoc)
+
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.picketlink.as.console.client.ui.federation.AbstractFederationDetails#doOnSave(java.util.Map)
      */
     @Override
@@ -136,7 +142,7 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
             this.presenter.onUpdateIdentityProvider(this.identityProvider, changeset);
         }
     }
-    
+
     private String getBaseUrl() {
         // extract host
         String base = GWT.getHostPageBaseURL();
@@ -145,28 +151,22 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
     }
 
     public static String extractHttpEndpointUrl(String base) {
-        String protocol = base.substring(0, base.indexOf("//")+2);
-        String remainder = base.substring(base.indexOf(protocol)+protocol.length(), base.length());
+        String protocol = base.substring(0, base.indexOf("//") + 2);
+        String remainder = base.substring(base.indexOf(protocol) + protocol.length(), base.length());
 
         String host = null;
         String port = null;
 
         int portDelim = remainder.indexOf(":");
-        if(portDelim !=-1 )
-        {
+        if (portDelim != -1) {
             host = remainder.substring(0, portDelim);
-            String portRemainder = remainder.substring(portDelim+1, remainder.length());
-            if(portRemainder.indexOf("/")!=-1)
-            {
+            String portRemainder = remainder.substring(portDelim + 1, remainder.length());
+            if (portRemainder.indexOf("/") != -1) {
                 port = portRemainder.substring(0, portRemainder.indexOf("/"));
-            }
-            else
-            {
+            } else {
                 port = portRemainder;
             }
-        }
-        else
-        {
+        } else {
             host = remainder.substring(0, remainder.indexOf("/"));
             port = "80";
         }

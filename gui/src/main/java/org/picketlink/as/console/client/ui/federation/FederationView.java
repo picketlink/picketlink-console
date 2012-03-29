@@ -66,7 +66,7 @@ public class FederationView extends SuspendableViewImpl implements FederationPre
      */
     @Override
     public Federation getCurrentFederation() {
-        return this.getFederationEditor().getCurrentFederation().getSelectedObject();
+        return this.getFederationEditor().getCurrentFederation();
     }
 
     /* (non-Javadoc)

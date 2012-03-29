@@ -39,6 +39,7 @@ import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -69,7 +70,7 @@ public class FederationDetails {
         VerticalPanel detailPanel = new VerticalPanel();
         detailPanel.setStyleName("fill-layout-width");
 
-        final TextItem aliasItem = new TextItem("alias", "Alias");
+        final TextItem aliasItem = new TextItem("alias", "Federation Alias");
 
         form.setFields(aliasItem);
         
@@ -87,7 +88,11 @@ public class FederationDetails {
 
         this.trustDomainForm = new Form<TrustDomain>(TrustDomain.class);
         
-        this.trustDomainForm.setFields(new TextBoxItem("name", "Name"));
+        TextBoxItem domainName = new TextBoxItem("name", "Domain Name");
+        
+        domainName.setRequired(true);
+        
+        this.trustDomainForm.setFields(domainName);
         
         trustDomainsHeader.add(this.trustDomainForm.asWidget());
 
@@ -99,7 +104,15 @@ public class FederationDetails {
             
             @Override
             public void onClick(ClickEvent event) {
-                presenter.onCreateTrustDomain(trustDomainForm.getUpdatedEntity());
+                if (presenter.getView().getIdentityProvider() == null) {
+                    Window.alert("Please, configure an Identity Provider first.");
+                } else {
+                    if (trustDomainForm.getUpdatedEntity() != null && !trustDomainForm.getUpdatedEntity().getName().trim().isEmpty()) {
+                        presenter.onCreateTrustDomain(trustDomainForm.getUpdatedEntity());                        
+                    } else {
+                        Window.alert("Enter a valid domain.");
+                    }
+                }
             }
         });
 
@@ -111,7 +124,9 @@ public class FederationDetails {
             
             @Override
             public void onClick(ClickEvent event) {
-                presenter.onRemoveTrustDomain(getTrustDomainTable().getSelectedTrustedDomain());
+                if (getTrustDomainTable().getSelectedTrustedDomain() != null) {
+                    presenter.onRemoveTrustDomain(getTrustDomainTable().getSelectedTrustedDomain());
+                }
             }
         });
 
