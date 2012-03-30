@@ -22,15 +22,18 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.List;
-
+import org.jboss.as.console.client.Console;
+import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
+import org.picketlink.as.console.client.ui.core.AbstractModelElementTable;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 
 /**
+ * <p>
  * This class defines the widget to be displayed for the table of federations.
+ * </p>
  * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 14, 2012
@@ -57,7 +60,7 @@ import com.google.gwt.user.cellview.client.TextColumn;
             }
         };
 
-        federationTable.addColumn(aliasColumn, "Name");        
+        federationTable.addColumn(aliasColumn, Console.CONSTANTS.common_label_name());        
     }
 
 }

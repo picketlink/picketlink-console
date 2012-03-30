@@ -22,6 +22,7 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
+import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.shared.help.FormHelpPanel;
 import org.jboss.as.console.client.shared.subsys.Baseadress;
 import org.jboss.as.console.client.shared.viewframework.builder.FormLayout;
@@ -33,6 +34,7 @@ import org.jboss.ballroom.client.widgets.forms.TextItem;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.dmr.client.ModelNode;
+import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 
@@ -68,49 +70,52 @@ public class FederationDetails {
 
     public Widget asWidget() {
         VerticalPanel detailPanel = new VerticalPanel();
+
         detailPanel.setStyleName("fill-layout-width");
 
-        final TextItem aliasItem = new TextItem("alias", "Federation Alias");
+        addFederationForm(detailPanel);
 
-        form.setFields(aliasItem);
-        
-        form.setEnabled(false);
-        
-        final FormHelpPanel helpPanel = createHelpPanel();
-
-        detailPanel.add(new FormLayout().setHelp(helpPanel).setForm(form).build());
-        
+        // adds the trust domain section
         VerticalPanel trustDomainsHeader = new VerticalPanel();
         
         trustDomainsHeader.setStyleName("fill-layout-width");
         
-        trustDomainsHeader.add(new ContentGroupLabel("Trusted Domains"));
+        trustDomainsHeader.add(new ContentGroupLabel(PicketLinkConsoleFramework.CONSTANTS.common_label_trustedDomains()));
 
-        this.trustDomainForm = new Form<TrustDomain>(TrustDomain.class);
-        
-        TextBoxItem domainName = new TextBoxItem("name", "Domain Name");
-        
-        domainName.setRequired(true);
-        
-        this.trustDomainForm.setFields(domainName);
-        
-        trustDomainsHeader.add(this.trustDomainForm.asWidget());
+        addTrustDomainForm(trustDomainsHeader);
+        addTrustDomainActions(detailPanel, trustDomainsHeader);
+        addTrustDomainTable(detailPanel);
 
+        return detailPanel;
+    }
+
+    /**
+     * @param detailPanel
+     */
+    private void addTrustDomainTable(VerticalPanel detailPanel) {
+        detailPanel.add(getTrustDomainTable().asWidget());
+    }
+
+    /**
+     * @param detailPanel
+     * @param trustDomainsHeader
+     */
+    private void addTrustDomainActions(VerticalPanel detailPanel, VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
         
-        ToolButton addTrustedDomainBtn = new ToolButton("Add");
+        ToolButton addTrustedDomainBtn = new ToolButton(Console.CONSTANTS.common_label_add());
         
         addTrustedDomainBtn.addClickHandler(new ClickHandler() {
             
             @Override
             public void onClick(ClickEvent event) {
                 if (presenter.getView().getIdentityProvider() == null) {
-                    Window.alert("Please, configure an Identity Provider first.");
+                    Window.alert(PicketLinkConsoleFramework.MESSAGES.identityProviderNotConfigured());
                 } else {
                     if (trustDomainForm.getUpdatedEntity() != null && !trustDomainForm.getUpdatedEntity().getName().trim().isEmpty()) {
                         presenter.onCreateTrustDomain(trustDomainForm.getUpdatedEntity());                        
                     } else {
-                        Window.alert("Enter a valid domain.");
+                        Window.alert(PicketLinkConsoleFramework.MESSAGES.invalidTrustedDomain());
                     }
                 }
             }
@@ -118,7 +123,7 @@ public class FederationDetails {
 
         trustDomainTools.addToolButtonRight(addTrustedDomainBtn);
 
-        ToolButton removeTrustedDomainBtn = new ToolButton("Remove");
+        ToolButton removeTrustedDomainBtn = new ToolButton(Console.CONSTANTS.common_label_delete());
         
         removeTrustedDomainBtn.addClickHandler(new ClickHandler() {
             
@@ -139,9 +144,36 @@ public class FederationDetails {
         trustDomainsHeader.add(new ContentDescription(""));
         
         detailPanel.add(trustDomainsHeader);
-        detailPanel.add(getTrustDomainTable().asWidget());
+    }
 
-        return detailPanel;
+    /**
+     * @param trustDomainsHeader
+     */
+    private void addTrustDomainForm(VerticalPanel trustDomainsHeader) {
+        this.trustDomainForm = new Form<TrustDomain>(TrustDomain.class);
+        
+        TextBoxItem domainName = new TextBoxItem("name", PicketLinkConsoleFramework.CONSTANTS.common_label_domainName());
+        
+        domainName.setRequired(true);
+        
+        this.trustDomainForm.setFields(domainName);
+        
+        trustDomainsHeader.add(this.trustDomainForm.asWidget());
+    }
+
+    /**
+     * @param detailPanel
+     */
+    private void addFederationForm(VerticalPanel detailPanel) {
+        final TextItem aliasItem = new TextItem("alias", PicketLinkConsoleFramework.CONSTANTS.common_label_federationAlias());
+
+        form.setFields(aliasItem);
+        
+        form.setEnabled(false);
+        
+        final FormHelpPanel helpPanel = createHelpPanel();
+
+        detailPanel.add(new FormLayout().setHelp(helpPanel).setForm(form).build());
     }
 
     /**

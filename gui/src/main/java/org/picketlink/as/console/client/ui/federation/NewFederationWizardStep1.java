@@ -22,11 +22,14 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
+import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.shared.subsys.Baseadress;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.dmr.client.ModelNode;
+import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
+import org.picketlink.as.console.client.ui.core.AbstractWizardStep;
 
 /**
  * <p>
@@ -39,7 +42,7 @@ import org.picketlink.as.console.client.shared.subsys.model.Federation;
 public class NewFederationWizardStep1 extends AbstractWizardStep<Federation> {
 
     public NewFederationWizardStep1(NewFederationWizard wizard) {
-        super("New Federation", wizard, Federation.class);
+        super(Console.MESSAGES.createTitle(PicketLinkConsoleFramework.CONSTANTS.common_label_federation()), wizard, Federation.class);
     }
 
     /* (non-Javadoc)
@@ -47,7 +50,7 @@ public class NewFederationWizardStep1 extends AbstractWizardStep<Federation> {
      */
     @Override
     protected void doAddFormItems(Form<Federation> form) {
-        addFormItem(new TextBoxItem("alias", "Alias"));
+        addFormItem(new TextBoxItem("alias", PicketLinkConsoleFramework.CONSTANTS.common_label_alias()));
     }
     
     /* (non-Javadoc)

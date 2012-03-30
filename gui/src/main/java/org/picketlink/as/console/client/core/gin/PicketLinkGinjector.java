@@ -24,7 +24,6 @@ import org.jboss.as.console.client.shared.SubsystemExtension.SubsystemGroupDefin
 import org.jboss.as.console.client.shared.SubsystemExtension.SubsystemItemDefinition;
 import org.picketlink.as.console.client.ItemMenuText;
 import org.picketlink.as.console.client.NameTokens;
-import org.picketlink.as.console.client.ui.MainPagePresenter;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
 import com.google.gwt.inject.client.AsyncProvider;
@@ -47,8 +46,6 @@ import com.google.gwt.inject.client.Ginjector;
 @GinModules(PicketLinkClientModule.class)
 public interface PicketLinkGinjector extends Ginjector {
 
-    AsyncProvider<MainPagePresenter> getMainPagePresenter();
-    
     AsyncProvider<FederationPresenter> getFederationPresenter();
     
 }

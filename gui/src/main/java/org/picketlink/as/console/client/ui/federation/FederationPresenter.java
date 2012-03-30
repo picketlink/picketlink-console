@@ -39,6 +39,8 @@ import org.jboss.ballroom.client.widgets.window.Feedback;
 import org.jboss.dmr.client.ModelNode;
 import org.picketlink.as.console.client.BeanFactory;
 import org.picketlink.as.console.client.NameTokens;
+import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
@@ -65,7 +67,8 @@ import com.gwtplatform.mvp.client.proxy.Proxy;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since 03/01/2011
  */
-public class FederationPresenter extends Presenter<FederationPresenter.MyView, FederationPresenter.MyProxy> implements DeployCommandExecutor {
+public class FederationPresenter extends Presenter<FederationPresenter.MyView, FederationPresenter.MyProxy> implements
+        DeployCommandExecutor {
 
     public interface MyView extends View {
         void setPresenter(FederationPresenter presenter);
@@ -189,13 +192,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     }
 
     /**
-     * @return the availableDeployments
-     */
-    public List<DeploymentRecord> getAvailableDeployments() {
-        return this.availableDeployments;
-    }
-
-    /**
      * <p>
      * Loads the federation instances from the subsystem.
      * </p>
@@ -214,8 +210,13 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         });
     }
 
+    /**
+     * <p>
+     * Load all available deployments. This deployments will me used during the configuration of Identity Providers and Service
+     * Providers.
+     * </p>
+     */
     public void loadDeployments() {
-        // load deployments
         deploymentStore.loadDeploymentContent(new SimpleCallback<List<DeploymentRecord>>() {
 
             @Override
@@ -237,7 +238,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
             getView().updateServiceProviders(Collections.EMPTY_LIST);
             return;
         }
-        
+
         this.federationStore.loadIdentityProviders(federation, new SimpleCallback<List<IdentityProvider>>() {
             @Override
             public void onSuccess(List<IdentityProvider> result) {
@@ -264,7 +265,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
             }
         });
     }
-    
+
     /**
      * <p>
      * Loads the service providers instances from the subsystem, given a selected federation instance.
@@ -274,12 +275,13 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
      */
     public void loadTrustDomain() {
         if (getView().getIdentityProvider() != null) {
-            this.federationStore.loadTrustDomains(getView().getCurrentFederation(), getView().getIdentityProvider(), new SimpleCallback<List<TrustDomain>>() {
-                @Override
-                public void onSuccess(List<TrustDomain> result) {
-                    getView().updateTrustDomains(result);
-                }
-            });
+            this.federationStore.loadTrustDomains(getView().getCurrentFederation(), getView().getIdentityProvider(),
+                    new SimpleCallback<List<TrustDomain>>() {
+                        @Override
+                        public void onSuccess(List<TrustDomain> result) {
+                            getView().updateTrustDomains(result);
+                        }
+                    });
         } else {
             getView().updateTrustDomains(Collections.EMPTY_LIST);
         }
@@ -298,11 +300,14 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
             @Override
             public void onSuccess(ResponseWrapper<Boolean> result) {
                 if (result.getUnderlying()) {
-                    Console.info(Console.MESSAGES.added("Federation ") + federation.getAlias());
+                    Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants().common_label_federation()
+                            + " ")
+                            + federation.getAlias());
                     loadFederations();
                 } else
-                    Console.error(Console.MESSAGES.addingFailed("Federation " + federation.getAlias()), result.getResponse()
-                            .toString());
+                    Console.error(
+                            Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants().common_label_federation()
+                                    + " " + federation.getAlias()), result.getResponse().toString());
             }
         });
     }
@@ -318,64 +323,67 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         this.federationStore.deleteFederation(federation, new SimpleCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean success) {
-
                 if (success) {
-                    Console.info(Console.MESSAGES.deleted("Federation ") + federation.getAlias());
+                    Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants().common_label_federation()
+                            + " ")
+                            + federation.getAlias());
                 } else {
-                    Console.error(Console.MESSAGES.deletionFailed("Federation ") + federation.getAlias());
+                    Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                            .common_label_federation() + " ")
+                            + federation.getAlias());
                 }
 
                 loadFederations();
             }
         });
     }
-    
+
     /**
      * @param updatedEntity
      */
     public void onRemoveTrustDomain(final TrustDomain trustDomain) {
-        this.federationStore.deleteTrustDomain(getView().getCurrentFederation(), getView().getIdentityProvider(), trustDomain, new SimpleCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean success) {
+        this.federationStore.deleteTrustDomain(getView().getCurrentFederation(), getView().getIdentityProvider(), trustDomain,
+                new SimpleCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean success) {
+                        if (success) {
+                            Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_trustDomain() + " ")
+                                    + trustDomain.getName());
+                        } else {
+                            Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_trustDomain() + " ")
+                                    + trustDomain.getName());
+                        }
 
-                if (success) {
-                    Console.info(Console.MESSAGES.deleted("Trusted Domain ") + trustDomain.getName());
-                } else {
-                    Console.error(Console.MESSAGES.deletionFailed("Trusted Domain ") + trustDomain.getName());
-                }
-
-                loadFederations();
-            }
-        });
+                        loadFederations();
+                    }
+                });
         this.restartIdentityProvider(getView().getIdentityProvider());
     }
-    
+
     /**
      * @param serviceProvider
      */
     public void onRemoveServiceProvider(final ServiceProvider serviceProvider) {
-        this.federationStore.deleteServiceProvider(getView().getCurrentFederation(), serviceProvider, new SimpleCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean success) {
+        this.federationStore.deleteServiceProvider(getView().getCurrentFederation(), serviceProvider,
+                new SimpleCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean success) {
+                        if (success) {
+                            Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_serviceProvider() + " ")
+                                    + serviceProvider.getAlias());
+                        } else {
+                            Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_serviceProvider() + " ")
+                                    + serviceProvider.getAlias());
+                        }
 
-                if (success) {
-                    Console.info(Console.MESSAGES.deleted("Service Provider ") + serviceProvider.getAlias());
-                } else {
-                    Console.error(Console.MESSAGES.deletionFailed("Service Provider ") + serviceProvider.getAlias());
-                }
-
-                loadFederations();
-            }
-        });
+                        loadFederations();
+                    }
+                });
         this.restartServiceProvider(serviceProvider);
-    }
-
-
-    /**
-     * @return
-     */
-    public BeanFactory getBeanFactory() {
-        return this.beanFactory;
     }
 
     /**
@@ -388,15 +396,17 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     public void onCreateIdentityProvider(final IdentityProvider identityProvider) {
         this.federationStore.createIdentityProvider(this.getView().getCurrentFederation(), identityProvider,
                 new SimpleCallback<ResponseWrapper<Boolean>>() {
-
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added("Identity Provider ") + identityProvider.getAlias());
+                            Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_identityProvider() + " ")
+                                    + identityProvider.getAlias());
                             loadFederations();
                         } else
-                            Console.error(Console.MESSAGES.addingFailed("Identity Provider " + identityProvider.getAlias()),
-                                    result.getResponse().toString());
+                            Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_identityProvider() + " " + identityProvider.getAlias()), result.getResponse()
+                                    .toString());
                     }
                 });
         this.restartIdentityProvider(identityProvider);
@@ -413,14 +423,16 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         if (changedValues.size() > 0) {
             this.federationStore.updateIdentityProvider(getView().getCurrentFederation(), identityProvider, changedValues,
                     new SimpleCallback<ResponseWrapper<Boolean>>() {
-
                         @Override
                         public void onSuccess(ResponseWrapper<Boolean> response) {
                             if (response.getUnderlying())
-                                Console.info(Console.MESSAGES.saved("Identity Provider " + identityProvider.getAlias()));
+                                Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
+                                        .common_label_identityProvider() + " " + identityProvider.getAlias()));
                             else
-                                Console.error(Console.MESSAGES.saveFailed("Identity Provider ") + identityProvider.getAlias(),
-                                        response.getResponse().toString());
+                                Console.error(
+                                        Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
+                                                .common_label_identityProvider() + " ")
+                                                + identityProvider.getAlias(), response.getResponse().toString());
 
                             loadIdentityProvider(getView().getCurrentFederation());
                         }
@@ -436,70 +448,72 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     public void onCreateServiceProvider(final ServiceProvider serviceProvider) {
         this.federationStore.createServiceProvider(this.getView().getCurrentFederation(), serviceProvider,
                 new SimpleCallback<ResponseWrapper<Boolean>>() {
-
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added("Service Provider ") + serviceProvider.getAlias());
+                            Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_serviceProvider() + " ")
+                                    + serviceProvider.getAlias());
                             loadFederations();
                         } else
-                            Console.error(Console.MESSAGES.addingFailed("Service Provider " + serviceProvider.getAlias()),
-                                    result.getResponse().toString());
+                            Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_serviceProvider() + " " + serviceProvider.getAlias()), result.getResponse()
+                                    .toString());
                     }
                 });
         this.restartServiceProvider(serviceProvider);
     }
-    
+
     /**
      * @param updatedEntity
      */
     public void onCreateTrustDomain(final TrustDomain trustDomain) {
-        this.federationStore.createTrustDomain(this.getView().getCurrentFederation(), this.getView().getIdentityProvider(), trustDomain,
-                new SimpleCallback<ResponseWrapper<Boolean>>() {
+        this.federationStore.createTrustDomain(this.getView().getCurrentFederation(), this.getView().getIdentityProvider(),
+                trustDomain, new SimpleCallback<ResponseWrapper<Boolean>>() {
 
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added("Trust Domain ") + trustDomain.getName());
+                            Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_trustDomain() + " ")
+                                    + trustDomain.getName());
                             loadFederations();
                         } else
-                            Console.error(Console.MESSAGES.addingFailed("Trust Domain " + trustDomain.getName()),
-                                    result.getResponse().toString());
+                            Console.error(
+                                    Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
+                                            .common_label_trustDomain() + " "), result.getResponse().toString());
                     }
                 });
         loadTrustDomain();
         restartIdentityProvider(getView().getIdentityProvider());
     }
 
-    
     public void restartIdentityProvider(IdentityProvider identityProvider) {
         identityProvider.setName(identityProvider.getAlias());
         identityProvider.setRuntimeName(identityProvider.getAlias());
-        
+
         this.enableDisableDeployment(identityProvider);
     }
 
     public void restartServiceProvider(ServiceProvider serviceProvider) {
         serviceProvider.setName(serviceProvider.getAlias());
         serviceProvider.setRuntimeName(serviceProvider.getAlias());
-        
+
         this.enableDisableDeployment(serviceProvider);
     }
 
     public void enableDisableDeployment(final DeploymentRecord record) {
 
-        final PopupPanel loading = Feedback.loading(
-                Console.CONSTANTS.common_label_plaseWait(),
-                Console.CONSTANTS.common_label_requestProcessed(),
-                new Feedback.LoadingCallback() {
+        final PopupPanel loading = Feedback.loading(Console.CONSTANTS.common_label_plaseWait(),
+                Console.CONSTANTS.common_label_requestProcessed(), new Feedback.LoadingCallback() {
                     @Override
                     public void onCancel() {
 
                     }
                 });
-        
+
         record.setEnabled(true);
-        
+
         deploymentStore.enableDisableDeployment(record, new SimpleCallback<DMRResponse>() {
 
             @Override
@@ -508,19 +522,17 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
 
                 ModelNode result = response.get();
 
-                if(result.isFailure())
-                {
-                    Console.error(Console.MESSAGES.modificationFailed("Deployment "+record.getRuntimeName()), result.getFailureDescription());
-                }
-                else
-                {
-                    Console.info(Console.MESSAGES.modified("Deployment "+record.getRuntimeName()));
+                if (result.isFailure()) {
+                    Console.error(Console.MESSAGES.modificationFailed("Deployment " + record.getRuntimeName()),
+                            result.getFailureDescription());
+                } else {
+                    Console.info(Console.MESSAGES.modified("Deployment " + record.getRuntimeName()));
                 }
             }
         });
-        
+
         record.setEnabled(false);
-        
+
         deploymentStore.enableDisableDeployment(record, new SimpleCallback<DMRResponse>() {
 
             @Override
@@ -529,53 +541,85 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
 
                 ModelNode result = response.get();
 
-                if(result.isFailure())
-                {
-                    Console.error(Console.MESSAGES.modificationFailed("Deployment "+record.getRuntimeName()), result.getFailureDescription());
-                }
-                else
-                {
-                    Console.info(Console.MESSAGES.modified("Deployment "+record.getRuntimeName()));
+                if (result.isFailure()) {
+                    Console.error(Console.MESSAGES.modificationFailed("Deployment " + record.getRuntimeName()),
+                            result.getFailureDescription());
+                } else {
+                    Console.info(Console.MESSAGES.modified("Deployment " + record.getRuntimeName()));
                 }
             }
         });
 
     }
 
-    /* (non-Javadoc)
-     * @see org.jboss.as.console.client.shared.deployment.DeployCommandExecutor#addToServerGroup(org.jboss.as.console.client.shared.model.DeploymentRecord, boolean, java.lang.String[])
+    /**
+     * @return the availableDeployments
+     */
+    public List<DeploymentRecord> getAvailableDeployments() {
+        return this.availableDeployments;
+    }
+
+    /**
+     * @return
+     */
+    public BeanFactory getBeanFactory() {
+        return this.beanFactory;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.jboss.as.console.client.shared.deployment.DeployCommandExecutor#addToServerGroup(org.jboss.as.console.client.shared
+     * .model.DeploymentRecord, boolean, java.lang.String[])
      */
     @Override
     public void addToServerGroup(DeploymentRecord record, boolean enable, String... selectedGroups) {
-        
+
     }
-    
-    /* (non-Javadoc)
-     * @see org.jboss.as.console.client.shared.deployment.DeployCommandExecutor#getPossibleGroupAssignments(org.jboss.as.console.client.shared.model.DeploymentRecord)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.jboss.as.console.client.shared.deployment.DeployCommandExecutor#getPossibleGroupAssignments(org.jboss.as.console.
+     * client.shared.model.DeploymentRecord)
      */
     @Override
     public List<ServerGroupRecord> getPossibleGroupAssignments(DeploymentRecord record) {
         return null;
     }
-    
-    /* (non-Javadoc)
-     * @see org.jboss.as.console.client.shared.deployment.DeployCommandExecutor#promptForGroupSelections(org.jboss.as.console.client.shared.model.DeploymentRecord)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.jboss.as.console.client.shared.deployment.DeployCommandExecutor#promptForGroupSelections(org.jboss.as.console.client
+     * .shared.model.DeploymentRecord)
      */
     @Override
     public void promptForGroupSelections(DeploymentRecord record) {
-        
+
     }
-    
-    /* (non-Javadoc)
-     * @see org.jboss.as.console.client.shared.deployment.DeployCommandExecutor#removeContent(org.jboss.as.console.client.shared.model.DeploymentRecord)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.jboss.as.console.client.shared.deployment.DeployCommandExecutor#removeContent(org.jboss.as.console.client.shared.
+     * model.DeploymentRecord)
      */
     @Override
     public void removeContent(DeploymentRecord record) {
-        
+
     }
-    
-    /* (non-Javadoc)
-     * @see org.jboss.as.console.client.shared.deployment.DeployCommandExecutor#removeDeploymentFromGroup(org.jboss.as.console.client.shared.model.DeploymentRecord)
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.jboss.as.console.client.shared.deployment.DeployCommandExecutor#removeDeploymentFromGroup(org.jboss.as.console.client
+     * .shared.model.DeploymentRecord)
      */
     @Override
     public void removeDeploymentFromGroup(DeploymentRecord record) {

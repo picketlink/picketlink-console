@@ -20,43 +20,31 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.ui.federation;
+package org.picketlink.as.console.client.ui.core;
 
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.ui.core.AbstractWizardView;
-
-import com.google.gwt.user.client.ui.DeckPanel;
+import com.gwtplatform.mvp.client.Presenter;
 
 /**
- * <p>
- * A wizard to be used when creating a new federation configuration.
- * </p>
- * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
- * @since Mar 19, 2012
+ * @since Mar 23, 2012
  */
-public class NewFederationWizard extends AbstractWizardView<FederationPresenter, Federation> {
-
-    public NewFederationWizard(FederationPresenter presenter) {
-        super("Federation", presenter);
-    }
-
-    /* (non-Javadoc)
-     * @see org.picketlink.as.console.client.ui.federation.AbstractWizardView#doAddSteps(com.google.gwt.user.client.ui.DeckPanel)
-     */
-    @Override
-    protected void doAddSteps(DeckPanel deck) {
-        deck.add(new NewFederationWizardStep1(this).asWidget());
-    }
+public interface WizardView<P extends Presenter, T> {
 
     /**
      * <p>
-     * Callback method called when the user wants to save a new federation instance.
+     * Lunchs the wizard.
      * </p>
-     * 
-     * @param newFederation
      */
-    public void onSave(Federation newFederation) {
-        this.getPresenter().onCreateFederation(newFederation);
-    }
+    void lunch();
+
+    /**
+     * @param updatedEntity
+     */
+    void onSave(T updatedEntity);
+
+    /**
+     * 
+     */
+    void onClose();
+
 }

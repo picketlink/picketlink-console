@@ -21,8 +21,6 @@ package org.picketlink.as.console.client.core.gin;
 
 import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStoreImpl;
-import org.picketlink.as.console.client.ui.MainPagePresenter;
-import org.picketlink.as.console.client.ui.MainPageView;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.FederationView;
 
@@ -41,16 +39,7 @@ public class PicketLinkClientModule extends AbstractPresenterModule {
      * @see com.google.gwt.inject.client.AbstractGinModule#configure()
      */
     protected void configure() {
-        bindMain();
         bindFederation();
-    }
-
-    /**
-     * Binds the components related with the main path
-     */
-    private void bindMain() {
-        bindPresenter(MainPagePresenter.class, MainPagePresenter.MyView.class, MainPageView.class,
-                MainPagePresenter.MyProxy.class);
     }
 
     /**

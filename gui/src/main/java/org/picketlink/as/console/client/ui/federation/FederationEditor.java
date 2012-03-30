@@ -31,10 +31,14 @@ import org.jboss.ballroom.client.widgets.ContentHeaderLabel;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.Feedback;
+import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
+import org.picketlink.as.console.client.ui.core.WizardView;
+import org.picketlink.as.console.client.ui.federation.idp.IdentityProviderDetails;
+import org.picketlink.as.console.client.ui.federation.sp.ServiceProviderDetails;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -59,9 +63,6 @@ import com.google.gwt.view.client.SingleSelectionModel;
  * @since Mar 14, 2012
  */
 public class FederationEditor {
-
-    private static final String EDITOR_DESCRIPTION = "The PicketLink Federation provides the configurations for IDPs and SPs given a federation configuration.";
-    private static final String EDITOR_LABEL_TEXT = "Federation";
 
     private FederationPresenter presenter;
     private FederationDetails federationDetails;
@@ -96,8 +97,8 @@ public class FederationEditor {
 
         layout.setWidgetTopHeight(scroll, 0, Style.Unit.PX, 100, Style.Unit.PCT);
 
-        vpanel.add(new ContentHeaderLabel(EDITOR_LABEL_TEXT));
-        vpanel.add(new ContentDescription(EDITOR_DESCRIPTION));
+        vpanel.add(new ContentHeaderLabel(PicketLinkConsoleFramework.CONSTANTS.common_label_federation()));
+        vpanel.add(new ContentDescription(PicketLinkConsoleFramework.MESSAGES.federationSectionDescription()));
 
         addTableWidgets(vpanel);
         addSelectionWidgets(vpanel);
@@ -265,7 +266,7 @@ public class FederationEditor {
                 final Federation currentSelection = getCurrentFederation();
 
                 if (currentSelection != null) {
-                    Feedback.confirm(Console.MESSAGES.deleteTitle(EDITOR_LABEL_TEXT),
+                    Feedback.confirm(Console.MESSAGES.deleteTitle(PicketLinkConsoleFramework.CONSTANTS.common_label_federation()),
                             Console.MESSAGES.deleteConfirm("Federation " + currentSelection.getAlias()),
                             new Feedback.ConfirmationHandler() {
                                 @Override

@@ -22,7 +22,9 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
+import org.jboss.as.console.client.Console;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
+import org.picketlink.as.console.client.ui.core.AbstractModelElementTable;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -72,7 +74,7 @@ public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
             }
         };
 
-        table.addColumn(nameColumn, "Name");
+        table.addColumn(nameColumn, Console.CONSTANTS.common_label_name());
 
         final SingleSelectionModel<TrustDomain> selectionModel = new SingleSelectionModel<TrustDomain>();
 
@@ -88,7 +90,6 @@ public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
         };
 
         selectionModel.addSelectionChangeHandler(selectionHandler);
-        // cellTable.setSelectionEnabled(true);
         this.getCellTable().setSelectionModel(selectionModel);
     }
     
