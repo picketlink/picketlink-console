@@ -129,5 +129,12 @@ public abstract class AbstractWizardStep<T> {
     protected ModelNode doGetHelpAddress() {
         return null;
     }
+    
+    /**
+     * @return the wizard
+     */
+    public WizardView getWizard() {
+        return this.wizard;
+    }
 
 }

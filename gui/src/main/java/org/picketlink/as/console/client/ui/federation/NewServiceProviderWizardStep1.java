@@ -22,6 +22,7 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.as.console.client.shared.model.DeploymentRecord;
@@ -45,6 +46,7 @@ public class NewServiceProviderWizardStep1 extends AbstractWizardStep<ServicePro
 
     private List<DeploymentRecord> deployments;
     private FederationPresenter presenter;
+    private ComboBoxItem aliasesItem;
 
     public NewServiceProviderWizardStep1(NewServiceProviderWizard wizard, FederationPresenter presenter) {
         super("New Service Provider", wizard, ServiceProvider.class);
@@ -56,17 +58,11 @@ public class NewServiceProviderWizardStep1 extends AbstractWizardStep<ServicePro
      */
     @Override
     protected void doAddFormItems(Form<ServiceProvider> form) {
-        ComboBoxItem aliasesItem = new ComboBoxItem("alias", "Alias");
+        aliasesItem = new ComboBoxItem("alias", "Alias");
         
         aliasesItem.setRequired(true);
-        
-        String[] aliases = new String[this.presenter.getAvailableDeployments().size()];
-        
-        for (int i = 0; i < this.presenter.getAvailableDeployments().size(); i++) {
-            aliases[i] = this.presenter.getAvailableDeployments().get(i).getName();
-        }
-        
-        aliasesItem.setValueMap(aliases);
+
+        updateAliasItems();
         
         addFormItem(aliasesItem);
         addFormItem(new TextBoxItem("url", "URL"));
@@ -83,5 +79,45 @@ public class NewServiceProviderWizardStep1 extends AbstractWizardStep<ServicePro
         address.add("service-provider", "*");
         return address;
     }
+    
+    /**
+     * 
+     */
+    private void updateAliasItems() {
+        List<DeploymentRecord> availableIdentityProviders = new ArrayList<DeploymentRecord>();
+        
+        if (this.presenter.getView().getIdentityProvider() != null) {
+            for (DeploymentRecord deploymentRecord : this.presenter.getAvailableDeployments()) {
+                if (!this.presenter.getView().getIdentityProvider().getAlias().equals(deploymentRecord.getName())) {
+                    NewServiceProviderWizard wizard = (NewServiceProviderWizard) getWizard();
+                    
+                    
+                    if (wizard.getServiceProviderTable().getDataProvider().getList() != null && !wizard.getServiceProviderTable().getDataProvider().getList().isEmpty()) {
+                        for (ServiceProvider serviceProvider : wizard.getServiceProviderTable().getDataProvider().getList()) {
+                            if (serviceProvider.getAlias().equals(deploymentRecord.getName())) {
+                                deploymentRecord = null;
+                                break;
+                            }
+                        }
+                    }
+                    
+                    if (deploymentRecord != null) {
+                        availableIdentityProviders.add(deploymentRecord);
+                    }
+                }
+            }
+        } else {
+            availableIdentityProviders.addAll(this.presenter.getAvailableDeployments());
+        }
+        
+        String[] aliases = new String[availableIdentityProviders.size()];
+        
+        for (int i = 0; i < availableIdentityProviders.size(); i++) {
+            aliases[i] = availableIdentityProviders.get(i).getName();
+        }
+
+        aliasesItem.setValueMap(aliases);
+    }
+
 
 }

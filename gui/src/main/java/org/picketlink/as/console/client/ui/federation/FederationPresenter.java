@@ -21,7 +21,6 @@
  */
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +86,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
          * 
          * @param identityProviders
          */
-        void updateIdentityProviders(List<IdentityProvider> identityProviders);
+        void updateIdentityProviders(IdentityProvider identityProvider);
 
         /**
          * <p>
@@ -203,10 +202,14 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
      */
     private void loadFederations() {
         this.federationStore.loadFederations(new SimpleCallback<List<Federation>>() {
+
             @Override
             public void onSuccess(List<Federation> result) {
                 getView().updateFederations(result);
-                loadIdentityProvider(getView().getCurrentFederation());
+                if (!result.isEmpty()) {
+                    loadIdentityProvider(result.get(0));
+                    loadServiceProviders(result.get(0));
+                }
             }
         });
     }
@@ -229,7 +232,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
      */
     public void loadIdentityProvider(Federation federation) {
         if (federation == null) {
-            getView().updateIdentityProviders(Collections.EMPTY_LIST);
+            getView().updateIdentityProviders(null);
             getView().updateTrustDomains(Collections.EMPTY_LIST);
             getView().updateServiceProviders(Collections.EMPTY_LIST);
             return;
@@ -238,7 +241,9 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         this.federationStore.loadIdentityProviders(federation, new SimpleCallback<List<IdentityProvider>>() {
             @Override
             public void onSuccess(List<IdentityProvider> result) {
-                getView().updateIdentityProviders(result);
+                if (!result.isEmpty()) {
+                    getView().updateIdentityProviders(result.get(0));
+                }
                 loadTrustDomain();
             }
         });
@@ -342,6 +347,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
                 loadFederations();
             }
         });
+        this.restartIdentityProvider(getView().getIdentityProvider());
     }
     
     /**

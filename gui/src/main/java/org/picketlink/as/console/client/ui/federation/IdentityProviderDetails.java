@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.subsys.Baseadress;
 import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
@@ -33,6 +34,7 @@ import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.dmr.client.ModelNode;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 
 import com.google.gwt.core.client.GWT;
 
@@ -49,6 +51,8 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
     private FederationPresenter presenter;
     private IdentityProvider identityProvider;
     List<FormItem<?>> items;
+    private ComboBoxItem aliasesItem;
+    private List<ServiceProvider> serviceProviders;
 
     public IdentityProviderDetails(FederationPresenter presenter) {
         super();
@@ -58,17 +62,9 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
     protected List<FormItem<?>> getFormItems() {
         items = new ArrayList<FormItem<?>>();
 
-        ComboBoxItem aliasesItem = new ComboBoxItem("alias", "Alias");
+        aliasesItem = new ComboBoxItem("alias", "Alias");
 
         aliasesItem.setRequired(true);
-
-        String[] aliases = new String[this.presenter.getAvailableDeployments().size()];
-
-        for (int i = 0; i < this.presenter.getAvailableDeployments().size(); i++) {
-            aliases[i] = this.presenter.getAvailableDeployments().get(i).getName();
-        }
-
-        aliasesItem.setValueMap(aliases);
 
         items.add(aliasesItem);
         items.add(new TextBoxItem("url", "Identity URL", true));
@@ -107,12 +103,13 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
     /**
      * @param identityProviders
      */
-    public void updateIdentityProvider(List<IdentityProvider> identityProviders) {
-        if (!identityProviders.isEmpty()) {
-            this.identityProvider = identityProviders.get(0);
+    public void updateIdentityProvider(IdentityProvider identityProvider) {
+        updateAliasItems();
+        if (identityProvider != null) {
+            this.identityProvider = identityProvider;
             setEntityInstance(this.identityProvider);
             getForm().setEnabled(false);
-            getForm().edit(identityProviders.get(0));
+            getForm().edit(this.identityProvider);
         } else {
             this.identityProvider = null;
             getForm().clearValues();
@@ -126,6 +123,36 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
 
                 getForm().edit(as);
             } 
+        }
+    }
+
+    /**
+     * 
+     */
+    private void updateAliasItems() {
+        List<DeploymentRecord> availableIdentityProviders = new ArrayList<DeploymentRecord>();
+        
+        if (this.serviceProviders != null && !this.serviceProviders.isEmpty()) {
+            for (DeploymentRecord serviceProvider : serviceProviders) {
+                for (DeploymentRecord deploymentRecord : this.presenter.getAvailableDeployments()) {
+                    if (!serviceProvider.getName().equals(deploymentRecord.getName())) {
+                        availableIdentityProviders.add(deploymentRecord);
+                    }
+                }
+            }
+        } else {
+            availableIdentityProviders.addAll(this.presenter.getAvailableDeployments());
+        }
+        
+        String[] aliases = new String[availableIdentityProviders.size()];
+        
+        for (int i = 0; i < availableIdentityProviders.size(); i++) {
+            aliases[i] = availableIdentityProviders.get(i).getName();
+        }
+
+        aliasesItem.setValueMap(aliases);
+        if (this.identityProvider != null) {
+            aliasesItem.setValue(this.identityProvider.getAlias());            
         }
     }
 
@@ -180,5 +207,13 @@ public class IdentityProviderDetails extends AbstractFederationDetails<IdentityP
      */
     public IdentityProvider getIdentityProvider() {
         return identityProvider;
+    }
+
+    /**
+     * @param result
+     */
+    public void setServiceProviders(List<ServiceProvider> result) {
+        updateAliasItems();
+        this.serviceProviders = result;
     }
 }

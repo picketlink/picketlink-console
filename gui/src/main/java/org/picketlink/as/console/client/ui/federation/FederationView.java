@@ -89,7 +89,7 @@ public class FederationView extends SuspendableViewImpl implements FederationPre
      * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#updateFederations(java.util.List)
      */
     @Override
-    public void updateIdentityProviders(List<IdentityProvider> federations) {
+    public void updateIdentityProviders(IdentityProvider federations) {
         getFederationEditor().updateIdentityProviders(federations);
     }
     

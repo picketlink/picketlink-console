@@ -27,11 +27,11 @@ import java.util.List;
 import org.jboss.as.console.client.widgets.ContentDescription;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -48,59 +48,60 @@ public class ServiceProviderDetails {
     private ServiceProviderTable serviceProviderTable;
     private FederationPresenter presenter;
     private NewServiceProviderWizard serviceProviderWizard;
+    private IdentityProvider identityProvider;
 
     public ServiceProviderDetails(FederationPresenter presenter) {
         this.presenter = presenter;
     }
-    
+
     public Widget asWidget() {
         VerticalPanel layout = new VerticalPanel();
-        
+
         layout.setStyleName("rhs-content-panel");
-        
-//        HorizontalPanel horizontalPanel = new HorizontalPanel();
-//        
-//        horizontalPanel.setHeight("10px");
-//        
-//        layout.add(horizontalPanel);
-        
+
+        // HorizontalPanel horizontalPanel = new HorizontalPanel();
+        //
+        // horizontalPanel.setHeight("10px");
+        //
+        // layout.add(horizontalPanel);
+
         ToolStrip trustDomainTools = new ToolStrip();
-        
+
         trustDomainTools.setStyleName("fill-layout-width");
-        
+
         ToolButton editBtn = new ToolButton("Add");
-        
+
         editBtn.addClickHandler(new ClickHandler() {
-            
+
             @Override
             public void onClick(ClickEvent event) {
                 getServiceProviderWizard().lunch();
             }
         });
-        
+
         trustDomainTools.add(editBtn);
-        
+
         ToolButton removeBtn = new ToolButton("Remove");
-        
+
         removeBtn.addClickHandler(new ClickHandler() {
-            
+
             @Override
             public void onClick(ClickEvent event) {
                 presenter.onRemoveServiceProvider(getServiceProviderTable().getSelectedServiceProvider());
             }
         });
-        
+
         trustDomainTools.add(removeBtn);
-        
+
         layout.add(trustDomainTools);
-        
+
         layout.add(new ContentDescription(""));
-        
+
         layout.add(getServiceProviderTable().asWidget());
-        
+
         return layout;
     }
-    
+
     /**
      * Returns a instance of the table to be used to show the service provider instances.
      * 
@@ -120,13 +121,20 @@ public class ServiceProviderDetails {
     public void updateServiceProviders(List<ServiceProvider> result) {
         this.getServiceProviderTable().setList(result);
     }
-    
+
     public NewServiceProviderWizard getServiceProviderWizard() {
         if (this.serviceProviderWizard == null) {
-            this.serviceProviderWizard = new NewServiceProviderWizard(this.presenter);
+            this.serviceProviderWizard = new NewServiceProviderWizard(this.getServiceProviderTable(), this.presenter);
         }
 
         return this.serviceProviderWizard;
+    }
+
+    /**
+     * @param identityProvider
+     */
+    public void setIdentityProvider(IdentityProvider identityProvider) {
+        this.identityProvider = identityProvider;
     }
 
 }

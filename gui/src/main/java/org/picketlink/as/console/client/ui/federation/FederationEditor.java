@@ -291,10 +291,10 @@ public class FederationEditor {
      * Updates the table from which the federation instances are listed.
      * </p>
      * 
-     * @param datasources
+     * @param federations
      */
-    public void updateFederations(List<Federation> datasources) {
-        getFederationTable().setList(datasources);
+    public void updateFederations(List<Federation> federations) {
+        getFederationTable().setList(federations);
         getFederationTable().getCellTable().selectDefaultEntity();
     }
 
@@ -305,8 +305,9 @@ public class FederationEditor {
      * 
      * @param identityProviders
      */
-    public void updateIdentityProviders(List<IdentityProvider> identityProviders) {
-        this.getIdentityProvidersDetails().updateIdentityProvider(identityProviders);
+    public void updateIdentityProviders(IdentityProvider identityProvider) {
+        this.getIdentityProvidersDetails().updateIdentityProvider(identityProvider);
+        this.getServiceProviderDetails().setIdentityProvider(identityProvider);
     }
 
     /**
@@ -318,6 +319,7 @@ public class FederationEditor {
      */
     public void updateServiceProviders(List<ServiceProvider> result) {
         this.getServiceProviderDetails().updateServiceProviders(result);
+        this.getIdentityProvidersDetails().setServiceProviders(result);
     }
     
     /**

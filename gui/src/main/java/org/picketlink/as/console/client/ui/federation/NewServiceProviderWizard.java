@@ -37,10 +37,12 @@ import com.google.gwt.user.client.ui.DeckPanel;
 public class NewServiceProviderWizard extends AbstractWizardView<FederationPresenter, ServiceProvider>{
 
     private NewServiceProviderWizardStep1 newServiceProviderWizardStep1;
+    private ServiceProviderTable serviceProviderTable;
 
-    public NewServiceProviderWizard(
+    public NewServiceProviderWizard(ServiceProviderTable serviceProviders,
             FederationPresenter presenter) {
         super("Service Provider", presenter);
+        this.serviceProviderTable = serviceProviders;
     }
     
     /* (non-Javadoc)
@@ -62,4 +64,10 @@ public class NewServiceProviderWizard extends AbstractWizardView<FederationPrese
         this.getPresenter().onCreateServiceProvider(updatedEntity);        
     }
     
+    /**
+     * @return the serviceProviderTable
+     */
+    public ServiceProviderTable getServiceProviderTable() {
+        return serviceProviderTable;
+    }
 }
