@@ -138,5 +138,22 @@ public interface FederationStore {
      */
     void deleteServiceProvider(Federation currentFederation, ServiceProvider serviceProvider,
             SimpleCallback<Boolean> simpleCallback);
+
+    /**
+     * @param currentFederation
+     * @param identityProvider
+     * @param simpleCallback
+     */
+    void deleteIdentityProvider(Federation currentFederation, IdentityProvider identityProvider,
+            SimpleCallback<Boolean> simpleCallback);
+
+    /**
+     * @param currentFederation
+     * @param currentSelection
+     * @param changedValues
+     * @param simpleCallback
+     */
+    void updateServiceProvider(Federation currentFederation, ServiceProvider currentSelection,
+            Map<String, Object> changedValues, SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
     
 }

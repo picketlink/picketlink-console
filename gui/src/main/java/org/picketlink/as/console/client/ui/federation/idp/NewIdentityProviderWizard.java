@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.ui.federation.sp;
+package org.picketlink.as.console.client.ui.federation.idp;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,49 +38,60 @@ import org.picketlink.as.console.client.ui.federation.AbstractFederationEditor;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.GenericFederationWizard;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor.Wizard;
-import org.picketlink.as.console.client.ui.federation.idp.IdentityProviderEditor;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 30, 2012
  */
-public class NewServiceProviderWizard<T extends GenericFederationEntity> extends GenericFederationWizard<T> implements
+public class NewIdentityProviderWizard<T extends GenericFederationEntity> extends GenericFederationWizard<T> implements
         PropertyManagement, Wizard<T> {
 
     private ComboBoxItem aliasesItem;
     private List<ServiceProvider> serviceProviders;
 
-    public NewServiceProviderWizard(AbstractFederationEditor<T> editor, Class<T> cls, List<String> flagChoices,
+    public NewIdentityProviderWizard(AbstractFederationEditor<T> editor, Class<T> cls, List<String> flagChoices,
             FederationPresenter presenter, String type, String moduleAttrName) {
-        super(editor, cls, presenter, type, moduleAttrName, "alias", "url", "postBinding");
+        super(editor, cls, presenter, type, moduleAttrName, "alias", "url", "signOutgoingMessages", "ignoreIncomingSignatures");
     }
 
     @Override
     protected FormItem<?>[] getCustomFields() {
-        aliasesItem = new ComboBoxItem("name", "Name");
-
-        aliasesItem.setRequired(true);
-
+        getAliasItem().setRequired(true);
+        
         updateAliasItems();
 
-        FormItem<?>[] formItems = new FormItem<?>[] { aliasesItem,
+        FormItem<?>[] formItems = new FormItem<?>[] {
+                getAliasItem(),
                 new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_identityURL(), true),
-                new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), };
+                new CheckBoxItem("signOutgoingMessages",
+                        PicketLinkConsoleFramework.CONSTANTS.common_label_signOutgoingMessages()),
+                new CheckBoxItem("ignoreIncomingSignatures",
+                        PicketLinkConsoleFramework.CONSTANTS.common_label_ignoreIncomingSignatures()) };
 
         return formItems;
+    }
+
+    /**
+     * @return
+     */
+    private ComboBoxItem getAliasItem() {
+        if (this.aliasesItem == null) {
+            this.aliasesItem = new ComboBoxItem("name", "Alias");
+        }
+
+        return this.aliasesItem;
     }
 
     /**
      * @param result
      */
     public void setServiceProviders(List<ServiceProvider> result) {
-        updateAliasItems();
         this.serviceProviders = result;
     }
-
+    
     private void updateAliasItems() {
         List<DeploymentRecord> availableIdentityProviders = new ArrayList<DeploymentRecord>();
-
+        
         if (this.serviceProviders != null && !this.serviceProviders.isEmpty()) {
             for (DeploymentRecord serviceProvider : serviceProviders) {
                 for (DeploymentRecord deploymentRecord : this.getEditor().getPresenter().getAvailableDeployments()) {
@@ -92,22 +103,22 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
         } else {
             availableIdentityProviders.addAll(this.getEditor().getPresenter().getAvailableDeployments());
         }
-
+        
         String[] aliases = new String[availableIdentityProviders.size()];
-
+        
         for (int i = 0; i < availableIdentityProviders.size(); i++) {
             aliases[i] = availableIdentityProviders.get(i).getName();
         }
 
-        aliasesItem.setValueMap(aliases);
-
-        if (this.getServiceProviderEditor().getCurrentSelection() != null) {
-            aliasesItem.setValue(this.getServiceProviderEditor().getCurrentSelection().getName());
+        getAliasItem().setValueMap(aliases);
+        
+        if (this.getIdentityProviderEditor().getCurrentSelection() != null) {
+            getAliasItem().setValue(this.getIdentityProviderEditor().getCurrentSelection().getName());            
         }
     }
-
-    public ServiceProviderEditor getServiceProviderEditor() {
-        return (ServiceProviderEditor) this.getEditor();
+    
+    public IdentityProviderEditor getIdentityProviderEditor() {
+        return (IdentityProviderEditor) this.getEditor();
     }
 
 }

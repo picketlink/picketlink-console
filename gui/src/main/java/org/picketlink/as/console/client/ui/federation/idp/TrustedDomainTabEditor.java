@@ -20,73 +20,52 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.ui.federation;
+package org.picketlink.as.console.client.ui.federation.idp;
 
 import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.shared.help.FormHelpPanel;
-import org.jboss.as.console.client.shared.subsys.Baseadress;
-import org.jboss.as.console.client.shared.viewframework.builder.FormLayout;
 import org.jboss.as.console.client.widgets.ContentDescription;
-import org.jboss.ballroom.client.widgets.ContentGroupLabel;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
-import org.jboss.ballroom.client.widgets.forms.TextItem;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
-import org.jboss.dmr.client.ModelNode;
+import org.jboss.ballroom.client.widgets.window.Feedback;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
+import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
- * <p>
- * This class defines the widget to be displayed to show the general informations about a selected federation instance.
- * </p>
- * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
- * @since Mar 14, 2012
+ * @since Mar 31, 2012
  */
-public class FederationDetails {
+public class TrustedDomainTabEditor {
 
-    private Form<Federation> form;
     private Form<TrustDomain> trustDomainForm;
     private TrustDomainTable trustDomainTable;
     private FederationPresenter presenter;
+    private IdentityProvider identityProvider;
 
-    public FederationDetails(CellTable<Federation> table, FederationPresenter presenter) {
-        this.form = new Form<Federation>(Federation.class);
-        this.form.setNumColumns(2);
-        this.form.bind(table);
+    public TrustedDomainTabEditor(FederationPresenter presenter) {
         this.presenter = presenter;
     }
-
+    
     public Widget asWidget() {
-        VerticalPanel detailPanel = new VerticalPanel();
-
-        detailPanel.setStyleName("fill-layout-width");
-
-        addFederationForm(detailPanel);
-
         // adds the trust domain section
         VerticalPanel trustDomainsHeader = new VerticalPanel();
-        
+
         trustDomainsHeader.setStyleName("fill-layout-width");
-        
-        trustDomainsHeader.add(new ContentGroupLabel(PicketLinkConsoleFramework.CONSTANTS.common_label_trustedDomains()));
 
         addTrustDomainForm(trustDomainsHeader);
-        addTrustDomainActions(detailPanel, trustDomainsHeader);
-        addTrustDomainTable(detailPanel);
+        addTrustDomainActions(trustDomainsHeader);
+        addTrustDomainTable(trustDomainsHeader);
 
-        return detailPanel;
+        return trustDomainsHeader;
     }
 
     /**
@@ -100,23 +79,29 @@ public class FederationDetails {
      * @param detailPanel
      * @param trustDomainsHeader
      */
-    private void addTrustDomainActions(VerticalPanel detailPanel, VerticalPanel trustDomainsHeader) {
+    private void addTrustDomainActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
-        
+
         ToolButton addTrustedDomainBtn = new ToolButton(Console.CONSTANTS.common_label_add());
-        
+
         addTrustedDomainBtn.addClickHandler(new ClickHandler() {
-            
+
             @Override
             public void onClick(ClickEvent event) {
-                if (presenter.getView().getIdentityProvider() == null) {
+                if (identityProvider == null) {
                     Window.alert(PicketLinkConsoleFramework.MESSAGES.identityProviderNotConfigured());
                 } else {
-                    if (trustDomainForm.getUpdatedEntity() != null && !trustDomainForm.getUpdatedEntity().getName().trim().isEmpty()) {
-                        presenter.onCreateTrustDomain(trustDomainForm.getUpdatedEntity());                        
+                    TrustDomain newTrustedDomain = trustDomainForm.getUpdatedEntity();
+                    
+                    if (newTrustedDomain != null
+                            && !newTrustedDomain.getName().trim().isEmpty()) {
+                        presenter.onCreateTrustDomain(identityProvider, newTrustedDomain);
+                        getTrustDomainTable().getDataProvider().getList().add(newTrustedDomain);
                     } else {
                         Window.alert(PicketLinkConsoleFramework.MESSAGES.invalidTrustedDomain());
                     }
+                    
+                    trustDomainForm.clearValues();
                 }
             }
         });
@@ -124,26 +109,37 @@ public class FederationDetails {
         trustDomainTools.addToolButtonRight(addTrustedDomainBtn);
 
         ToolButton removeTrustedDomainBtn = new ToolButton(Console.CONSTANTS.common_label_delete());
-        
+
         removeTrustedDomainBtn.addClickHandler(new ClickHandler() {
-            
+
             @Override
             public void onClick(ClickEvent event) {
-                if (getTrustDomainTable().getSelectedTrustedDomain() != null) {
-                    presenter.onRemoveTrustDomain(getTrustDomainTable().getSelectedTrustedDomain());
-                }
+                final TrustDomain removedTrustedDomain = getTrustDomainTable().getSelectedTrustedDomain();
+                
+                Feedback.confirm(
+                        Console.MESSAGES.deleteTitle(PicketLinkConsoleFramework.CONSTANTS.common_label_trustDomain()),
+                        Console.MESSAGES.deleteConfirm(removedTrustedDomain.getName()),
+                        new Feedback.ConfirmationHandler() {
+                            @Override
+                            public void onConfirmation(boolean isConfirmed) {
+                                if (isConfirmed) {
+                                    presenter.onRemoveTrustDomain(identityProvider, removedTrustedDomain);
+                                    getTrustDomainTable().getDataProvider().getList().remove(removedTrustedDomain);
+                                }
+                            }
+                        });
+                
+                trustDomainForm.clearValues();
             }
         });
 
         trustDomainTools.addToolButtonRight(removeTrustedDomainBtn);
 
         trustDomainTools.setStyleName("fill-layout-width");
-        
+
         trustDomainsHeader.add(trustDomainTools);
-        
+
         trustDomainsHeader.add(new ContentDescription(""));
-        
-        detailPanel.add(trustDomainsHeader);
     }
 
     /**
@@ -151,58 +147,29 @@ public class FederationDetails {
      */
     private void addTrustDomainForm(VerticalPanel trustDomainsHeader) {
         this.trustDomainForm = new Form<TrustDomain>(TrustDomain.class);
-        
+
         TextBoxItem domainName = new TextBoxItem("name", PicketLinkConsoleFramework.CONSTANTS.common_label_domainName());
-        
+
         domainName.setRequired(true);
-        
+
         this.trustDomainForm.setFields(domainName);
-        
+
         trustDomainsHeader.add(this.trustDomainForm.asWidget());
     }
 
-    /**
-     * @param detailPanel
-     */
-    private void addFederationForm(VerticalPanel detailPanel) {
-        final TextItem aliasItem = new TextItem("alias", PicketLinkConsoleFramework.CONSTANTS.common_label_federationAlias());
-
-        form.setFields(aliasItem);
-        
-        form.setEnabled(false);
-        
-        final FormHelpPanel helpPanel = createHelpPanel();
-
-        detailPanel.add(new FormLayout().setHelp(helpPanel).setForm(form).build());
-    }
-
-    /**
-     * <p>
-     * Creates a instance of {@link FormHelpPanel} to show descriptions about the federation. 
-     * </p>
-     * 
-     * @return
-     */
-    private FormHelpPanel createHelpPanel() {
-        final FormHelpPanel helpPanel = new FormHelpPanel(new FormHelpPanel.AddressCallback() {
-            @Override
-            public ModelNode getAddress() {
-                ModelNode address = Baseadress.get();
-                address.add("subsystem", "picketlink");
-                address.add("federation", "*");
-                return address;
-            }
-        }, form);
-        
-        return helpPanel;
-    }
-    
     public TrustDomainTable getTrustDomainTable() {
         if (this.trustDomainTable == null) {
             this.trustDomainTable = new TrustDomainTable();
         }
 
         return this.trustDomainTable;
+    }
+
+    /**
+     * @param policy
+     */
+    public void setIdentityProvider(IdentityProvider policy) {
+        this.identityProvider = policy;
     }
 
 }

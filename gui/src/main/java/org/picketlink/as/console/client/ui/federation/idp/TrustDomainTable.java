@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.ui.federation;
+package org.picketlink.as.console.client.ui.federation.idp;
 
 import org.jboss.as.console.client.Console;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;

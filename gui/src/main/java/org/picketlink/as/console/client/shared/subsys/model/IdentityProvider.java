@@ -23,8 +23,10 @@
 package org.picketlink.as.console.client.shared.subsys.model;
 
 import org.jboss.as.console.client.shared.model.DeploymentRecord;
+import org.jboss.as.console.client.shared.viewframework.NamedEntity;
 import org.jboss.as.console.client.widgets.forms.Address;
 import org.jboss.as.console.client.widgets.forms.Binding;
+import org.jboss.as.console.client.widgets.forms.FormItem;
 
 /**
  * <p>Federation bean definition.</p>
@@ -34,11 +36,19 @@ import org.jboss.as.console.client.widgets.forms.Binding;
  * @since Mar 14, 2012
  */
 @Address("/subsystem=picketlink/federation={0}/identity-provider={1}")
-public interface IdentityProvider extends DeploymentRecord {
+public interface IdentityProvider extends DeploymentRecord, NamedEntity, GenericFederationEntity {
 
-    @Binding(key = true)
-    String getAlias();
-    void setAlias(String alias);
+    @Override
+    @FormItem(localLabel="common_label_name",
+            required=true,
+            formItemTypeForEdit="TEXT",
+            formItemTypeForAdd="TEXT_BOX",
+            tabName="common_label_attributes")
+    @Binding(detypedName="alias", key = true)
+    String getName();
+    
+    @Override
+    void setName(String alias);
     
     @Binding (detypedName="url")
     String getUrl();

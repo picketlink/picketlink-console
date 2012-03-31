@@ -44,5 +44,7 @@ public interface PicketLinkUIConstants extends Constants {
     String common_label_domainName();
     String common_label_federationAlias();
     String common_label_identityURL();
+    String subsys_picketlink_identity_provider_desc();
+    String subsys_picketlink_service_provider_desc();
     
 }

@@ -22,7 +22,7 @@ package org.picketlink.as.console.client.core.gin;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStoreImpl;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
-import org.picketlink.as.console.client.ui.federation.FederationView;
+import org.picketlink.as.console.client.ui.federation.NewFederationView;
 
 import com.google.inject.Singleton;
 import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
@@ -46,7 +46,7 @@ public class PicketLinkClientModule extends AbstractPresenterModule {
      * Binds the components related with the federation configuration path
      */
     private void bindFederation() {
-        bindPresenter(FederationPresenter.class, FederationPresenter.MyView.class, FederationView.class,
+        bindPresenter(FederationPresenter.class, FederationPresenter.MyView.class, NewFederationView.class,
                 FederationPresenter.MyProxy.class);
         bind(FederationStore.class).to(FederationStoreImpl.class).in(Singleton.class);
     }
