@@ -63,8 +63,9 @@ public class ServiceProviderEditor extends AbstractFederationEditor<ServiceProvi
     }
 
     @Override
-    protected void saveData(ServiceProvider identityProvider) {
+    protected boolean onInsert(ServiceProvider identityProvider) {
         presenter.onCreateServiceProvider(identityProvider);
+        return true;
     }
 
     /*
@@ -82,8 +83,8 @@ public class ServiceProviderEditor extends AbstractFederationEditor<ServiceProvi
     /**
      * @param changedValues
      */
-    public void onUpdate(Map<String, Object> changedValues) {
-        this.presenter.onUpdateServiceProvider(getCurrentSelection(), changedValues);
+    public void onUpdate(ServiceProvider serviceProvider, Map<String, Object> changedValues) {
+        this.presenter.onUpdateServiceProvider(serviceProvider, changedValues);
     }
 
     /*

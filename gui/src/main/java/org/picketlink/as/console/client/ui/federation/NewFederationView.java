@@ -120,7 +120,8 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         this.federationsTable.getSelectionModel().addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
-                presenter.updateFederationSelection(getCurrentSelection());
+                presenter.updateFederationSelection(((SingleSelectionModel<Federation>) event.getSource()).getSelectedObject());
+                
             }
         });
 
@@ -148,6 +149,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     private Federation getCurrentSelection() {
         SingleSelectionModel<Federation> ssm = (SingleSelectionModel<Federation>) getFederationsTable().getSelectionModel();
+        
         return ssm.getSelectedObject();
     }
 
@@ -294,35 +296,56 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
      */
     @Override
     protected DefaultCellTable<Federation> makeEntityTable() {
-        return getFederationsTable();
+        this.federationsTable = new DefaultCellTable<Federation>(5);
+
+        Column<Federation, Federation> option = new Column<Federation, Federation>(new TextLinkCell<Federation>(
+                Console.CONSTANTS.common_label_view(), new ActionCell.Delegate<Federation>() {
+                    @Override
+                    public void execute(Federation selection) {
+                        presenter.getPlaceManager().revealPlace(
+                                new PlaceRequest(org.picketlink.as.console.client.NameTokens.FEDERATION).with("name",
+                                        selection.getName()));
+                    }
+                })) {
+            @Override
+            public Federation getValue(Federation domain) {
+                return domain;
+            }
+        };
+
+        this.federationsTable
+                .addColumn(new Columns.NameColumn(), PicketLinkConsoleFramework.CONSTANTS.common_label_alias());
+        this.federationsTable.addColumn(option, "Option");
+        
+        return this.federationsTable;
     }
 
     /**
      * @return
      */
     private DefaultCellTable<Federation> getFederationsTable() {
-        if (this.federationsTable == null) {
-            this.federationsTable = new DefaultCellTable<Federation>(5);
-
-            Column<Federation, Federation> option = new Column<Federation, Federation>(new TextLinkCell<Federation>(
-                    Console.CONSTANTS.common_label_view(), new ActionCell.Delegate<Federation>() {
-                        @Override
-                        public void execute(Federation selection) {
-                            presenter.getPlaceManager().revealPlace(
-                                    new PlaceRequest(org.picketlink.as.console.client.NameTokens.FEDERATION).with("name",
-                                            selection.getName()));
-                        }
-                    })) {
-                @Override
-                public Federation getValue(Federation domain) {
-                    return domain;
-                }
-            };
-
-            this.federationsTable
-                    .addColumn(new Columns.NameColumn(), PicketLinkConsoleFramework.CONSTANTS.common_label_alias());
-            this.federationsTable.addColumn(option, "Option");
-        }
+//        if (this.federationsTable == null) {
+//            this.federationsTable = new DefaultCellTable<Federation>(5);
+//
+//            Column<Federation, Federation> option = new Column<Federation, Federation>(new TextLinkCell<Federation>(
+//                    Console.CONSTANTS.common_label_view(), new ActionCell.Delegate<Federation>() {
+//                        @Override
+//                        public void execute(Federation selection) {
+//                            presenter.getPlaceManager().revealPlace(
+//                                    new PlaceRequest(org.picketlink.as.console.client.NameTokens.FEDERATION).with("name",
+//                                            selection.getName()));
+//                        }
+//                    })) {
+//                @Override
+//                public Federation getValue(Federation domain) {
+//                    return domain;
+//                }
+//            };
+//
+//            this.federationsTable
+//                    .addColumn(new Columns.NameColumn(), PicketLinkConsoleFramework.CONSTANTS.common_label_alias());
+//            this.federationsTable.addColumn(option, "Option");
+//        }
 
         return this.federationsTable;
     }
@@ -335,9 +358,10 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     public void setSelectedFederation(String alias) {
         this.selectedFederation = alias;
-
+        
         if (selectedFederation != null) {
             pages.showPage(1);
+            loadFederation(alias);
         } else {
             pages.showPage(0);
         }

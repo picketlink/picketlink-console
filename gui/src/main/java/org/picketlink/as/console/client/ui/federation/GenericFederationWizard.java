@@ -114,9 +114,8 @@ public class GenericFederationWizard <T extends GenericFederationEntity> impleme
                         T edited = form.getUpdatedEntity();
                         original.setName(edited.getName());
 
-//                        copyCustomFields(original, edited);
-
-                        editor.onUpdate(form.getChangedValues());
+                        editor.onUpdate(edited, form.getChangedValues());
+                        form.edit(edited);
                     } else {
                         // it's a new policy
                         T data = form.getUpdatedEntity();
@@ -262,5 +261,11 @@ public class GenericFederationWizard <T extends GenericFederationEntity> impleme
     public AbstractFederationDetailEditor<T> getEditor() {
         return this.editor;
     }
-    
+
+    /**
+     * @return the isDialogue
+     */
+    public boolean isDialogue() {
+        return isDialogue;
+    }
 }

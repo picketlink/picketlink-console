@@ -66,8 +66,8 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
     protected final Class<T> entityClass;
     protected final FederationPresenter presenter;
 
-    protected DefaultCellTable<T> attributesTable;
-    protected ListDataProvider<T> attributesProvider;
+    protected DefaultCellTable<T> modelTable;
+    protected ListDataProvider<T> modelTableDataProvider;
     protected String domainName;
     protected boolean resourceExists;
     protected ToolButton addModule;
@@ -97,23 +97,16 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
 
     protected abstract void onDelete(T policy);
     
-    protected abstract void onUpdate(Map<String, Object> changedValues);
+    protected abstract void onUpdate(T model, Map<String, Object> changedValues);
     
-    protected abstract void saveData(T entity);
+    protected abstract boolean onInsert(T entity);
 
     public Widget asWidget() {
 
         VerticalPanel vpanel = new VerticalPanel();
         vpanel.setStyleName("rhs-content-panel");
 
-        // TODO: in order for the selection to retain we need a distinct key per module.
-
-        // attributesTable = new DefaultCellTable<T>(4, getKeyProvider());
-        attributesTable = new DefaultCellTable<T>(4);
-
-        attributesTable.getElement().setAttribute("style", "margin-top:5px;");
-        attributesProvider = new ListDataProvider<T>();
-        attributesProvider.addDataDisplay(attributesTable);
+        createModelTable();
 
         headerLabel = new ContentHeaderLabel("TITLE HERE");
         vpanel.add(headerLabel);
@@ -123,55 +116,20 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
         
         wizard = getWizard();
         
-        ToolStrip tableTools = new ToolStrip();
+        createTableTools(vpanel);
 
-        addModule = new ToolButton(Console.CONSTANTS.common_label_add());
-        addModule.addClickHandler(new ClickHandler() {
-            @Override
-            public void onClick(ClickEvent event) {
-                openWizard(null);
-            }
-        });
-        addModule.ensureDebugId(Console.DEBUG_CONSTANTS.debug_label_add_abstractDomainDetailEditor());
-        tableTools.addToolButtonRight(addModule);
-        tableTools.addToolButtonRight(
-                new ToolButton(Console.CONSTANTS.common_label_remove(), new ClickHandler() {
-                    @Override
-                    public void onClick(ClickEvent event) {
-
-                        final T policy = getCurrentSelection();
-                        Feedback.confirm(
-                                Console.MESSAGES.deleteTitle(getEntityName()),
-                                Console.MESSAGES.deleteConfirm(policy.getName()),
-                                new Feedback.ConfirmationHandler() {
-                                    @Override
-                                    public void onConfirmation(boolean isConfirmed) {
-                                        if (isConfirmed) {
-                                            attributesProvider.getList().remove(policy);
-                                            onDelete(policy);
-                                            wizard.clearValues();
-                                        }
-                                    }
-                                });
-                    }
-                })
-        );
-        vpanel.add(tableTools);
-
-        // -------
-
-        addCustomColumns(attributesTable);
+        addCustomColumns(modelTable);
 
         List<HasCell<T, T>> actionCells = new ArrayList<HasCell<T,T>>();
         IdentityColumn<T> actionColumn = new IdentityColumn<T>(new CompositeCell(actionCells));
-        attributesTable.addColumn(actionColumn, "");
+        modelTable.addColumn(actionColumn, "");
 
-        vpanel.add(attributesTable);
+        vpanel.add(modelTable);
 
         // -------
 
         DefaultPager pager = new DefaultPager();
-        pager.setDisplay(attributesTable);
+        pager.setDisplay(modelTable);
         vpanel.add(pager);
 
         // -------
@@ -184,19 +142,20 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
         ssm.addSelectionChangeHandler(new SelectionChangeEvent.Handler() {
             @Override
             public void onSelectionChange(SelectionChangeEvent event) {
-                T policy = ssm.getSelectedObject();
-                if (policy == null) // Can this actually happen?
+                T modelSelection = ssm.getSelectedObject();
+                
+                if (modelSelection == null) // Can this actually happen?
                 {
                     return;
                 }
 
-                wizard.edit(policy);
-                doUpdateSelection(policy);
+                wizard.edit(modelSelection);
+                doUpdateSelection(modelSelection);
 
             }
         });
-        attributesTable.setSelectionModel(ssm);
-
+        
+        modelTable.setSelectionModel(ssm);
 
         vpanel.add(new ContentGroupLabel("Details"));
 
@@ -222,6 +181,58 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
     }
 
     /**
+     * @param vpanel
+     */
+    private void createTableTools(VerticalPanel vpanel) {
+        ToolStrip tableTools = new ToolStrip();
+
+        addModule = new ToolButton(Console.CONSTANTS.common_label_add());
+        addModule.addClickHandler(new ClickHandler() {
+            @Override
+            public void onClick(ClickEvent event) {
+                openWizard(null);
+            }
+        });
+        addModule.ensureDebugId(Console.DEBUG_CONSTANTS.debug_label_add_abstractDomainDetailEditor());
+        tableTools.addToolButtonRight(addModule);
+        tableTools.addToolButtonRight(
+                new ToolButton(Console.CONSTANTS.common_label_delete(), new ClickHandler() {
+                    @Override
+                    public void onClick(ClickEvent event) {
+
+                        final T policy = getCurrentSelection();
+                        Feedback.confirm(
+                                Console.MESSAGES.deleteTitle(getEntityName()),
+                                Console.MESSAGES.deleteConfirm(policy.getName()),
+                                new Feedback.ConfirmationHandler() {
+                                    @Override
+                                    public void onConfirmation(boolean isConfirmed) {
+                                        if (isConfirmed) {
+                                            modelTableDataProvider.getList().remove(policy);
+                                            onDelete(policy);
+                                            wizard.clearValues();
+                                        }
+                                    }
+                                });
+                    }
+                })
+        );
+        
+        vpanel.add(tableTools);
+    }
+
+    /**
+     * 
+     */
+    private void createModelTable() {
+        modelTable = new DefaultCellTable<T>(4);
+
+        modelTable.getElement().setAttribute("style", "margin-top:5px;");
+        modelTableDataProvider = new ListDataProvider<T>();
+        modelTableDataProvider.addDataDisplay(modelTable);
+    }
+
+    /**
      * @param bottomTabs
      */
     protected void addTabs(TabPanel bottomTabs) {
@@ -234,7 +245,7 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
 
 
     public T getCurrentSelection() {
-        return ((SingleSelectionModel<T>) attributesTable.getSelectionModel()).getSelectedObject();
+        return ((SingleSelectionModel<T>) modelTable.getSelectionModel()).getSelectedObject();
     }
 
 
@@ -248,13 +259,13 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
 
         this.headerLabel.setText("Federation: "+ federationName);
 
-        List<T> list = attributesProvider.getList();
+        List<T> list = modelTableDataProvider.getList();
         list.clear();
         list.addAll(newList);
 
         if(!list.isEmpty())
         {
-            attributesTable.getSelectionModel().setSelected(list.get(0), true);
+            modelTable.getSelectionModel().setSelected(list.get(0), true);
         }
         else if(wizard!=null) // loading happens before asWidget() is invoked
         {
@@ -288,16 +299,12 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
     }
 
     public void addAttribute(T policy) {
-        attributesProvider.getList().add(policy);
-        save(policy);
-    }
-
-    public void save(T policy) {
-        saveData(policy);
-
-        // This combination seems to consistently update the details view
-        attributesTable.getSelectionModel().setSelected(policy, true);
-        SelectionChangeEvent.fire(attributesTable.getSelectionModel());
+        if (onInsert(policy)) {
+            modelTableDataProvider.getList().add(policy);
+            // This combination seems to consistently update the details view
+            modelTable.getSelectionModel().setSelected(policy, true);
+            SelectionChangeEvent.fire(modelTable.getSelectionModel());
+        }
     }
 
     public interface Wizard<T> {
@@ -338,7 +345,20 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
      * @return the attributesTable
      */
     public DefaultCellTable<T> getAttributesTable() {
-        return attributesTable;
+        return modelTable;
     }
-
+    
+    /**
+     * @return the attributesProvider
+     */
+    public ListDataProvider<T> getAttributesProvider() {
+        return modelTableDataProvider;
+    }
+    
+    /**
+     * @return the addModule
+     */
+    public ToolButton getAddModule() {
+        return addModule;
+    }
 }

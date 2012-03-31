@@ -68,8 +68,9 @@ public class IdentityProviderEditor extends AbstractFederationEditor<IdentityPro
     }
 
     @Override
-    protected void saveData(IdentityProvider identityProvider) {
+    protected boolean onInsert(IdentityProvider identityProvider) {
         presenter.onCreateIdentityProvider(identityProvider);
+        return true;
     }
 
     /* (non-Javadoc)
@@ -109,13 +110,14 @@ public class IdentityProviderEditor extends AbstractFederationEditor<IdentityPro
     @Override
     protected void onDelete(IdentityProvider identityProvider) {
         this.presenter.onRemoveIdentityProvider(identityProvider);
+        getAddModule().setEnabled(true);
     }
 
     /**
      * @param changedValues
      */
-    public void onUpdate(Map<String, Object> changedValues) {
-        this.presenter.onUpdateIdentityProvider(getCurrentSelection(), changedValues);
+    public void onUpdate(IdentityProvider identityProvider, Map<String, Object> changedValues) {
+        this.presenter.onUpdateIdentityProvider(identityProvider, changedValues);
     }
 
     /*
@@ -163,7 +165,8 @@ public class IdentityProviderEditor extends AbstractFederationEditor<IdentityPro
      * @param resourceExists
      */
     public void setIdentityProviders(String name, List<IdentityProvider> modules, boolean resourceExists) {
-        setData(getPresenter().getView().getCurrentFederation().getName(), modules, resourceExists);
+        setData(name, modules, resourceExists);
+        getAddModule().setEnabled(modules.isEmpty());
     }
 
     /*

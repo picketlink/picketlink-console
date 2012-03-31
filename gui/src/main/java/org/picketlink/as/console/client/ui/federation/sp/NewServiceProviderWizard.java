@@ -34,11 +34,10 @@ import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
+import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor.Wizard;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationEditor;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.GenericFederationWizard;
-import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor.Wizard;
-import org.picketlink.as.console.client.ui.federation.idp.IdentityProviderEditor;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -59,12 +58,18 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
     protected FormItem<?>[] getCustomFields() {
         aliasesItem = new ComboBoxItem("name", "Name");
 
-        aliasesItem.setRequired(true);
+        if (!isDialogue()) {
+            aliasesItem.setEnabled(false);
+            aliasesItem.setRequired(false);
+        } else {
+            aliasesItem.setRequired(true);    
+        }
+        
 
         updateAliasItems();
 
         FormItem<?>[] formItems = new FormItem<?>[] { aliasesItem,
-                new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_identityURL(), true),
+                new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true),
                 new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), };
 
         return formItems;

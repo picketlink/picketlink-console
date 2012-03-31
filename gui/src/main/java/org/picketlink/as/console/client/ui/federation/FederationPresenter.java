@@ -22,7 +22,6 @@
 package org.picketlink.as.console.client.ui.federation;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -228,7 +227,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     @Override
     protected void onBind() {
         super.onBind();
-//        loadDeployments();
+        loadDeployments();
 //        loadFederations();
         getView().setPresenter(this);
     }
@@ -241,8 +240,8 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     @Override
     protected void onReset() {
         super.onReset();
-        getView().setSelectedFederation(this.selectedFederation);
         getView().initialLoad();
+        getView().setSelectedFederation(this.selectedFederation);
     }
 
     /**
@@ -288,8 +287,8 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     public void loadIdentityProvider(final Federation federation) {
         if (federation == null) {
             getView().updateIdentityProviders(null);
-            getView().updateTrustDomains(Collections.EMPTY_LIST);
-            getView().updateServiceProviders(Collections.EMPTY_LIST);
+            getView().updateTrustDomains(new ArrayList());
+            getView().updateServiceProviders(new ArrayList());
             return;
         }
 
@@ -300,7 +299,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
                     getView().setIdentityProviders(federation.getName(), result, !result.isEmpty());
                     loadTrustDomain(federation, result.get(0));
                 } else {
-                    getView().setIdentityProviders(federation.getName(), Collections.EMPTY_LIST, !result.isEmpty());
+                    getView().setIdentityProviders(federation.getName(), new ArrayList(), !result.isEmpty());
                     loadTrustDomain(federation, null);
                 }
             }
@@ -341,7 +340,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
                         }
                     });
         } else {
-            getView().setTrustedDomains(Collections.EMPTY_LIST);
+            getView().setTrustedDomains(new ArrayList());
         }
     }
 
@@ -774,7 +773,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         //
         // }
         // });
-        getView().setSelectedFederation(currentSelection.getName());
         loadIdentityProvider(currentSelection);
         loadServiceProviders(currentSelection);
     }

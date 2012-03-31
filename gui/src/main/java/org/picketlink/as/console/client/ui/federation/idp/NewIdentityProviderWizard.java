@@ -58,13 +58,23 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     protected FormItem<?>[] getCustomFields() {
         getAliasItem().setRequired(true);
         
+        
         updateAliasItems();
+        
+        if (!isDialogue()) {
+            getAliasItem().setEnabled(false);
+            getAliasItem().setRequired(false);
+        }
 
+        CheckBoxItem checkBoxItem = new CheckBoxItem("signOutgoingMessages",
+                PicketLinkConsoleFramework.CONSTANTS.common_label_signOutgoingMessages());
+        
+        checkBoxItem.setEnabled(false);
+        
         FormItem<?>[] formItems = new FormItem<?>[] {
                 getAliasItem(),
                 new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_identityURL(), true),
-                new CheckBoxItem("signOutgoingMessages",
-                        PicketLinkConsoleFramework.CONSTANTS.common_label_signOutgoingMessages()),
+                checkBoxItem,
                 new CheckBoxItem("ignoreIncomingSignatures",
                         PicketLinkConsoleFramework.CONSTANTS.common_label_ignoreIncomingSignatures()) };
 
@@ -90,6 +100,10 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     }
     
     private void updateAliasItems() {
+        if (getEditor().getPresenter().getAvailableDeployments() == null) {
+            return;
+        }
+        
         List<DeploymentRecord> availableIdentityProviders = new ArrayList<DeploymentRecord>();
         
         if (this.serviceProviders != null && !this.serviceProviders.isEmpty()) {

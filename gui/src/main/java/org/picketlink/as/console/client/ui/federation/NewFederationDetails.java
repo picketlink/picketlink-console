@@ -90,7 +90,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public void bind(CellTable<Federation> instanceTable) {
-        form.bind(instanceTable);
+//        form.bind(instanceTable);
     }
 
     /*
@@ -100,7 +100,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public void cancel() {
-
+        form.cancel();
     }
 
     /*
@@ -121,8 +121,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public void addEditListener(EditListener listener) {
-        // TODO Auto-generated method stub
-
+        form.addEditListener(listener);
     }
 
     /*
@@ -134,8 +133,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public void removeEditListener(EditListener listener) {
-        // TODO Auto-generated method stub
-
+        form.removeEditListener(listener);
     }
 
     /*
@@ -145,8 +143,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public Map<String, Object> getChangedValues() {
-        // TODO Auto-generated method stub
-        return null;
+        return form.getChangedValues();
     }
 
     /*
@@ -156,8 +153,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public Class<?> getConversionType() {
-        // TODO Auto-generated method stub
-        return null;
+        return Federation.class;
     }
 
     /*
@@ -167,8 +163,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public Federation getEditedEntity() {
-        // TODO Auto-generated method stub
-        return null;
+        return form.getEditedEntity();
     }
 
     /*
@@ -178,8 +173,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public Federation getUpdatedEntity() {
-        // TODO Auto-generated method stub
-        return null;
+        return form.getUpdatedEntity();
     }
 
     /*
@@ -189,8 +183,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public List<String> getFormItemNames() {
-        // TODO Auto-generated method stub
-        return null;
+        return form.getFormItemNames();
     }
 
     /*
@@ -200,8 +193,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public void setEnabled(boolean b) {
-        // TODO Auto-generated method stub
-
+        form.setEnabled(b);
     }
 
     /*
@@ -211,8 +203,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public FormValidation validate() {
-        // TODO Auto-generated method stub
-        return null;
+        return form.validate();
     }
 
     /*
@@ -222,8 +213,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
      */
     @Override
     public void clearValues() {
-        // TODO Auto-generated method stub
-
+        form.clearValues();
     }
 
 }
