@@ -145,9 +145,8 @@
 
 	<!-- Plugins -->
 	<build>
-		<finalName>as7-console</finalName>
+		<finalName>picketlink-console-${project.version}</finalName>
 		<outputDirectory>war/WEB-INF/classes</outputDirectory>
-
 		<resources>
 			<resource>
 				<directory>src/main/java</directory>
@@ -155,7 +154,6 @@
 		</resources>
 
 		<plugins>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -175,8 +173,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
@@ -196,7 +192,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.zanata</groupId>
 				<artifactId>zanata-maven-plugin</artifactId>
@@ -207,7 +202,6 @@
 					<projectVersion>master</projectVersion>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
@@ -224,6 +218,7 @@
 					<hostedWebapp>war</hostedWebapp>
 					<localWorkers>2</localWorkers>
 					<compileReport>false</compileReport>
+					<force>false</force>
 				</configuration>
 				<executions>
 					<execution>
@@ -254,7 +249,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -263,7 +257,6 @@
 					<target>1.6</target>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.bsc.maven</groupId>
 				<artifactId>maven-processor-plugin</artifactId>
@@ -287,16 +280,15 @@
 					</execution>
 				</executions>
 			</plugin>
-
 			<plugin>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1-beta-1</version>
+				<version>2.2</version>
 				<configuration>
 					<warSourceDirectory>war</warSourceDirectory>
 					<webappDirectory>war</webappDirectory>
+					<packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<artifactId>maven-clean-plugin</artifactId>
 				<version>2.2</version>
@@ -304,7 +296,6 @@
 					<skip>true</skip>
 				</configuration>
 			</plugin>
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -333,7 +324,6 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-
 					<execution>
 						<id>fake.war</id>
 						<phase>verify</phase>
@@ -350,10 +340,8 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-
 				</executions>
 			</plugin>
-
 		</plugins>
 		<pluginManagement>
 			<plugins>
