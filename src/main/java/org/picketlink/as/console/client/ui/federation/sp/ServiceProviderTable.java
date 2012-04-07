@@ -23,11 +23,17 @@
 package org.picketlink.as.console.client.ui.federation.sp;
 
 import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.widgets.tables.TextLinkCell;
+import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
+import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
+import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 /**
  * <p>
@@ -38,7 +44,13 @@ import com.google.gwt.user.cellview.client.TextColumn;
  * @since Mar 19, 2012
  */
 public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvider> {
+    
+    private FederationPresenter presenter;
 
+    public ServiceProviderTable(FederationPresenter presenter) {
+        this.presenter = presenter;
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -67,6 +79,21 @@ public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvi
         };
 
         table.addColumn(aliasColumn, Console.CONSTANTS.common_label_name());
+        
+        Column<ServiceProvider, ServiceProvider> reloadColumn = new Column<ServiceProvider, ServiceProvider>(new TextLinkCell<ServiceProvider>(
+                "Restart", new ActionCell.Delegate<ServiceProvider>() {
+                    @Override
+                    public void execute(ServiceProvider serviceProvider) {
+                        presenter.restartServiceProvider(serviceProvider);
+                    }
+                })) {
+            @Override
+            public ServiceProvider getValue(ServiceProvider domain) {
+                return domain;
+            }
+        };
+        
+        table.addColumn(reloadColumn, "Option");
     }
 
 }

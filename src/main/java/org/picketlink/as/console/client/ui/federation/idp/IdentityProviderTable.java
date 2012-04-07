@@ -23,10 +23,14 @@
 package org.picketlink.as.console.client.ui.federation.idp;
 
 import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.widgets.tables.TextLinkCell;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
+import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
+import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
 
 /**
@@ -38,7 +42,13 @@ import com.google.gwt.user.cellview.client.TextColumn;
  * @since Mar 19, 2012
  */
 public class IdentityProviderTable extends AbstractModelElementTable<IdentityProvider> {
+    
+    private FederationPresenter presenter;
 
+    public IdentityProviderTable(FederationPresenter presenter) {
+        this.presenter = presenter;
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -67,6 +77,21 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
         };
 
         table.addColumn(aliasColumn, Console.CONSTANTS.common_label_name());
+        
+        Column<IdentityProvider, IdentityProvider> reloadColumn = new Column<IdentityProvider, IdentityProvider>(new TextLinkCell<IdentityProvider>(
+                "Restart", new ActionCell.Delegate<IdentityProvider>() {
+                    @Override
+                    public void execute(IdentityProvider IdentityProvider) {
+                        presenter.restartIdentityProvider(IdentityProvider);
+                    }
+                })) {
+            @Override
+            public IdentityProvider getValue(IdentityProvider domain) {
+                return domain;
+            }
+        };
+        
+        table.addColumn(reloadColumn, "Option");
     }
 
 }

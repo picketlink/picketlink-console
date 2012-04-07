@@ -242,6 +242,7 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
                             public void onConfirmation(boolean isConfirmed) {
                                 if (isConfirmed) {
                                     table.getDataProvider().getList().remove(policy);
+                                    table.getCellTable().getSelectionModel().setSelected(null, true);
                                     doDelete(policy);
                                     wizard.clearValues();
                                 }

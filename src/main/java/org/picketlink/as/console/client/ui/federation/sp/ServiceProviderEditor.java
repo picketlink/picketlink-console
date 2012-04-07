@@ -26,10 +26,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
+
+import com.google.gwt.user.client.Window;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -38,7 +41,7 @@ import org.picketlink.as.console.client.ui.federation.Wizard;
 public class ServiceProviderEditor extends AbstractFederationDetailEditor<ServiceProvider> {
 
     public ServiceProviderEditor(FederationPresenter presenter) {
-        super(presenter, new ServiceProviderTable(), ServiceProvider.class);
+        super(presenter, new ServiceProviderTable(presenter), ServiceProvider.class);
     }
 
     /* (non-Javadoc)
@@ -66,8 +69,8 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
     }
 
     @Override
-    protected boolean doInsert(ServiceProvider identityProvider) {
-        getPresenter().onCreateServiceProvider(identityProvider);
+    protected boolean doInsert(ServiceProvider serviceProvider) {
+        getPresenter().onCreateServiceProvider(serviceProvider);
         return true;
     }
 
@@ -79,8 +82,8 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
      * client.shared.subsys.model.GenericFederationEntity)
      */
     @Override
-    protected void doDelete(ServiceProvider identityProvider) {
-        this.getPresenter().onRemoveServiceProvider(identityProvider);
+    protected void doDelete(ServiceProvider serviceProvider) {
+        this.getPresenter().onRemoveServiceProvider(serviceProvider);
     }
 
     /* (non-Javadoc)
@@ -88,6 +91,9 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
      */
     public void doUpdate(ServiceProvider serviceProvider, Map<String, Object> changedValues) {
         this.getPresenter().onUpdateServiceProvider(serviceProvider, changedValues);
+        if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
+            this.getPresenter().restartServiceProvider(serviceProvider);
+        }
     }
 
     /* (non-Javadoc)
@@ -107,4 +113,11 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
         setData(getPresenter().getView().getCurrentFederation().getName(), modules);
     }
 
+    public void setIdentityProvider(IdentityProvider identityProvider) {
+        if (identityProvider == null) {
+            disableAddButton();
+        } else {
+            enableAddButton();
+        }
+    }
 }

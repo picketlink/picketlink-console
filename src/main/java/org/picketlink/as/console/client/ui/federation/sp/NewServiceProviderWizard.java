@@ -81,6 +81,10 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
     }
 
     private void updateAliasItems() {
+        if (this.getPresenter().getAvailableDeployments() == null) {
+            return;
+        }
+        
         List<DeploymentRecord> availableIdentityProviders = new ArrayList<DeploymentRecord>();
 
         if (this.serviceProviders != null && !this.serviceProviders.isEmpty()) {

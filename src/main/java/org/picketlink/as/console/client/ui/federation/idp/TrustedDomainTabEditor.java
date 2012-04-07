@@ -97,6 +97,7 @@ public class TrustedDomainTabEditor {
                             && !newTrustedDomain.getName().trim().isEmpty()) {
                         presenter.onCreateTrustDomain(identityProvider, newTrustedDomain);
                         getTrustDomainTable().getDataProvider().getList().add(newTrustedDomain);
+                        showRestartDialog();
                     } else {
                         Window.alert(PicketLinkConsoleFramework.MESSAGES.invalidTrustedDomain());
                     }
@@ -125,6 +126,7 @@ public class TrustedDomainTabEditor {
                                 if (isConfirmed) {
                                     presenter.onRemoveTrustDomain(identityProvider, removedTrustedDomain);
                                     getTrustDomainTable().getDataProvider().getList().remove(removedTrustedDomain);
+                                    showRestartDialog();
                                 }
                             }
                         });
@@ -165,6 +167,12 @@ public class TrustedDomainTabEditor {
         return this.trustDomainTable;
     }
 
+    private void showRestartDialog() {
+        if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
+            presenter.restartIdentityProvider(identityProvider);
+        }        
+    }
+    
     /**
      * @param policy
      */

@@ -443,7 +443,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
                         }
 
                     });
-            restartIdentityProvider(identityProvider);
         }
     }
     
@@ -470,7 +469,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
                         }
 
                     });
-            restartServiceProvider(currentSelection);
         }
     }
 

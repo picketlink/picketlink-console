@@ -32,6 +32,7 @@ import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEd
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.TabPanel;
 
 /**
@@ -43,7 +44,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     private TrustedDomainTabEditor trustedDomainTabEditor;
 
     public IdentityProviderEditor(FederationPresenter presenter) {
-        super(presenter, new IdentityProviderTable(), IdentityProvider.class);
+        super(presenter, new IdentityProviderTable(presenter), IdentityProvider.class);
     }
 
     /* (non-Javadoc)
@@ -121,6 +122,9 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      */
     public void doUpdate(IdentityProvider identityProvider, Map<String, Object> changedValues) {
         this.getPresenter().onUpdateIdentityProvider(identityProvider, changedValues);
+        if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
+            this.getPresenter().restartIdentityProvider(identityProvider);
+        }
     }
 
     @Override

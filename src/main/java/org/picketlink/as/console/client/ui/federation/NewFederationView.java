@@ -172,6 +172,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     public void setIdentityProviders(String name, List<IdentityProvider> identityProviders) {
         getIdentityProviderEditor().setIdentityProviders(name, identityProviders);
+        getServiceProviderEditor().setIdentityProvider(getIdentityProviderEditor().getCurrentSelection());
     }
 
     @Override
