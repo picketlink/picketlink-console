@@ -1,5 +1,12 @@
+/.gwt
+/.external*
 /.settings
 /fake_war
 /target
 /.classpath
 /.project
+/war/PicketLinkConsole
+/war/WEB-INF/classes
+/war/WEB-INF/deploy/
+/war/WEB-INF/lib/
+/war/app
