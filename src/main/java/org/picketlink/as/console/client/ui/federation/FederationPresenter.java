@@ -337,7 +337,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
                         loadFederations();
                     }
                 });
-        this.restartIdentityProvider(identityProvider);
     }
 
     /**
@@ -515,7 +514,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
                                             .common_label_trustDomain() + " "), result.getResponse().toString());
                     }
                 });
-        restartIdentityProvider(identityProvider);
     }
 
     public void restartIdentityProvider(IdentityProvider identityProvider) {
