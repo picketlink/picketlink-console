@@ -82,7 +82,7 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
                 "Restart", new ActionCell.Delegate<IdentityProvider>() {
                     @Override
                     public void execute(IdentityProvider IdentityProvider) {
-                        presenter.restartIdentityProvider(IdentityProvider);
+                        presenter.getDeploymentManager().restartIdentityProvider(IdentityProvider);
                     }
                 })) {
             @Override

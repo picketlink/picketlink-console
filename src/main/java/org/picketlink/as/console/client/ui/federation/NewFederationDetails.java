@@ -33,6 +33,7 @@ import org.jboss.ballroom.client.widgets.forms.FormValidation;
 import org.jboss.ballroom.client.widgets.forms.TextItem;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
+import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -45,13 +46,16 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class NewFederationDetails implements FormAdapter<Federation> {
 
-    private Form<Federation> form;
+    private final Form<Federation> form;
+    private final FederationPresenter presenter;
+    private DigitalCertificateDetails digitalCertificateDetails;
 
     /**
      * @param table
      */
-    public NewFederationDetails() {
+    public NewFederationDetails(FederationPresenter presenter) {
         form = new Form<Federation>(Federation.class);
+        this.presenter = presenter;
     }
 
     /*
@@ -77,6 +81,11 @@ public class NewFederationDetails implements FormAdapter<Federation> {
         layout.add(new FormLayout().setSetTools(null).setHelp(null).setForm(form).build());
 
         tabPanel.add(layout, "Attributes");
+        
+        this.digitalCertificateDetails = new DigitalCertificateDetails(this.presenter);
+        
+        tabPanel.add(this.digitalCertificateDetails.asWidget(), "Digital Certificates");
+        
         tabPanel.selectTab(0);
 
         return tabPanel;
@@ -213,6 +222,10 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     @Override
     public void clearValues() {
         form.clearValues();
+    }
+
+    public void setKeyStore(KeyStore keyStore) {
+        this.digitalCertificateDetails.setKeyStore(keyStore);
     }
 
 }

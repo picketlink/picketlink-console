@@ -31,6 +31,8 @@ import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.model.DeploymentStore;
 import org.jboss.ballroom.client.widgets.window.Feedback;
 import org.jboss.dmr.client.ModelNode;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
@@ -46,6 +48,18 @@ public class DeploymentManager {
     @Inject
     public DeploymentManager(DeploymentStore deploymentStore) {
         this.deploymentStore = deploymentStore;
+    }
+    
+    public void restartIdentityProvider(IdentityProvider identityProvider) {
+        identityProvider.setName(identityProvider.getName());
+        identityProvider.setRuntimeName(identityProvider.getName());
+        enableDisableDeployment(identityProvider);
+    }
+
+    public void restartServiceProvider(ServiceProvider serviceProvider) {
+        serviceProvider.setName(serviceProvider.getName());
+        serviceProvider.setRuntimeName(serviceProvider.getName());
+        enableDisableDeployment(serviceProvider);
     }
     
     /**
@@ -111,7 +125,6 @@ public class DeploymentManager {
                 }
             }
         });
-
     }
     
 }

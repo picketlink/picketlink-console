@@ -52,18 +52,15 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     protected FormItem<?>[] doGetCustomFields() {
         getAliasItem().setRequired(true);
         
-        
         updateAliasItems();
         
         if (!isDialogue()) {
             getAliasItem().setEnabled(false);
             getAliasItem().setRequired(false);
         }
-
+        
         CheckBoxItem checkBoxItem = new CheckBoxItem("signOutgoingMessages",
                 PicketLinkConsoleFramework.CONSTANTS.common_label_signOutgoingMessages());
-        
-        checkBoxItem.setEnabled(false);
         
         FormItem<?>[] formItems = new FormItem<?>[] {
                 getAliasItem(),
@@ -86,7 +83,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
         return this.aliasesItem;
     }
 
-    private void updateAliasItems() {
+    public void updateAliasItems() {
         if (getPresenter().getAvailableDeployments() == null) {
             return;
         }

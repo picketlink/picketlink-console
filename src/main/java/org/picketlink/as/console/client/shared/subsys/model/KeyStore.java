@@ -20,32 +20,39 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.i18n;
+package org.picketlink.as.console.client.shared.subsys.model;
 
-import com.google.gwt.i18n.client.Constants;
-
+import org.jboss.as.console.client.widgets.forms.Address;
+import org.jboss.as.console.client.widgets.forms.Binding;
 
 /**
- * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
- * @since Mar 30, 2012
+ * <p>Federation bean definition.</p>
+ * <p>This interface also defines the address to be used when using the AS7 management API.</p>
+ * 
+ * @author Pedro Silva
+ * @since Mar 14, 2012
  */
-public interface PicketLinkUIConstants extends Constants {
+@Address("/subsystem=picketlink/federation={0}/key-store={1}")
+public interface KeyStore {
 
-    String common_label_federation();
-    String common_label_identityProvider();
-    String common_label_serviceProvider();
-    String common_label_trustDomain();
-    String common_label_alias();
-    String common_label_URL();
-    String common_label_ignoreIncomingSignatures();
-    String common_label_signOutgoingMessages();
-    String common_label_postBinding();
-    String common_label_trustedDomains();
-    String common_label_domainName();
-    String common_label_federationAlias();
-    String common_label_identityURL();
-    String common_label_key_store();
-    String subsys_picketlink_identity_provider_desc();
-    String subsys_picketlink_service_provider_desc();
+    @Binding(detypedName="url")
+    String getUrl();
     
+    void setUrl(String url);
+
+    @Binding(detypedName="passwd")
+    String getPasswd();
+    
+    void setPasswd(String passwd);
+
+    @Binding(detypedName="sign-key-alias", key=true)
+    String getSignKeyAlias();
+    
+    void setSignKeyAlias(String signKeyAlias);
+
+    @Binding(detypedName="sign-key-passwd")
+    String getSignKeyPasswd();
+    
+    void setSignKeyPasswd(String signKeyPasswd);
+
 }

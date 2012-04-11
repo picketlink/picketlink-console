@@ -28,7 +28,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.dispatch.impl.DMRAction;
 import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
 import org.jboss.as.console.client.shared.help.StaticHelpPanel;
@@ -45,7 +44,6 @@ import org.jboss.dmr.client.ModelDescriptionConstants;
 import org.jboss.dmr.client.ModelNode;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -62,7 +60,6 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
 
     private final AbstractFederationDetailEditor<T> editor;
     private final Class<T> entityClass;
-    private final BeanFactory factory = GWT.create(BeanFactory.class);
     private Form<T> form;
     private final FederationPresenter presenter;
 

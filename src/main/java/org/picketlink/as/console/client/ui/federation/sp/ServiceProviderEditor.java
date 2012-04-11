@@ -70,7 +70,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
 
     @Override
     protected boolean doInsert(ServiceProvider serviceProvider) {
-        getPresenter().onCreateServiceProvider(serviceProvider);
+        getPresenter().getFederationManager().onCreateServiceProvider(serviceProvider);
         return true;
     }
 
@@ -83,16 +83,16 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
      */
     @Override
     protected void doDelete(ServiceProvider serviceProvider) {
-        this.getPresenter().onRemoveServiceProvider(serviceProvider);
+        this.getPresenter().getFederationManager().onRemoveServiceProvider(serviceProvider);
     }
 
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor#doUpdate(org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity, java.util.Map)
      */
     public void doUpdate(ServiceProvider serviceProvider, Map<String, Object> changedValues) {
-        this.getPresenter().onUpdateServiceProvider(serviceProvider, changedValues);
+        this.getPresenter().getFederationManager().onUpdateServiceProvider(serviceProvider, changedValues);
         if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
-            this.getPresenter().restartServiceProvider(serviceProvider);
+            this.getPresenter().getDeploymentManager().restartServiceProvider(serviceProvider);
         }
     }
 

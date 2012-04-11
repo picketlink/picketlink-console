@@ -95,7 +95,7 @@ public class TrustedDomainTabEditor {
                     
                     if (newTrustedDomain != null
                             && !newTrustedDomain.getName().trim().isEmpty()) {
-                        presenter.onCreateTrustDomain(identityProvider, newTrustedDomain);
+                        presenter.getFederationManager().onCreateTrustDomain(identityProvider, newTrustedDomain);
                         getTrustDomainTable().getDataProvider().getList().add(newTrustedDomain);
                         showRestartDialog();
                     } else {
@@ -124,7 +124,7 @@ public class TrustedDomainTabEditor {
                             @Override
                             public void onConfirmation(boolean isConfirmed) {
                                 if (isConfirmed) {
-                                    presenter.onRemoveTrustDomain(identityProvider, removedTrustedDomain);
+                                    presenter.getFederationManager().onRemoveTrustDomain(identityProvider, removedTrustedDomain);
                                     getTrustDomainTable().getDataProvider().getList().remove(removedTrustedDomain);
                                     showRestartDialog();
                                 }
@@ -169,7 +169,7 @@ public class TrustedDomainTabEditor {
 
     private void showRestartDialog() {
         if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
-            presenter.restartIdentityProvider(identityProvider);
+            presenter.getDeploymentManager().restartIdentityProvider(identityProvider);
         }        
     }
     

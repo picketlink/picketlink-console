@@ -41,6 +41,7 @@ import org.jboss.ballroom.client.widgets.tabs.FakeTabPanel;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 import org.picketlink.as.console.client.ui.federation.idp.IdentityProviderEditor;
@@ -51,8 +52,6 @@ import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SingleSelectionModel;
 import com.google.inject.Inject;
 
 /**
@@ -72,7 +71,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     private String selectedFederation;
     private FederationTable federationsTable;
     private ServiceProviderEditor serviceProviderEditor;
-    private FormAdapter<Federation> federationDetails;
+    private NewFederationDetails federationDetails;
 
     /**
      * @param beanType
@@ -82,7 +81,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     public NewFederationView(ApplicationMetaData propertyMetaData, DispatchAsync dispatchAsync) {
         super(Federation.class, propertyMetaData, EnumSet.of(FrameworkButton.EDIT_SAVE));
         bridge = new EntityToDmrBridgeImpl<Federation>(propertyMetaData, Federation.class, this, dispatchAsync);
-        this.federationDetails = new NewFederationDetails();
     }
 
     @Override
@@ -174,6 +172,11 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         getIdentityProviderEditor().setIdentityProviders(name, identityProviders);
         getServiceProviderEditor().setIdentityProvider(getIdentityProviderEditor().getCurrentSelection());
     }
+    
+    @Override
+    public void setKeyStore(String name, KeyStore keyStore) {
+        this.federationDetails.setKeyStore(keyStore);
+    }
 
     @Override
     public void setServiceProviders(String name, List<ServiceProvider> serviceProviders) {
@@ -223,6 +226,10 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     }
 
     protected FormAdapter<Federation> makeEditEntityDetailsForm() {
+        if (this.federationDetails == null) {
+            this.federationDetails = new NewFederationDetails(this.presenter);
+        }
+
         return this.federationDetails;
     }
 
@@ -246,6 +253,8 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     public void setSelectedFederation(String alias) {
         this.selectedFederation = alias;
+        
+        this.presenter.loadDeployments();
         
         if (selectedFederation != null) {
             pages.showPage(1);

@@ -73,7 +73,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
     @Override
     protected boolean doInsert(IdentityProvider identityProvider) {
-        getPresenter().onCreateIdentityProvider(identityProvider);
+        getPresenter().getFederationManager().onCreateIdentityProvider(identityProvider);
         return true;
     }
 
@@ -113,7 +113,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      */
     @Override
     protected void doDelete(IdentityProvider identityProvider) {
-        this.getPresenter().onRemoveIdentityProvider(identityProvider);
+        this.getPresenter().getFederationManager().onRemoveIdentityProvider(identityProvider);
         enableAddButton();
     }
 
@@ -121,9 +121,9 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      * @see org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor#doUpdate(org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity, java.util.Map)
      */
     public void doUpdate(IdentityProvider identityProvider, Map<String, Object> changedValues) {
-        this.getPresenter().onUpdateIdentityProvider(identityProvider, changedValues);
+        this.getPresenter().getFederationManager().onUpdateIdentityProvider(identityProvider, changedValues);
         if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
-            this.getPresenter().restartIdentityProvider(identityProvider);
+            this.getPresenter().getDeploymentManager().restartIdentityProvider(identityProvider);
         }
     }
 

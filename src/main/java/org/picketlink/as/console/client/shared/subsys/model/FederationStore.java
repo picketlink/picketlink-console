@@ -57,6 +57,16 @@ public interface FederationStore {
 
     /**
      * <p>
+     * Loads the keystore configuration given a federation instance.
+     * </p>
+     * 
+     * @param federation
+     * @param simpleCallback
+     */
+    void loadKeyStore(Federation federation, SimpleCallback<List<KeyStore>> simpleCallback);
+    
+    /**
+     * <p>
      * Loads the service providers configurations given a federation instance.
      * </p>
      * 
@@ -74,6 +84,16 @@ public interface FederationStore {
      * @param callback
      */
     void createFederation(Federation federation, AsyncCallback<ResponseWrapper<Boolean>> callback);
+    
+    /**
+     * <p>
+     * Create a new keystore element configuration in the subsystem.
+     * </p>
+     * 
+     * @param keyStore
+     * @param simpleCallback
+     */
+    void createKeyStore(Federation federation, KeyStore keyStore, SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
 
     /**
      * <p>
@@ -155,5 +175,10 @@ public interface FederationStore {
      */
     void updateServiceProvider(Federation currentFederation, ServiceProvider currentSelection,
             Map<String, Object> changedValues, SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
-    
+
+    void updateKeyStore(Federation currentFederation, KeyStore updatedEntity, Map<String, Object> changedValues,
+            SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    void deleteKeyStore(Federation federation, KeyStore keyStore, SimpleCallback<Boolean> simpleCallback);
+
 }

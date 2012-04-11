@@ -25,6 +25,7 @@ package org.picketlink.as.console.client;
 import org.jboss.as.console.spi.BeanFactoryExtension;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 
@@ -48,4 +49,6 @@ public interface PicketlinkBeanFactory {
     AutoBean<ServiceProvider> serviceProvider();
     
     AutoBean<TrustDomain> trustDomain();
+    
+    AutoBean<KeyStore> keyStore();
 }

@@ -24,7 +24,6 @@ package org.picketlink.as.console.client.ui.federation.sp;
 
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.widgets.tables.TextLinkCell;
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
@@ -33,7 +32,6 @@ import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 /**
  * <p>
@@ -84,7 +82,7 @@ public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvi
                 "Restart", new ActionCell.Delegate<ServiceProvider>() {
                     @Override
                     public void execute(ServiceProvider serviceProvider) {
-                        presenter.restartServiceProvider(serviceProvider);
+                        presenter.getDeploymentManager().restartServiceProvider(serviceProvider);
                     }
                 })) {
             @Override
