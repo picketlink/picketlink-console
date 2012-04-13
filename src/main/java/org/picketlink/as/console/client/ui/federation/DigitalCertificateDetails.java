@@ -103,6 +103,7 @@ public class DigitalCertificateDetails {
                     presenter.getFederationManager().onRemoveKeyStore(keyStore);
                     form.clearValues();
                     form.edit(presenter.getBeanFactory().keyStore().as());
+                    signKeyAliasItem.setEnabled(true);
                 } else {
                     Window.alert("You must save before removing.");
                 }

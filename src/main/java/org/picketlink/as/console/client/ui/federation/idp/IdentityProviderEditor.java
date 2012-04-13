@@ -25,6 +25,7 @@ package org.picketlink.as.console.client.ui.federation.idp;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
@@ -162,6 +163,12 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      */
     public void setTrustedDomains(List<TrustDomain> result) {
         this.getTrustedDomainTabEditor().getTrustDomainTable().getDataProvider().setList(result);
+    }
+
+    public void updateDeployments(List<DeploymentRecord> deployments) {
+        if (getWizard() != null) {
+            ((NewIdentityProviderWizard) getWizard()).updateAliasItems();
+        }
     }
 
 }

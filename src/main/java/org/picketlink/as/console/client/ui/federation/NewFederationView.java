@@ -27,6 +27,7 @@ import java.util.List;
 
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
+import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.viewframework.AbstractEntityView;
 import org.jboss.as.console.client.shared.viewframework.EntityEditor;
 import org.jboss.as.console.client.shared.viewframework.EntityToDmrBridge;
@@ -159,6 +160,13 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     public Federation getCurrentFederation() {
         return this.federationsTable.getSelectedFederation();
+    }
+
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#updateDeployments(java.util.List)
+     */
+    public void updateDeployments(List<DeploymentRecord> deployments) {
+        getIdentityProviderEditor().updateDeployments(deployments);
     }
 
     /*

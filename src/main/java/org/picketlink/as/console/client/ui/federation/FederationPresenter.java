@@ -75,6 +75,8 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         void setTrustedDomains(List<TrustDomain> result);
 
         void setKeyStore(String name, KeyStore keyStore);
+
+        void updateDeployments(List<DeploymentRecord> deployments);
     }
 
     @ProxyCodeSplit
@@ -146,7 +148,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     @Override
     protected void onBind() {
         super.onBind();
-        loadDeployments();
         getView().setPresenter(this);
     }
 
@@ -201,6 +202,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     @Override
     public void onLoadDeployments(List<DeploymentRecord> deployments) {
         this.availableDeployments = deployments;
+        getView().updateDeployments(deployments);
     }
 
     public DispatchAsync getDispatchAsync() {

@@ -371,4 +371,8 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
     protected Class<T> getEntityClass() {
         return entityClass;
     }
+    
+    public Wizard<T> getWizard() {
+        return wizard;
+    }
 }
