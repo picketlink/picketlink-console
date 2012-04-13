@@ -22,7 +22,6 @@
 
 package org.picketlink.as.console.client.ui.federation.sp;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.as.console.client.shared.model.DeploymentRecord;
@@ -34,8 +33,8 @@ import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
-import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationWizard;
+import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
 
 /**
@@ -45,7 +44,7 @@ import org.picketlink.as.console.client.ui.federation.Wizard;
 public class NewServiceProviderWizard<T extends GenericFederationEntity> extends AbstractFederationWizard<T> implements Wizard<T> {
 
     private ComboBoxItem aliasesItem;
-    private List<ServiceProvider> serviceProviders;
+    private ComboBoxItem deploymentsItem;
 
     public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
         super(editor, cls, presenter, type, "alias", "url", "postBinding");
@@ -53,19 +52,21 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
 
     @Override
     protected FormItem<?>[] doGetCustomFields() {
-        aliasesItem = new ComboBoxItem("name", "Name");
-
+        ComboBoxItem aliasItem = null;
+        
         if (!isDialogue()) {
-            aliasesItem.setEnabled(false);
-            aliasesItem.setRequired(false);
+            this.deploymentsItem = new ComboBoxItem("name", "Alias");
+            aliasItem = this.deploymentsItem;
+            updateAliasComboBox(aliasItem, this.getPresenter().getAllDeployments());
+            aliasItem.setEnabled(false);
+            aliasItem.setRequired(false);
         } else {
-            aliasesItem.setRequired(true);    
+            aliasItem = getAliasItem();
+            aliasItem.setRequired(true);
+            updateAliasItems();
         }
         
-
-        updateAliasItems();
-
-        FormItem<?>[] formItems = new FormItem<?>[] { aliasesItem,
+        FormItem<?>[] formItems = new FormItem<?>[] { aliasItem,
                 new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true),
                 new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), };
 
@@ -77,38 +78,43 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
      */
     public void setServiceProviders(List<ServiceProvider> result) {
         updateAliasItems();
-        this.serviceProviders = result;
     }
 
-    private void updateAliasItems() {
-        if (this.getPresenter().getAvailableDeployments() == null) {
+    /**
+     * @return
+     */
+    private ComboBoxItem getAliasItem() {
+        if (this.aliasesItem == null) {
+            this.aliasesItem = new ComboBoxItem("name", "Alias");
+        }
+
+        return this.aliasesItem;
+    }
+
+    public void updateAliasItems() {
+        if (this.deploymentsItem != null) {
+            updateAliasComboBox(this.deploymentsItem, this.getPresenter().getAllDeployments());            
+        }
+        updateAliasComboBox(getAliasItem(), this.getPresenter().getAvailableDeployments());
+    }
+
+    private void updateAliasComboBox(ComboBoxItem aliasItem, List<DeploymentRecord> deployments) {
+        if (getPresenter().getAllDeployments() == null) {
             return;
         }
         
-        List<DeploymentRecord> availableIdentityProviders = new ArrayList<DeploymentRecord>();
+        String[] aliases = new String[deployments.size()];
+        
+        for (int i = 0; i < deployments.size(); i++) {
+            aliases[i] = deployments.get(i).getName();
+        }
 
-        if (this.serviceProviders != null && !this.serviceProviders.isEmpty()) {
-            for (DeploymentRecord serviceProvider : serviceProviders) {
-                for (DeploymentRecord deploymentRecord : this.getPresenter().getAvailableDeployments()) {
-                    if (!serviceProvider.getName().equals(deploymentRecord.getName())) {
-                        availableIdentityProviders.add(deploymentRecord);
-                    }
-                }
+        aliasItem.setValueMap(aliases);
+        
+        if (!isDialogue()) {
+            if (this.getServiceProviderEditor().getCurrentSelection() != null) {
+                aliasItem.setValue(this.getServiceProviderEditor().getCurrentSelection().getName());            
             }
-        } else {
-            availableIdentityProviders.addAll(this.getPresenter().getAvailableDeployments());
-        }
-
-        String[] aliases = new String[availableIdentityProviders.size()];
-
-        for (int i = 0; i < availableIdentityProviders.size(); i++) {
-            aliases[i] = availableIdentityProviders.get(i).getName();
-        }
-
-        aliasesItem.setValueMap(aliases);
-
-        if (this.getServiceProviderEditor().getCurrentSelection() != null) {
-            aliasesItem.setValue(this.getServiceProviderEditor().getCurrentSelection().getName());
         }
     }
 

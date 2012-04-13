@@ -25,8 +25,8 @@ package org.picketlink.as.console.client.ui.federation.sp;
 import java.util.List;
 import java.util.Map;
 
+import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
@@ -73,6 +73,16 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
         getPresenter().getFederationManager().onCreateServiceProvider(serviceProvider);
         return true;
     }
+    
+    @Override
+    protected boolean onLunchWizard() {
+        if (this.getPresenter().getIdentityProvider() == null) {
+            Window.alert("Please, configure an Identity Provider first.");
+            return false;
+        }
+        
+        return true;
+    }
 
     /*
      * (non-Javadoc)
@@ -113,11 +123,9 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
         setData(getPresenter().getView().getCurrentFederation().getName(), modules);
     }
 
-    public void setIdentityProvider(IdentityProvider identityProvider) {
-        if (identityProvider == null) {
-            disableAddButton();
-        } else {
-            enableAddButton();
+    public void updateDeployments(List<DeploymentRecord> deployments) {
+        if (getWizard() != null) {
+            ((NewServiceProviderWizard) getWizard()).updateAliasItems();
         }
     }
 }

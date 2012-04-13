@@ -15,20 +15,27 @@ import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
+import org.picketlink.as.console.client.ui.federation.idp.AddIdentityProviderEvent;
+import org.picketlink.as.console.client.ui.federation.idp.RemoveIdentityProviderEvent;
+import org.picketlink.as.console.client.ui.federation.sp.AddServiceProviderEvent;
+import org.picketlink.as.console.client.ui.federation.sp.RemoveServiceProviderEvent;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
 
 public class FederationManager {
 
     private final FederationStore federationStore;
     private final DeploymentManager deploymentManager;
+    private final EventBus eventBus;
     
     private FederationPresenter presenter;
     
     @Inject
-    public FederationManager(FederationStore federationStore, DeploymentManager deploymentManager) {
+    public FederationManager(FederationStore federationStore, DeploymentManager deploymentManager, EventBus eventBus) {
         this.federationStore = federationStore;
         this.deploymentManager = deploymentManager;
+        this.eventBus = eventBus;
     }
     
     /**
@@ -70,6 +77,7 @@ public class FederationManager {
                 // if the idp application is deployed populate the view, otherwise remove it from the subsystem and clear the view.
                 if (isDeployed(identityProvider)) {
                     presenter.getView().setIdentityProviders(federation.getName(), result);
+                    eventBus.fireEvent(new AddIdentityProviderEvent(identityProvider));
                     loadTrustDomain(federation, identityProvider);
                 } else {
                     onRemoveIdentityProvider(identityProvider);
@@ -93,7 +101,7 @@ public class FederationManager {
             private boolean isDeployed(IdentityProvider identityProvider) {
                 boolean isDeployed = false;
                 
-                for (DeploymentRecord deployment : presenter.getAvailableDeployments()) {
+                for (DeploymentRecord deployment : presenter.getAllDeployments()) {
                     if (deployment.getName().equals(identityProvider.getName())) {
                         isDeployed = true;
                         break;
@@ -151,9 +159,10 @@ public class FederationManager {
                 for (ServiceProvider serviceProvider : new ArrayList<ServiceProvider>(serviceProviders)) {
                     boolean isDeployed = false;
 
-                    for (DeploymentRecord deployment : presenter.getAvailableDeployments()) {
+                    for (DeploymentRecord deployment : presenter.getAllDeployments()) {
                         if (deployment.getName().equals(serviceProvider.getName())) {
                             isDeployed = true;
+                            eventBus.fireEvent(new AddServiceProviderEvent(serviceProvider));
                             break;
                         }
                     }
@@ -400,7 +409,8 @@ public class FederationManager {
                                     .toString());
                     }
                 });
-        this.deploymentManager.restartServiceProvider(serviceProvider);
+        this.presenter.loadDeployments();
+        this.eventBus.fireEvent(new AddServiceProviderEvent(serviceProvider));
     }
     
     /**
@@ -424,7 +434,8 @@ public class FederationManager {
                         loadAllFederationConfiguration();
                     }
                 });
-        this.deploymentManager.restartServiceProvider(serviceProvider);
+        this.presenter.loadDeployments();
+        this.eventBus.fireEvent(new RemoveServiceProviderEvent(serviceProvider));
     }
 
     /**
@@ -453,7 +464,8 @@ public class FederationManager {
                     }
                 });
 
-        this.deploymentManager.restartIdentityProvider(identityProvider);
+        this.presenter.loadDeployments();
+        this.eventBus.fireEvent(new AddIdentityProviderEvent(identityProvider));
     }
 
     /**
@@ -478,6 +490,8 @@ public class FederationManager {
                         deploymentManager.restartIdentityProvider(identityProvider);
                     }
                 });
+        this.eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
+        this.presenter.loadDeployments();
     }
 
     /**

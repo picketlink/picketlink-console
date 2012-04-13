@@ -32,8 +32,8 @@ import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
-import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationWizard;
+import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
 
 /**
@@ -43,6 +43,7 @@ import org.picketlink.as.console.client.ui.federation.Wizard;
 public class NewIdentityProviderWizard<T extends GenericFederationEntity> extends AbstractFederationWizard<T> implements Wizard<T> {
 
     private ComboBoxItem aliasesItem;
+    private ComboBoxItem deploymentsItem;
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
         super(editor, cls, presenter, type, "alias", "url", "signOutgoingMessages", "ignoreIncomingSignatures");
@@ -50,20 +51,25 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
     @Override
     protected FormItem<?>[] doGetCustomFields() {
-        getAliasItem().setRequired(true);
-        
-        updateAliasItems();
+        ComboBoxItem aliasItem = null;
         
         if (!isDialogue()) {
-            getAliasItem().setEnabled(false);
-            getAliasItem().setRequired(false);
+            this.deploymentsItem = new ComboBoxItem("name", "Alias");
+            aliasItem = this.deploymentsItem;
+            updateAliasComboBox(aliasItem, this.getPresenter().getAllDeployments());
+            aliasItem.setEnabled(false);
+            aliasItem.setRequired(false);
+        } else {
+            aliasItem = getAliasItem();
+            aliasItem.setRequired(true);
+            updateAliasItems();
         }
         
         CheckBoxItem checkBoxItem = new CheckBoxItem("signOutgoingMessages",
                 PicketLinkConsoleFramework.CONSTANTS.common_label_signOutgoingMessages());
         
         FormItem<?>[] formItems = new FormItem<?>[] {
-                getAliasItem(),
+                aliasItem,
                 new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_identityURL(), true),
                 checkBoxItem,
                 new CheckBoxItem("ignoreIncomingSignatures",
@@ -84,22 +90,29 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     }
 
     public void updateAliasItems() {
-        if (getPresenter().getAvailableDeployments() == null) {
+        if (this.deploymentsItem != null) {
+            updateAliasComboBox(this.deploymentsItem, this.getPresenter().getAllDeployments());            
+        }
+        updateAliasComboBox(getAliasItem(), this.getPresenter().getAvailableDeployments());
+    }
+
+    private void updateAliasComboBox(ComboBoxItem aliasItem, List<DeploymentRecord> deployments) {
+        if (getPresenter().getAllDeployments() == null) {
             return;
         }
         
-        List<DeploymentRecord> availableDeployments = getPresenter().getAvailableDeployments();
+        String[] aliases = new String[deployments.size()];
         
-        String[] aliases = new String[availableDeployments.size()];
-        
-        for (int i = 0; i < availableDeployments.size(); i++) {
-            aliases[i] = availableDeployments.get(i).getName();
+        for (int i = 0; i < deployments.size(); i++) {
+            aliases[i] = deployments.get(i).getName();
         }
 
-        getAliasItem().setValueMap(aliases);
+        aliasItem.setValueMap(aliases);
         
-        if (this.getIdentityProviderEditor().getCurrentSelection() != null) {
-            getAliasItem().setValue(this.getIdentityProviderEditor().getCurrentSelection().getName());            
+        if (!isDialogue()) {
+            if (this.getIdentityProviderEditor().getCurrentSelection() != null) {
+                aliasItem.setValue(this.getIdentityProviderEditor().getCurrentSelection().getName());            
+            }
         }
     }
     

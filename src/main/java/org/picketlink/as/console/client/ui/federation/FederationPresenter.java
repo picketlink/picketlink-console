@@ -21,6 +21,7 @@
  */
 package org.picketlink.as.console.client.ui.federation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jboss.as.console.client.shared.BeanFactory;
@@ -35,6 +36,12 @@ import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
+import org.picketlink.as.console.client.ui.federation.idp.AddIdentityProviderEvent;
+import org.picketlink.as.console.client.ui.federation.idp.ChangedIdentityProviderHandler;
+import org.picketlink.as.console.client.ui.federation.idp.RemoveIdentityProviderEvent;
+import org.picketlink.as.console.client.ui.federation.sp.AddServiceProviderEvent;
+import org.picketlink.as.console.client.ui.federation.sp.ChangedServiceProviderHandler;
+import org.picketlink.as.console.client.ui.federation.sp.RemoveServiceProviderEvent;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.shared.EventBus;
@@ -57,7 +64,7 @@ import com.gwtplatform.mvp.client.proxy.Proxy;
  * @since 03/01/2011
  */
 public class FederationPresenter extends Presenter<FederationPresenter.MyView, FederationPresenter.MyProxy> implements
-        DeploymentCallback {
+        DeploymentCallback, ChangedIdentityProviderHandler, ChangedServiceProviderHandler {
 
     public interface MyView extends View {
         void setPresenter(FederationPresenter presenter);
@@ -93,7 +100,11 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     private final FederationManager federationManager;
 
     private List<DeploymentRecord> availableDeployments;
+    
     private String selectedFederation;
+    private IdentityProvider identityProvider;
+    private List<DeploymentRecord> allDeployments;
+    private List<ServiceProvider> serviceProviders = new ArrayList<ServiceProvider>();
 
     @Inject
     public FederationPresenter(final EventBus eventBus, BeanFactory beanFactory, final MyView view, final MyProxy proxy,
@@ -106,6 +117,10 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         this.beanFactory = beanFactory;
         this.federationManager = federationManager;
         this.federationManager.setPresenter(this);
+        eventBus.addHandler(AddIdentityProviderEvent.TYPE, this);
+        eventBus.addHandler(RemoveIdentityProviderEvent.TYPE, this);
+        eventBus.addHandler(AddServiceProviderEvent.TYPE, this);
+        eventBus.addHandler(RemoveServiceProviderEvent.TYPE, this);
     }
 
     /*
@@ -176,6 +191,10 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     public List<DeploymentRecord> getAvailableDeployments() {
         return this.availableDeployments;
     }
+    
+    public List<DeploymentRecord> getAllDeployments() {
+        return this.allDeployments;
+    }
 
     /**
      * @return
@@ -201,8 +220,24 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
      */
     @Override
     public void onLoadDeployments(List<DeploymentRecord> deployments) {
-        this.availableDeployments = deployments;
-        getView().updateDeployments(deployments);
+        this.availableDeployments = new ArrayList<DeploymentRecord>(deployments);
+        this.allDeployments = new ArrayList<DeploymentRecord>(deployments);
+        
+        for (DeploymentRecord deployment : new ArrayList<DeploymentRecord>(this.availableDeployments)) {
+            if (this.identityProvider != null) { 
+                if (deployment.getName().equals(this.identityProvider.getName())) {
+                    this.availableDeployments.remove(deployment);
+                }
+            }
+            
+            for (ServiceProvider serviceProvider : this.serviceProviders) {
+                if (deployment.getName().equals(serviceProvider.getName())) {
+                    this.availableDeployments.remove(deployment);
+                }
+            }
+        }
+        
+        getView().updateDeployments(this.availableDeployments);
     }
 
     public DispatchAsync getDispatchAsync() {
@@ -219,5 +254,39 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     
     public DeploymentManager getDeploymentManager() {
         return this.deploymentManager;
+    }
+
+    @Override
+    public void onAddIdentityProvider(IdentityProvider identityProvider) {
+        this.identityProvider = identityProvider;
+    }
+
+    @Override
+    public void onRemoveIdentityProvider(IdentityProvider identityProvider) {
+        this.identityProvider = null;
+    }
+
+    @Override
+    public void onAddServiceProvider(ServiceProvider serviceProvider) {
+        for (ServiceProvider configureServiceProviders : this.serviceProviders) {
+            if (configureServiceProviders.getName().equals(serviceProvider.getName())) {
+                return;
+            }
+        }
+        
+        this.serviceProviders.add(serviceProvider);
+    }
+
+    @Override
+    public void onRemoveServiceProvider(ServiceProvider serviceProvider) {
+        for (ServiceProvider configureServiceProviders : new ArrayList<ServiceProvider>(this.serviceProviders)) {
+            if (configureServiceProviders.getName().equals(serviceProvider.getName())) {
+                this.serviceProviders.remove(configureServiceProviders);
+            }
+        }
+    }
+
+    public Object getIdentityProvider() {
+        return this.identityProvider;
     }
 }

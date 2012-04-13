@@ -167,6 +167,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
      */
     public void updateDeployments(List<DeploymentRecord> deployments) {
         getIdentityProviderEditor().updateDeployments(deployments);
+        getServiceProviderEditor().updateDeployments(deployments);
     }
 
     /*
@@ -178,7 +179,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     public void setIdentityProviders(String name, List<IdentityProvider> identityProviders) {
         getIdentityProviderEditor().setIdentityProviders(name, identityProviders);
-        getServiceProviderEditor().setIdentityProvider(getIdentityProviderEditor().getCurrentSelection());
     }
     
     @Override

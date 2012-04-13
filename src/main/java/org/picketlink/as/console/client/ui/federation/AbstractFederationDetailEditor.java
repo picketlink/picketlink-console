@@ -226,7 +226,9 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
         addModule.addClickHandler(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
-                launchWizard(null);
+                if (onLunchWizard()) {
+                    launchWizard(null);                    
+                }
             }
         });
         addModule.ensureDebugId(Console.DEBUG_CONSTANTS.debug_label_add_abstractDomainDetailEditor());
@@ -235,23 +237,36 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
             @Override
             public void onClick(ClickEvent event) {
 
-                final T policy = getCurrentSelection();
-                Feedback.confirm(Console.MESSAGES.deleteTitle(doGetEntityName()),
-                        Console.MESSAGES.deleteConfirm(policy.getName()), new Feedback.ConfirmationHandler() {
-                            @Override
-                            public void onConfirmation(boolean isConfirmed) {
-                                if (isConfirmed) {
-                                    table.getDataProvider().getList().remove(policy);
-                                    table.getCellTable().getSelectionModel().setSelected(null, true);
-                                    doDelete(policy);
-                                    wizard.clearValues();
+                final T currentSelection = getCurrentSelection();
+                
+                if (currentSelection != null) {
+                    Feedback.confirm(Console.MESSAGES.deleteTitle(doGetEntityName()),
+                            Console.MESSAGES.deleteConfirm(currentSelection.getName()), new Feedback.ConfirmationHandler() {
+                                @Override
+                                public void onConfirmation(boolean isConfirmed) {
+                                    if (isConfirmed) {
+                                        table.getDataProvider().getList().remove(currentSelection);
+                                        table.getCellTable().getSelectionModel().setSelected(null, true);
+                                        doDelete(currentSelection);
+                                        wizard.clearValues();
+                                    }
                                 }
-                            }
-                        });
+                            });
+                }
             }
         }));
 
         vpanel.add(tableTools);
+    }
+    
+    /**
+     * <p>
+     * Subclasses can override this method to do something when the Add button is called.
+     * </p>
+     * @return 
+     */
+    protected boolean onLunchWizard() {
+        return true;
     }
 
     /**
