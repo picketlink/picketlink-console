@@ -22,7 +22,10 @@
 package org.picketlink.as.console.client.ui.federation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
@@ -102,9 +105,12 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     private List<DeploymentRecord> availableDeployments;
     
     private String selectedFederation;
-    private IdentityProvider identityProvider;
+    private Map<String, IdentityProvider> identityProviders = new HashMap<String, IdentityProvider>();
+    private Map<String, List<ServiceProvider>> serviceProviders = new HashMap<String, List<ServiceProvider>>();
+    
+//    private IdentityProvider identityProvider;
     private List<DeploymentRecord> allDeployments;
-    private List<ServiceProvider> serviceProviders = new ArrayList<ServiceProvider>();
+//    private List<ServiceProvider> serviceProviders = new ArrayList<ServiceProvider>();
 
     @Inject
     public FederationPresenter(final EventBus eventBus, BeanFactory beanFactory, final MyView view, final MyProxy proxy,
@@ -151,8 +157,8 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
 
     @Override
     public void prepareFromRequest(PlaceRequest request) {
-        super.prepareFromRequest(request);
         this.selectedFederation = request.getParameter("name", null);
+        super.prepareFromRequest(request);
     }
 
     /*
@@ -224,20 +230,52 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         this.allDeployments = new ArrayList<DeploymentRecord>(deployments);
         
         for (DeploymentRecord deployment : new ArrayList<DeploymentRecord>(this.availableDeployments)) {
-            if (this.identityProvider != null) { 
-                if (deployment.getName().equals(this.identityProvider.getName())) {
+            boolean isAvailable = true;
+            
+            for (Map.Entry<String, IdentityProvider> identityProviders : this.identityProviders.entrySet()) {
+                if (deployment.getName().equals(identityProviders.getValue().getName())) {
                     this.availableDeployments.remove(deployment);
+                    isAvailable = false;
+                }
+            }
+
+            for (Entry<String, List<ServiceProvider>> serviceProviders : this.serviceProviders.entrySet()) {
+                for (ServiceProvider serviceProvider : serviceProviders.getValue()) {
+                    if (deployment.getName().equals(serviceProvider.getName())) {
+                        this.availableDeployments.remove(deployment);
+                        isAvailable = false;
+                    }
+                    
                 }
             }
             
-            for (ServiceProvider serviceProvider : this.serviceProviders) {
-                if (deployment.getName().equals(serviceProvider.getName())) {
-                    this.availableDeployments.remove(deployment);
-                }
+            if (isAvailable && !this.availableDeployments.contains(deployment)) {
+                this.availableDeployments.add(deployment);
             }
         }
         
         getView().updateDeployments(this.availableDeployments);
+//        getView().setSelectedFederation(this.selectedFederation);
+    }
+
+    public IdentityProvider getIdentityProvider(){
+        if (this.selectedFederation == null) {
+            return null;
+        }
+        
+        return this.identityProviders.get(this.selectedFederation);
+    }
+
+    private List<ServiceProvider> getServiceProviders() {
+        if (this.selectedFederation == null) {
+            return null;
+        }
+
+        if (this.serviceProviders.get(this.selectedFederation) == null) {
+            this.serviceProviders.put(this.selectedFederation, new ArrayList<ServiceProvider>());
+        }
+        
+        return this.serviceProviders.get(this.selectedFederation);
     }
 
     public DispatchAsync getDispatchAsync() {
@@ -258,35 +296,63 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
 
     @Override
     public void onAddIdentityProvider(IdentityProvider identityProvider) {
-        this.identityProvider = identityProvider;
+        if (this.selectedFederation != null) {
+            this.identityProviders.put(this.selectedFederation, identityProvider);
+        }
     }
 
     @Override
     public void onRemoveIdentityProvider(IdentityProvider identityProvider) {
-        this.identityProvider = null;
+        this.identityProviders.remove(this.selectedFederation);
     }
 
     @Override
     public void onAddServiceProvider(ServiceProvider serviceProvider) {
-        for (ServiceProvider configureServiceProviders : this.serviceProviders) {
-            if (configureServiceProviders.getName().equals(serviceProvider.getName())) {
-                return;
+        if (getServiceProviders() != null) {
+            for (ServiceProvider configureServiceProviders : getServiceProviders()) {
+                if (configureServiceProviders.getName().equals(serviceProvider.getName())) {
+                    return;
+                }
             }
+            
+            getServiceProviders().add(serviceProvider);
         }
-        
-        this.serviceProviders.add(serviceProvider);
     }
 
     @Override
     public void onRemoveServiceProvider(ServiceProvider serviceProvider) {
-        for (ServiceProvider configureServiceProviders : new ArrayList<ServiceProvider>(this.serviceProviders)) {
+        for (ServiceProvider configureServiceProviders : new ArrayList<ServiceProvider>(getServiceProviders())) {
             if (configureServiceProviders.getName().equals(serviceProvider.getName())) {
-                this.serviceProviders.remove(configureServiceProviders);
+                getServiceProviders().remove(configureServiceProviders);
             }
         }
     }
 
-    public Object getIdentityProvider() {
-        return this.identityProvider;
+//    public void clearFederation() {
+//        if (this.selectedFederation != null) {
+//            this.identityProviders.remove(this.selectedFederation);
+//            this.serviceProviders.remove(this.selectedFederation);
+//        }
+//    }
+
+    public void clearFederation(Federation federation) {
+        if (federation != null) {
+            for (Map.Entry<String, IdentityProvider> identityProviders : new HashMap<String, IdentityProvider>(this.identityProviders).entrySet()) {
+                if (identityProviders.getKey().equals(federation.getName())) {
+                    continue;
+                }
+                
+                this.identityProviders.remove(federation.getName());
+            }
+            
+            for (Entry<String, List<ServiceProvider>> serviceProviders : new HashMap<String, List<ServiceProvider>>(this.serviceProviders).entrySet()) {
+                if (serviceProviders.getKey().equals(federation.getName())) {
+                    continue;
+                }
+                
+                this.serviceProviders.remove(federation.getName());
+            }
+        }
     }
+
 }

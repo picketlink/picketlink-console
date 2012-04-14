@@ -40,26 +40,6 @@ public class FederationManager {
     
     /**
      * <p>
-     * Loads all the federation configurations from the subsystem. This includes idps, sps, etc.
-     * </p>
-     */
-    private void loadAllFederationConfiguration() {
-        this.federationStore.loadFederations(new SimpleCallback<List<Federation>>() {
-
-            @Override
-            public void onSuccess(List<Federation> result) {
-                if (!result.isEmpty()) {
-                    Federation federation = result.get(0);
-                    
-                    loadIdentityProvider(federation);
-                    loadServiceProviders(federation);
-                }
-            }
-        });
-    }
-    
-    /**
-     * <p>
      * Loads the identity provider instances from the subsystem.
      * </p>
      */
@@ -218,7 +198,6 @@ public class FederationManager {
                     Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants().common_label_federation()
                             + " ")
                             + federation.getName());
-                    loadAllFederationConfiguration();
                 } else
                     Console.error(
                             Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants().common_label_federation()
@@ -247,10 +226,9 @@ public class FederationManager {
                             .common_label_federation() + " ")
                             + federation.getName());
                 }
-
-                loadAllFederationConfiguration();
             }
         });
+        this.presenter.loadDeployments();
     }
 
     /**
@@ -269,7 +247,6 @@ public class FederationManager {
                         if (result.getUnderlying()) {
                             Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
                                     .common_label_key_store()));
-                            loadAllFederationConfiguration();
                         } else
                             Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
                                     .common_label_key_store()));
@@ -312,8 +289,6 @@ public class FederationManager {
                 } else {
                     Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants().common_label_key_store()));
                 }
-
-                loadAllFederationConfiguration();
             }
         });        
     }
@@ -332,7 +307,6 @@ public class FederationManager {
                             Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
                                     .common_label_trustDomain() + " ")
                                     + trustDomain.getName());
-                            loadAllFederationConfiguration();
                         } else
                             Console.error(
                                     Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
@@ -358,8 +332,6 @@ public class FederationManager {
                                     .common_label_trustDomain() + " ")
                                     + trustDomain.getName());
                         }
-
-                        loadAllFederationConfiguration();
                     }
                 });
     }
@@ -402,13 +374,13 @@ public class FederationManager {
                             Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
                                     .common_label_serviceProvider() + " ")
                                     + serviceProvider.getName());
-                            loadAllFederationConfiguration();
                         } else
                             Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
                                     .common_label_serviceProvider() + " " + serviceProvider.getName()), result.getResponse()
                                     .toString());
                     }
                 });
+        this.deploymentManager.restartServiceProvider(serviceProvider);
         this.presenter.loadDeployments();
         this.eventBus.fireEvent(new AddServiceProviderEvent(serviceProvider));
     }
@@ -431,9 +403,9 @@ public class FederationManager {
                                     + serviceProvider.getName());
                         }
 
-                        loadAllFederationConfiguration();
                     }
                 });
+        this.deploymentManager.restartServiceProvider(serviceProvider);
         this.presenter.loadDeployments();
         this.eventBus.fireEvent(new RemoveServiceProviderEvent(serviceProvider));
     }
@@ -456,7 +428,6 @@ public class FederationManager {
                             Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
-                            loadAllFederationConfiguration();
                         } else
                             Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " " + identityProvider.getName()), result.getResponse()
@@ -485,11 +456,9 @@ public class FederationManager {
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
                         }
-
-                        loadAllFederationConfiguration();
-                        deploymentManager.restartIdentityProvider(identityProvider);
                     }
                 });
+        this.deploymentManager.restartIdentityProvider(identityProvider);
         this.eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
         this.presenter.loadDeployments();
     }

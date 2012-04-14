@@ -169,6 +169,12 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         getIdentityProviderEditor().updateDeployments(deployments);
         getServiceProviderEditor().updateDeployments(deployments);
     }
+    
+    @Override
+    public void refresh() {
+        this.presenter.clearFederation(this.getCurrentFederation());
+        super.refresh();
+    }
 
     /*
      * (non-Javadoc)
@@ -261,8 +267,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     public void setSelectedFederation(String alias) {
         this.selectedFederation = alias;
-        
-        this.presenter.loadDeployments();
         
         if (selectedFederation != null) {
             pages.showPage(1);
