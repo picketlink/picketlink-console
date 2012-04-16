@@ -22,9 +22,7 @@
 package org.picketlink.as.console.client.ui.federation;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.jboss.as.console.client.shared.BeanFactory;
@@ -35,16 +33,11 @@ import org.jboss.as.console.spi.Subsystem;
 import org.jboss.ballroom.client.layout.LHSHighlightEvent;
 import org.picketlink.as.console.client.NameTokens;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
-import org.picketlink.as.console.client.ui.federation.idp.AddIdentityProviderEvent;
-import org.picketlink.as.console.client.ui.federation.idp.ChangedIdentityProviderHandler;
-import org.picketlink.as.console.client.ui.federation.idp.RemoveIdentityProviderEvent;
-import org.picketlink.as.console.client.ui.federation.sp.AddServiceProviderEvent;
-import org.picketlink.as.console.client.ui.federation.sp.ChangedServiceProviderHandler;
-import org.picketlink.as.console.client.ui.federation.sp.RemoveServiceProviderEvent;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.shared.EventBus;
@@ -67,7 +60,7 @@ import com.gwtplatform.mvp.client.proxy.Proxy;
  * @since 03/01/2011
  */
 public class FederationPresenter extends Presenter<FederationPresenter.MyView, FederationPresenter.MyProxy> implements
-        DeploymentCallback, ChangedIdentityProviderHandler, ChangedServiceProviderHandler {
+        DeploymentCallback {
 
     public interface MyView extends View {
         void setPresenter(FederationPresenter presenter);
@@ -78,7 +71,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
 
         void setSelectedFederation(String selectedFederation);
 
-        void setIdentityProviders(String name, List<IdentityProvider> modules);
+        void setIdentityProviders(String name, List<IdentityProviderWrapper> identityProviders);
 
         void setServiceProviders(String string, List<ServiceProvider> result);
 
@@ -103,14 +96,9 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     private final FederationManager federationManager;
 
     private List<DeploymentRecord> availableDeployments;
+    private List<DeploymentRecord> allDeployments;
     
     private String selectedFederation;
-    private Map<String, IdentityProvider> identityProviders = new HashMap<String, IdentityProvider>();
-    private Map<String, List<ServiceProvider>> serviceProviders = new HashMap<String, List<ServiceProvider>>();
-    
-//    private IdentityProvider identityProvider;
-    private List<DeploymentRecord> allDeployments;
-//    private List<ServiceProvider> serviceProviders = new ArrayList<ServiceProvider>();
 
     @Inject
     public FederationPresenter(final EventBus eventBus, BeanFactory beanFactory, final MyView view, final MyProxy proxy,
@@ -123,10 +111,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         this.beanFactory = beanFactory;
         this.federationManager = federationManager;
         this.federationManager.setPresenter(this);
-        eventBus.addHandler(AddIdentityProviderEvent.TYPE, this);
-        eventBus.addHandler(RemoveIdentityProviderEvent.TYPE, this);
-        eventBus.addHandler(AddServiceProviderEvent.TYPE, this);
-        eventBus.addHandler(RemoveServiceProviderEvent.TYPE, this);
+        this.deploymentManager.setPresenter(this);
     }
 
     /*
@@ -170,6 +155,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     protected void onBind() {
         super.onBind();
         getView().setPresenter(this);
+        loadDeployments();
     }
 
     /*
@@ -192,31 +178,14 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     }
 
     /**
-     * @return the availableDeployments
-     */
-    public List<DeploymentRecord> getAvailableDeployments() {
-        return this.availableDeployments;
-    }
-    
-    public List<DeploymentRecord> getAllDeployments() {
-        return this.allDeployments;
-    }
-
-    /**
-     * @return
-     */
-    public PlaceManager getPlaceManager() {
-        return this.placeManager;
-    }
-
-    /**
+     * <p>
+     * This methos is called when a federation is selected, added or removed from the table. Loads the configuration for all configure federations.
+     * </p>
+     * 
      * @param currentSelection
      */
     public void updateFederationSelection(final Federation currentSelection) {
-        loadDeployments();
-        getFederationManager().loadKeyStore(currentSelection);
-        getFederationManager().loadIdentityProvider(currentSelection);
-        getFederationManager().loadServiceProviders(currentSelection);
+        getFederationManager().loadAllFederations();
     }
 
     /*
@@ -226,56 +195,101 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
      */
     @Override
     public void onLoadDeployments(List<DeploymentRecord> deployments) {
-        this.availableDeployments = new ArrayList<DeploymentRecord>(deployments);
-        this.allDeployments = new ArrayList<DeploymentRecord>(deployments);
+        FederationWrapper selectedFederationConfig = getSelectedFederationConfig();
         
-        for (DeploymentRecord deployment : new ArrayList<DeploymentRecord>(this.availableDeployments)) {
-            boolean isAvailable = true;
-            
-            for (Map.Entry<String, IdentityProvider> identityProviders : this.identityProviders.entrySet()) {
-                if (deployment.getName().equals(identityProviders.getValue().getName())) {
-                    this.availableDeployments.remove(deployment);
-                    isAvailable = false;
-                }
+        // if a federation was selected update the view with the informations
+        if (selectedFederationConfig != null) {
+            if (!selectedFederationConfig.getKeyStores().isEmpty()) {
+                getView().setKeyStore(selectedFederation, selectedFederationConfig.getKeyStores().get(0));            
             }
-
-            for (Entry<String, List<ServiceProvider>> serviceProviders : this.serviceProviders.entrySet()) {
-                for (ServiceProvider serviceProvider : serviceProviders.getValue()) {
-                    if (deployment.getName().equals(serviceProvider.getName())) {
-                        this.availableDeployments.remove(deployment);
-                        isAvailable = false;
+            
+            List<IdentityProviderWrapper> identityProviders = selectedFederationConfig.getIdentityProviders();
+            
+            for (DeploymentRecord deployment : deployments) {
+                for (IdentityProviderWrapper identityProviderWrapper : identityProviders) {
+                    if (deployment.getName().equals(identityProviderWrapper.getIdentityProvider().getName())) {
+                        identityProviderWrapper.getIdentityProvider().setEnabled(deployment.isEnabled());
                     }
-                    
                 }
             }
             
-            if (isAvailable && !this.availableDeployments.contains(deployment)) {
-                this.availableDeployments.add(deployment);
+            getView().setIdentityProviders(selectedFederation, identityProviders);
+            getView().setServiceProviders(selectedFederation, selectedFederationConfig.getServiceProviders());
+        }
+        
+        // updates the deployments list
+        this.allDeployments = deployments;
+        
+        // updates the available deployments list 
+        updateAvailableDeployments();
+    }
+
+    /**
+     * <p>
+     * Returns the selected federation configuration.
+     * </p>
+     * 
+     * @return
+     */
+    private FederationWrapper getSelectedFederationConfig() {
+        FederationWrapper federation = null;
+        
+        if (this.selectedFederation != null) {
+            federation = this.federationManager.getFederations().get(selectedFederation);
+        }
+        
+        return federation;
+    }
+
+    /**
+     * <p>
+     * Updates the deployments that can be used as idps and sps.
+     * If an deployment is already configured it is removed from the list.
+     * </p>
+     */
+    private void updateAvailableDeployments() {
+        this.availableDeployments = new ArrayList<DeploymentRecord>(this.allDeployments);
+        
+        for (Entry<String, FederationWrapper> entry : this.federationManager.getFederations().entrySet()) {
+            FederationWrapper federation = entry.getValue();
+            
+            for (DeploymentRecord deploymentRecord : new ArrayList<DeploymentRecord>(this.availableDeployments)) {
+                for (IdentityProviderWrapper identityProvider : federation.getIdentityProviders()) {
+                    if (deploymentRecord.getName().equals(identityProvider.getIdentityProvider().getName())) {
+                        identityProvider.getIdentityProvider().setEnabled(deploymentRecord.isEnabled());
+                        this.availableDeployments.remove(deploymentRecord);
+                    }
+                }
+            }
+            
+            for (DeploymentRecord deploymentRecord : new ArrayList<DeploymentRecord>(this.availableDeployments)) {
+                for (ServiceProvider serviceProvider : federation.getServiceProviders()) {
+                    if (deploymentRecord.getName().equals(serviceProvider.getName())) {
+                        serviceProvider.setEnabled(true);
+                        this.availableDeployments.remove(deploymentRecord);
+                    }
+                }
             }
         }
         
         getView().updateDeployments(this.availableDeployments);
-//        getView().setSelectedFederation(this.selectedFederation);
     }
 
-    public IdentityProvider getIdentityProvider(){
-        if (this.selectedFederation == null) {
-            return null;
+    /**
+     * <p>
+     * Returns the idp configured for the selected federation.
+     * </p>
+     * 
+     * @return
+     */
+    public IdentityProviderWrapper getIdentityProvider(){
+        IdentityProviderWrapper identityProvider = null;
+        
+        if (getSelectedFederationConfig() != null) {
+            identityProvider = getSelectedFederationConfig().getIdentityProvider();
         }
         
-        return this.identityProviders.get(this.selectedFederation);
-    }
-
-    private List<ServiceProvider> getServiceProviders() {
-        if (this.selectedFederation == null) {
-            return null;
-        }
-
-        if (this.serviceProviders.get(this.selectedFederation) == null) {
-            this.serviceProviders.put(this.selectedFederation, new ArrayList<ServiceProvider>());
-        }
-        
-        return this.serviceProviders.get(this.selectedFederation);
+        return identityProvider;
     }
 
     public DispatchAsync getDispatchAsync() {
@@ -294,65 +308,15 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         return this.deploymentManager;
     }
 
-    @Override
-    public void onAddIdentityProvider(IdentityProvider identityProvider) {
-        if (this.selectedFederation != null) {
-            this.identityProviders.put(this.selectedFederation, identityProvider);
-        }
+    public PlaceManager getPlaceManager() {
+        return this.placeManager;
     }
-
-    @Override
-    public void onRemoveIdentityProvider(IdentityProvider identityProvider) {
-        this.identityProviders.remove(this.selectedFederation);
+    
+    public List<DeploymentRecord> getAvailableDeployments() {
+        return this.availableDeployments;
     }
-
-    @Override
-    public void onAddServiceProvider(ServiceProvider serviceProvider) {
-        if (getServiceProviders() != null) {
-            for (ServiceProvider configureServiceProviders : getServiceProviders()) {
-                if (configureServiceProviders.getName().equals(serviceProvider.getName())) {
-                    return;
-                }
-            }
-            
-            getServiceProviders().add(serviceProvider);
-        }
+    
+    public List<DeploymentRecord> getAllDeployments() {
+        return this.allDeployments;
     }
-
-    @Override
-    public void onRemoveServiceProvider(ServiceProvider serviceProvider) {
-        for (ServiceProvider configureServiceProviders : new ArrayList<ServiceProvider>(getServiceProviders())) {
-            if (configureServiceProviders.getName().equals(serviceProvider.getName())) {
-                getServiceProviders().remove(configureServiceProviders);
-            }
-        }
-    }
-
-//    public void clearFederation() {
-//        if (this.selectedFederation != null) {
-//            this.identityProviders.remove(this.selectedFederation);
-//            this.serviceProviders.remove(this.selectedFederation);
-//        }
-//    }
-
-    public void clearFederation(Federation federation) {
-        if (federation != null) {
-            for (Map.Entry<String, IdentityProvider> identityProviders : new HashMap<String, IdentityProvider>(this.identityProviders).entrySet()) {
-                if (identityProviders.getKey().equals(federation.getName())) {
-                    continue;
-                }
-                
-                this.identityProviders.remove(federation.getName());
-            }
-            
-            for (Entry<String, List<ServiceProvider>> serviceProviders : new HashMap<String, List<ServiceProvider>>(this.serviceProviders).entrySet()) {
-                if (serviceProviders.getKey().equals(federation.getName())) {
-                    continue;
-                }
-                
-                this.serviceProviders.remove(federation.getName());
-            }
-        }
-    }
-
 }

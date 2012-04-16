@@ -115,7 +115,7 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
                         T data = form.getUpdatedEntity();
                         editor.doSaveWizard(data);
                     }
-
+                    presenter.loadDeployments();
                     editor.closeWizard();
                 }
             }
@@ -132,6 +132,7 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
                 @Override
                 public void onDelete(T entity) {
                     editor.closeWizard();
+                    presenter.loadDeployments();
                 }
             });
 

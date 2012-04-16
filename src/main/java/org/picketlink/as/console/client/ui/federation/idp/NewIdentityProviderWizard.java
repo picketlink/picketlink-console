@@ -29,6 +29,7 @@ import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
+import org.jboss.ballroom.client.widgets.forms.TextItem;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
@@ -40,19 +41,26 @@ import org.picketlink.as.console.client.ui.federation.Wizard;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 30, 2012
  */
-public class NewIdentityProviderWizard<T extends GenericFederationEntity> extends AbstractFederationWizard<T> implements Wizard<T> {
+public class NewIdentityProviderWizard<T extends GenericFederationEntity> extends AbstractFederationWizard<T> implements
+        Wizard<T> {
 
     private ComboBoxItem aliasesItem;
+    private TextItem editAliasesItem;
     private ComboBoxItem deploymentsItem;
+    private CheckBoxItem signOutgoingMessages;
+    private CheckBoxItem ignoreIncomingSignature;
+    private TextBoxItem url;
+    private CheckBoxItem externalIDP;
 
-    public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
+    public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
+            String type) {
         super(editor, cls, presenter, type, "alias", "url", "signOutgoingMessages", "ignoreIncomingSignatures");
     }
 
     @Override
     protected FormItem<?>[] doGetCustomFields() {
         ComboBoxItem aliasItem = null;
-        
+
         if (!isDialogue()) {
             this.deploymentsItem = new ComboBoxItem("name", "Alias");
             aliasItem = this.deploymentsItem;
@@ -64,16 +72,43 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
             aliasItem.setRequired(true);
             updateAliasItems();
         }
-        
-        CheckBoxItem checkBoxItem = new CheckBoxItem("signOutgoingMessages",
+
+        FormItem<?>[] formItems = null;
+
+        signOutgoingMessages = new CheckBoxItem("signOutgoingMessages",
                 PicketLinkConsoleFramework.CONSTANTS.common_label_signOutgoingMessages());
-        
-        FormItem<?>[] formItems = new FormItem<?>[] {
-                aliasItem,
-                new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_identityURL(), true),
-                checkBoxItem,
-                new CheckBoxItem("ignoreIncomingSignatures",
-                        PicketLinkConsoleFramework.CONSTANTS.common_label_ignoreIncomingSignatures()) };
+
+        ignoreIncomingSignature = new CheckBoxItem("ignoreIncomingSignatures",
+                PicketLinkConsoleFramework.CONSTANTS.common_label_ignoreIncomingSignatures());
+
+        url = new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_identityURL(), true);
+
+        if (isDialogue()) {
+            externalIDP = new CheckBoxItem("external", "Is external?") {
+                @Override
+                protected void doValueChange() {
+                    if (getValue() != null && getValue()) {
+                        getAliasItem().setEnabled(false);
+                        getAliasItem().setRequired(false);
+                        ignoreIncomingSignature.setEnabled(false);
+                        signOutgoingMessages.setEnabled(false);
+                    } else {
+                        getAliasItem().setEnabled(true);
+                        getAliasItem().setRequired(true);
+                        ignoreIncomingSignature.setEnabled(true);
+                        signOutgoingMessages.setEnabled(true);
+                    }
+                }
+            };
+
+            formItems = new FormItem<?>[] { externalIDP, aliasItem, url, signOutgoingMessages, ignoreIncomingSignature };
+        } else {
+            editAliasesItem = new TextItem("name", "Alias");
+            
+            editAliasesItem.setEnabled(true);
+
+            formItems = new FormItem<?>[] { editAliasesItem, url, signOutgoingMessages, ignoreIncomingSignature };
+        }
 
         return formItems;
     }
@@ -91,33 +126,45 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
     public void updateAliasItems() {
         if (this.deploymentsItem != null) {
-            updateAliasComboBox(this.deploymentsItem, this.getPresenter().getAllDeployments());            
+            updateAliasComboBox(this.deploymentsItem, this.getPresenter().getAllDeployments());
         }
+
         updateAliasComboBox(getAliasItem(), this.getPresenter().getAvailableDeployments());
+
+        if (getPresenter().getIdentityProvider() != null && getPresenter().getIdentityProvider().getIdentityProvider() != null
+                && getPresenter().getIdentityProvider().getIdentityProvider().getName().indexOf("external") != -1) {
+            editAliasesItem.setEnabled(false);
+            signOutgoingMessages.setEnabled(false);
+            ignoreIncomingSignature.setEnabled(false);
+        }
     }
 
     private void updateAliasComboBox(ComboBoxItem aliasItem, List<DeploymentRecord> deployments) {
         if (getPresenter().getAllDeployments() == null) {
             return;
         }
-        
+
         String[] aliases = new String[deployments.size()];
-        
+
         for (int i = 0; i < deployments.size(); i++) {
             aliases[i] = deployments.get(i).getName();
         }
 
         aliasItem.setValueMap(aliases);
-        
+
         if (!isDialogue()) {
             if (this.getIdentityProviderEditor().getCurrentSelection() != null) {
-                aliasItem.setValue(this.getIdentityProviderEditor().getCurrentSelection().getName());            
+                aliasItem.setValue(this.getIdentityProviderEditor().getCurrentSelection().getName());
             }
         }
     }
-    
+
     public IdentityProviderEditor getIdentityProviderEditor() {
         return (IdentityProviderEditor) this.getEditor();
+    }
+
+    public boolean isExternalIDP() {
+        return this.externalIDP != null && this.externalIDP.getValue();
     }
 
 }

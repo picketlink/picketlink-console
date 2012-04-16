@@ -22,6 +22,7 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -42,6 +43,7 @@ import org.jboss.ballroom.client.widgets.tabs.FakeTabPanel;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
@@ -172,7 +174,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     
     @Override
     public void refresh() {
-        this.presenter.clearFederation(this.getCurrentFederation());
         super.refresh();
     }
 
@@ -183,8 +184,18 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
      * java.util.List, boolean)
      */
     @Override
-    public void setIdentityProviders(String name, List<IdentityProvider> identityProviders) {
-        getIdentityProviderEditor().setIdentityProviders(name, identityProviders);
+    public void setIdentityProviders(String name, List<IdentityProviderWrapper> identityProviders) {
+        List<IdentityProvider> list = new ArrayList<IdentityProvider>();
+        List<TrustDomain> trustDomains = new ArrayList<TrustDomain>();
+        
+        for (IdentityProviderWrapper identityProvider : identityProviders) {
+            list.add(identityProvider.getIdentityProvider());
+            
+            trustDomains.addAll(identityProvider.getTrustDomains());
+        }
+
+        getIdentityProviderEditor().setIdentityProviders(name, list);
+        getIdentityProviderEditor().setTrustedDomains(trustDomains);
     }
     
     @Override
@@ -255,7 +266,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     protected DefaultCellTable<Federation> makeEntityTable() {
         this.federationsTable = new FederationTable(this.presenter, this.federationDetails);
-        
         return this.federationsTable.getCellTable();
     }
 

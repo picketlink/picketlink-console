@@ -227,6 +227,7 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
             @Override
             public void onClick(ClickEvent event) {
                 if (onLunchWizard()) {
+                    presenter.loadDeployments();
                     launchWizard(null);                    
                 }
             }

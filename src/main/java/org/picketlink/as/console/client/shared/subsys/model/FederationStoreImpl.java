@@ -31,6 +31,7 @@ import static org.jboss.dmr.client.ModelDescriptionConstants.REMOVE;
 import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
 import static org.jboss.dmr.client.ModelDescriptionConstants.SUCCESS;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -47,6 +48,7 @@ import org.jboss.as.console.client.widgets.forms.AddressBinding;
 import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
 import org.jboss.as.console.client.widgets.forms.BeanMetaData;
 import org.jboss.as.console.client.widgets.forms.EntityAdapter;
+import org.jboss.dmr.client.ModelDescriptionConstants;
 import org.jboss.dmr.client.ModelNode;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -563,6 +565,70 @@ public class FederationStoreImpl implements FederationStore {
             }
         });
     }
+    
+    @Override
+    public void loadConfiguration(final SimpleCallback<Map<String, FederationWrapper>> callback) {
+        AddressBinding address = federationMetaData.getAddress();
+        ModelNode operation = address.asSubresource(baseadress.getAdress());
+        operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
+        operation.get(ModelDescriptionConstants.RECURSIVE).set(true);
+        
+        dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode response = result.get();
+
+                if (response.isFailure()) {
+                    callback.onFailure(new RuntimeException(response.getFailureDescription()));
+                } else {
+                    Map<String, FederationWrapper> federations = new HashMap<String, FederationWrapper>();
+                    
+                    for (ModelNode federationNode : response.get(RESULT).asList()) {
+                        FederationWrapper wrapper = new FederationWrapper();
+                        Federation federation = federationAdapter.fromDMR(federationNode);
+
+                        if (federationNode.asProperty().getValue().get("key-store").isDefined()) {
+                            List<KeyStore> keyStores = keyStoreAdapter.fromDMRList(federationNode.asProperty().getValue().get("key-store").asList());
+                            
+                            wrapper.getKeyStores().addAll(keyStores);
+                        }
+
+                        if (federationNode.asProperty().getValue().get("identity-provider").isDefined()) {
+                            for (ModelNode idpNode : federationNode.asProperty().getValue().get("identity-provider").asList()) {
+                                IdentityProviderWrapper idpWrapper = new IdentityProviderWrapper(identityProviderAdapter.fromDMR(idpNode));
+                                
+                                if (idpNode.asProperty().getValue().get("trust-domain").isDefined()) {
+                                    for (ModelNode keyStoreNode : idpNode.asProperty().getValue().get("trust-domain").asList()) {
+                                        TrustDomain trustDomain = trustDomainAdapter.fromDMR(keyStoreNode);
+                                        
+                                        idpWrapper.addTrustDomain(trustDomain);
+                                    }
+                                }
+                                
+                                wrapper.addIdentityProvider(idpWrapper);
+                            }
+                        }
+
+                        if (federationNode.asProperty().getValue().get("service-provider").isDefined()) {
+                            List<ServiceProvider> serviceProviders = serviceProviderAdapter.fromDMRList(federationNode.asProperty().getValue().get("service-provider").asList());
+                            
+                            wrapper.getServiceProviders().addAll(serviceProviders);
+                        }
+                        
+                        federations.put(federation.getName(), wrapper);
+                        
+                        callback.onSuccess(federations);
+                    }
+                }
+            }
+        });        
+    }
+
 
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#loadKeyStore(org.picketlink.as.console.client.shared.subsys.model.Federation, org.jboss.as.console.client.domain.model.SimpleCallback)
@@ -663,4 +729,5 @@ public class FederationStoreImpl implements FederationStore {
             }
         });
     }
+
 }

@@ -1,16 +1,15 @@
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.model.ResponseWrapper;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
+import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
@@ -31,6 +30,8 @@ public class FederationManager {
     
     private FederationPresenter presenter;
     
+    private Map<String, FederationWrapper> federations = new HashMap<String, FederationWrapper>();
+    
     @Inject
     public FederationManager(FederationStore federationStore, DeploymentManager deploymentManager, EventBus eventBus) {
         this.federationStore = federationStore;
@@ -38,150 +39,6 @@ public class FederationManager {
         this.eventBus = eventBus;
     }
     
-    /**
-     * <p>
-     * Loads the identity provider instances from the subsystem.
-     * </p>
-     */
-    public void loadIdentityProvider(final Federation federation) {
-        this.federationStore.loadIdentityProviders(federation, new SimpleCallback<List<IdentityProvider>>() {
-            @Override
-            public void onSuccess(List<IdentityProvider> result) {
-                if (result.isEmpty()) {
-                    clearValues(federation);
-                    return;
-                }
-                
-                IdentityProvider identityProvider = result.get(0);
-                
-                // if the idp application is deployed populate the view, otherwise remove it from the subsystem and clear the view.
-                if (isDeployed(identityProvider)) {
-                    presenter.getView().setIdentityProviders(federation.getName(), result);
-                    eventBus.fireEvent(new AddIdentityProviderEvent(identityProvider));
-                    loadTrustDomain(federation, identityProvider);
-                } else {
-                    onRemoveIdentityProvider(identityProvider);
-                    clearValues(federation);
-                }
-            }
-
-            private void clearValues(final Federation federation) {
-                presenter.getView().setIdentityProviders(federation.getName(), new ArrayList());
-                loadTrustDomain(federation, null);
-            }
-
-            /**
-             * <p>
-             * Checks if the idp application is deployed in the AS.
-             * </p>
-             * 
-             * @param identityProvider
-             * @return
-             */
-            private boolean isDeployed(IdentityProvider identityProvider) {
-                boolean isDeployed = false;
-                
-                for (DeploymentRecord deployment : presenter.getAllDeployments()) {
-                    if (deployment.getName().equals(identityProvider.getName())) {
-                        isDeployed = true;
-                        break;
-                    }
-                }
-                
-                return isDeployed;
-            }
-        });
-    }
-    
-    /**
-     * <p>
-     * Loads the federation instances from the subsystem.
-     * </p>
-     */
-    public void loadKeyStore(final Federation federation) {
-        this.federationStore.loadKeyStore(federation, new SimpleCallback<List<KeyStore>>() {
-            @Override
-            public void onSuccess(List<KeyStore> result) {
-                if (!result.isEmpty()) {
-                    presenter.getView().setKeyStore(federation.getName(), result.get(0));
-                } else {
-                    presenter.getView().setKeyStore(federation.getName(), null);
-                }
-            }
-        });
-    }
-    
-    /**
-     * <p>
-     * Loads the service providers instances from the subsystem, given a selected federation instance.
-     * </p>
-     * 
-     * @param federation
-     */
-    public void loadServiceProviders(final Federation federation) {
-        this.federationStore.loadServiceProviders(federation, new SimpleCallback<List<ServiceProvider>>() {
-            @Override
-            public void onSuccess(List<ServiceProvider> serviceProviders) {
-                removeUndeployedServiceProviders(serviceProviders);
-                presenter.getView().setServiceProviders(federation.getName(), serviceProviders);
-            }
-
-            /**
-             * <p>
-             * Check if the service providers are deployed in the AS. If not remove them from the subsystem.
-             * </p>
-             * 
-             * @param serviceProviders
-             */
-            private void removeUndeployedServiceProviders(List<ServiceProvider> serviceProviders) {
-                List<ServiceProvider> toRemove = new ArrayList<ServiceProvider>();
-                
-                for (ServiceProvider serviceProvider : new ArrayList<ServiceProvider>(serviceProviders)) {
-                    boolean isDeployed = false;
-
-                    for (DeploymentRecord deployment : presenter.getAllDeployments()) {
-                        if (deployment.getName().equals(serviceProvider.getName())) {
-                            isDeployed = true;
-                            eventBus.fireEvent(new AddServiceProviderEvent(serviceProvider));
-                            break;
-                        }
-                    }
-                    
-                    if (!isDeployed) {
-                        serviceProviders.remove(serviceProvider);
-                        toRemove.add(serviceProvider);
-                    }
-                }
-                
-                for (ServiceProvider serviceProvider : toRemove) {
-                    onRemoveServiceProvider(serviceProvider);                        
-                }
-            }
-        });
-    }
-    
-    /**
-     * <p>
-     * Loads the service providers instances from the subsystem, given a selected federation instance.
-     * </p>
-     * 
-     * @param federation
-     * 
-     * @param federation
-     */
-    public void loadTrustDomain(Federation federation, IdentityProvider identityProvider) {
-        if (identityProvider != null) {
-            this.federationStore.loadTrustDomains(federation, identityProvider, new SimpleCallback<List<TrustDomain>>() {
-                @Override
-                public void onSuccess(List<TrustDomain> result) {
-                    presenter.getView().setTrustedDomains(result);
-                }
-            });
-        } else {
-            presenter.getView().setTrustedDomains(new ArrayList<TrustDomain>());
-        }
-    }
-
     /**
      * <p>
      * Creates the given federation instance in the subsystem.
@@ -195,6 +52,7 @@ public class FederationManager {
             @Override
             public void onSuccess(ResponseWrapper<Boolean> result) {
                 if (result.getUnderlying()) {
+                    loadAllFederations();
                     Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants().common_label_federation()
                             + " ")
                             + federation.getName());
@@ -218,6 +76,7 @@ public class FederationManager {
             @Override
             public void onSuccess(Boolean success) {
                 if (success) {
+                    loadAllFederations();
                     Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants().common_label_federation()
                             + " ")
                             + federation.getName());
@@ -266,8 +125,6 @@ public class FederationManager {
                             else
                                 Console.error(Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
                                         .common_label_key_store()));
-
-                            loadIdentityProvider(presenter.getView().getCurrentFederation());
                         }
 
                     });
@@ -346,16 +203,16 @@ public class FederationManager {
                     new SimpleCallback<ResponseWrapper<Boolean>>() {
                         @Override
                         public void onSuccess(ResponseWrapper<Boolean> response) {
-                            if (response.getUnderlying())
+                            if (response.getUnderlying()) {
+                                loadAllFederations();
                                 Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
                                         .common_label_serviceProvider() + " " + currentSelection.getName()));
-                            else
+                            } else {
                                 Console.error(
                                         Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
                                                 .common_label_serviceProvider() + " ")
                                                 + currentSelection.getName(), response.getResponse().toString());
-
-                            loadIdentityProvider(presenter.getView().getCurrentFederation());
+                            }
                         }
 
                     });
@@ -371,6 +228,7 @@ public class FederationManager {
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
+                            loadAllFederations();
                             Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
                                     .common_label_serviceProvider() + " ")
                                     + serviceProvider.getName());
@@ -381,7 +239,6 @@ public class FederationManager {
                     }
                 });
         this.deploymentManager.restartServiceProvider(serviceProvider);
-        this.presenter.loadDeployments();
         this.eventBus.fireEvent(new AddServiceProviderEvent(serviceProvider));
     }
     
@@ -394,6 +251,7 @@ public class FederationManager {
                     @Override
                     public void onSuccess(Boolean success) {
                         if (success) {
+                            loadAllFederations();
                             Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
                                     .common_label_serviceProvider() + " ")
                                     + serviceProvider.getName());
@@ -406,7 +264,6 @@ public class FederationManager {
                     }
                 });
         this.deploymentManager.restartServiceProvider(serviceProvider);
-        this.presenter.loadDeployments();
         this.eventBus.fireEvent(new RemoveServiceProviderEvent(serviceProvider));
     }
 
@@ -425,6 +282,7 @@ public class FederationManager {
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
+                            loadAllFederations();
                             Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
@@ -434,8 +292,7 @@ public class FederationManager {
                                     .toString());
                     }
                 });
-
-        this.presenter.loadDeployments();
+        this.deploymentManager.restartIdentityProvider(identityProvider);
         this.eventBus.fireEvent(new AddIdentityProviderEvent(identityProvider));
     }
 
@@ -448,6 +305,7 @@ public class FederationManager {
                     @Override
                     public void onSuccess(Boolean success) {
                         if (success) {
+                            loadAllFederations();
                             Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
@@ -460,7 +318,6 @@ public class FederationManager {
                 });
         this.deploymentManager.restartIdentityProvider(identityProvider);
         this.eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
-        this.presenter.loadDeployments();
     }
 
     /**
@@ -476,16 +333,16 @@ public class FederationManager {
                     new SimpleCallback<ResponseWrapper<Boolean>>() {
                         @Override
                         public void onSuccess(ResponseWrapper<Boolean> response) {
-                            if (response.getUnderlying())
+                            if (response.getUnderlying()) {
+                                loadAllFederations();
                                 Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
                                         .common_label_identityProvider() + " " + identityProvider.getName()));
-                            else
+                            } else {
                                 Console.error(
                                         Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
                                                 .common_label_identityProvider() + " ")
                                                 + identityProvider.getName(), response.getResponse().toString());
-
-                            loadIdentityProvider(presenter.getView().getCurrentFederation());
+                            }
                         }
 
                     });
@@ -496,4 +353,21 @@ public class FederationManager {
         this.presenter = federationPresenter;
     }
 
+    public void loadAllFederations() {
+        this.federationStore.loadConfiguration(new SimpleCallback<Map<String, FederationWrapper>>() {
+            @Override
+            public void onSuccess(Map<String, FederationWrapper> result) {
+                if (result.isEmpty()) {
+                    return;
+                }
+                
+                federations = result;
+                presenter.loadDeployments();
+            }
+        });
+    }
+
+    public Map<String, FederationWrapper> getFederations() {
+        return this.federations;
+    }
 }

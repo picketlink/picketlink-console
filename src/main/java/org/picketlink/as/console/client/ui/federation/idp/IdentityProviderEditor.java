@@ -33,7 +33,6 @@ import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEd
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.TabPanel;
 
 /**
@@ -74,7 +73,16 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
     @Override
     protected boolean doInsert(IdentityProvider identityProvider) {
+        if (identityProvider.isExternal()) {
+            identityProvider.setName(this.getPresenter().getView().getCurrentFederation().getName() + "-" + "external-idp");
+        }
+        
         getPresenter().getFederationManager().onCreateIdentityProvider(identityProvider);
+        
+        if (!identityProvider.isExternal()) {
+            getPresenter().getDeploymentManager().restartIdentityProvider(identityProvider);
+        }
+        
         return true;
     }
 
@@ -123,7 +131,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      */
     public void doUpdate(IdentityProvider identityProvider, Map<String, Object> changedValues) {
         this.getPresenter().getFederationManager().onUpdateIdentityProvider(identityProvider, changedValues);
-        if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
+        if (identityProvider.getName().indexOf("external") == -1) {
             this.getPresenter().getDeploymentManager().restartIdentityProvider(identityProvider);
         }
     }

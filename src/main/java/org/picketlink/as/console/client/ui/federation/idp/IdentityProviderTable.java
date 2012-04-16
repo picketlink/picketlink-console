@@ -23,12 +23,16 @@
 package org.picketlink.as.console.client.ui.federation.idp;
 
 import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.widgets.tables.TextLinkCell;
+import org.jboss.ballroom.client.widgets.icons.Icons;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
 import com.google.gwt.cell.client.ActionCell;
+import com.google.gwt.cell.client.ImageResourceCell;
+import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -78,11 +82,16 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
 
         table.addColumn(aliasColumn, Console.CONSTANTS.common_label_name());
         
+        table.addColumn(makeEnabledColumn(), Console.CONSTANTS.common_label_enabled());
+        
         Column<IdentityProvider, IdentityProvider> reloadColumn = new Column<IdentityProvider, IdentityProvider>(new TextLinkCell<IdentityProvider>(
                 "Restart", new ActionCell.Delegate<IdentityProvider>() {
                     @Override
                     public void execute(IdentityProvider IdentityProvider) {
-                        presenter.getDeploymentManager().restartIdentityProvider(IdentityProvider);
+                        if (IdentityProvider.getName().indexOf("external") == -1) {
+                            presenter.getDeploymentManager().restartIdentityProvider(IdentityProvider);
+                            presenter.loadDeployments();
+                        }
                     }
                 })) {
             @Override
@@ -92,6 +101,26 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
         };
         
         table.addColumn(reloadColumn, "Option");
+    }
+    
+    private Column makeEnabledColumn() {
+        return new Column<DeploymentRecord, ImageResource>(new ImageResourceCell()) {
+
+            @Override
+            public ImageResource getValue(DeploymentRecord deployment) {
+                IdentityProvider idp = (IdentityProvider) deployment;
+                
+                ImageResource res = null;
+
+                if (idp.isEnabled() || idp.getName().indexOf("external") != -1) {
+                    res = Icons.INSTANCE.status_good();
+                } else {
+                    res = Icons.INSTANCE.status_bad();
+                }
+
+                return res;
+            }
+        };
     }
 
 }

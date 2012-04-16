@@ -62,4 +62,6 @@ public interface IdentityProvider extends DeploymentRecord, NamedEntity, Generic
     boolean isIgnoreIncomingSignatures();
     void setIgnoreIncomingSignatures(boolean url);
 
+    boolean isExternal();
+    void setExternal(boolean external);
 }

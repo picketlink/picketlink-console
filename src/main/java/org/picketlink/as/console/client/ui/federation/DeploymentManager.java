@@ -44,6 +44,7 @@ import com.google.inject.Inject;
 public class DeploymentManager {
     
     private DeploymentStore deploymentStore;
+    private FederationPresenter presenter;
 
     @Inject
     public DeploymentManager(DeploymentStore deploymentStore) {
@@ -79,7 +80,6 @@ public class DeploymentManager {
     }
     
     public void enableDisableDeployment(final DeploymentRecord record) {
-
         final PopupPanel loading = Feedback.loading(Console.CONSTANTS.common_label_plaseWait(),
                 Console.CONSTANTS.common_label_requestProcessed(), new Feedback.LoadingCallback() {
                     @Override
@@ -125,6 +125,12 @@ public class DeploymentManager {
                 }
             }
         });
+        
+        record.setEnabled(true);
+    }
+
+    public void setPresenter(FederationPresenter federationPresenter) {
+        this.presenter = federationPresenter;
     }
     
 }

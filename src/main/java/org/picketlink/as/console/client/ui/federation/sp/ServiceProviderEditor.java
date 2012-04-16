@@ -71,6 +71,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
     @Override
     protected boolean doInsert(ServiceProvider serviceProvider) {
         getPresenter().getFederationManager().onCreateServiceProvider(serviceProvider);
+        getPresenter().getDeploymentManager().restartServiceProvider(serviceProvider);
         return true;
     }
     
@@ -101,9 +102,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
      */
     public void doUpdate(ServiceProvider serviceProvider, Map<String, Object> changedValues) {
         this.getPresenter().getFederationManager().onUpdateServiceProvider(serviceProvider, changedValues);
-        if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
-            this.getPresenter().getDeploymentManager().restartServiceProvider(serviceProvider);
-        }
+        this.getPresenter().getDeploymentManager().restartServiceProvider(serviceProvider);
     }
 
     /* (non-Javadoc)

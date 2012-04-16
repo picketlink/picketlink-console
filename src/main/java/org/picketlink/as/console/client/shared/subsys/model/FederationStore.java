@@ -181,4 +181,6 @@ public interface FederationStore {
 
     void deleteKeyStore(Federation federation, KeyStore keyStore, SimpleCallback<Boolean> simpleCallback);
 
+    void loadConfiguration(SimpleCallback<Map<String, FederationWrapper>> callback);
+
 }
