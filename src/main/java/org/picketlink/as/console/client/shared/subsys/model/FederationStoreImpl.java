@@ -589,9 +589,9 @@ public class FederationStoreImpl implements FederationStore {
                     Map<String, FederationWrapper> federations = new HashMap<String, FederationWrapper>();
                     
                     for (ModelNode federationNode : response.get(RESULT).asList()) {
-                        FederationWrapper wrapper = new FederationWrapper();
                         Federation federation = federationAdapter.fromDMR(federationNode);
-
+                        FederationWrapper wrapper = new FederationWrapper(federation);
+                        
                         if (federationNode.asProperty().getValue().get("key-store").isDefined()) {
                             List<KeyStore> keyStores = keyStoreAdapter.fromDMRList(federationNode.asProperty().getValue().get("key-store").asList());
                             

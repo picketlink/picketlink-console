@@ -22,14 +22,24 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
+import java.util.List;
+import java.util.Map;
+
+import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
+import org.jboss.as.console.client.shared.model.DeploymentRecord;
+import org.jboss.as.console.client.shared.model.ResponseWrapper;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
- * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
- * @since Mar 30, 2012
+ * <p>This interface defines the methods that can be used to manipulate the {@link Federation} model.</p>
+ * 
+ * @author Pedro Silva
+ * @since Mar 14, 2012
  */
-public interface GenericFederationEntity {
+public interface DeploymentFederationStore {
 
-    String getName();
-    void setName(String alias);
+    void redeploy(DeploymentRecord deploymentRecord, AsyncCallback<DMRResponse> callback);
 
 }

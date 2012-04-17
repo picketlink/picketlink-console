@@ -22,6 +22,7 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.jboss.as.console.client.widgets.forms.FormToolStrip;
@@ -90,8 +91,6 @@ public class DigitalCertificateDetails {
                 if (!hasKeyStore) {
                     presenter.getFederationManager().onCreateKeyStore(form.getUpdatedEntity());
                     hasKeyStore = true;
-                } else {
-                    presenter.getFederationManager().onUpdateKeyStore(form.getUpdatedEntity(), changeset);
                 }
                 
                 form.edit(form.getUpdatedEntity());
@@ -102,8 +101,21 @@ public class DigitalCertificateDetails {
                 if (hasKeyStore) {
                     presenter.getFederationManager().onRemoveKeyStore(keyStore);
                     form.clearValues();
+                    hasKeyStore = false;
                     form.edit(presenter.getBeanFactory().keyStore().as());
                     signKeyAliasItem.setEnabled(true);
+                    
+                    if (presenter.getCurrentFederation().getIdentityProvider() != null) {
+                        presenter.getCurrentFederation().getIdentityProvider().getIdentityProvider().setSignOutgoingMessages(false);
+                        presenter.getCurrentFederation().getIdentityProvider().getIdentityProvider().setIgnoreIncomingSignatures(true);
+                        
+                        HashMap<String, Object> changedValues = new HashMap<String, Object>();
+                        
+                        changedValues.put("signOutgoingMessages", "false");
+                        changedValues.put("ignoreIncomingSignatures", "true");
+                        
+                        presenter.getFederationManager().onUpdateIdentityProvider(presenter.getCurrentFederation().getIdentityProvider().getIdentityProvider(), changedValues);
+                    }
                 } else {
                     Window.alert("You must save before removing.");
                 }

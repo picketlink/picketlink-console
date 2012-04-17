@@ -33,7 +33,7 @@ import org.jboss.ballroom.client.widgets.forms.FormValidation;
 import org.jboss.ballroom.client.widgets.forms.TextItem;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
+import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -224,8 +224,10 @@ public class NewFederationDetails implements FormAdapter<Federation> {
         form.clearValues();
     }
 
-    public void setKeyStore(KeyStore keyStore) {
-        this.digitalCertificateDetails.setKeyStore(keyStore);
+    public void updateKeyStore(FederationWrapper federation) {
+        if (!federation.getKeyStores().isEmpty()) {
+            this.digitalCertificateDetails.setKeyStore(federation.getKeyStores().get(0));            
+        }
     }
 
 }

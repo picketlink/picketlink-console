@@ -47,8 +47,6 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     private ComboBoxItem aliasesItem;
     private TextItem editAliasesItem;
     private ComboBoxItem deploymentsItem;
-    private CheckBoxItem signOutgoingMessages;
-    private CheckBoxItem ignoreIncomingSignature;
     private TextBoxItem url;
     private CheckBoxItem externalIDP;
 
@@ -75,12 +73,6 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
         FormItem<?>[] formItems = null;
 
-        signOutgoingMessages = new CheckBoxItem("signOutgoingMessages",
-                PicketLinkConsoleFramework.CONSTANTS.common_label_signOutgoingMessages());
-
-        ignoreIncomingSignature = new CheckBoxItem("ignoreIncomingSignatures",
-                PicketLinkConsoleFramework.CONSTANTS.common_label_ignoreIncomingSignatures());
-
         url = new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_identityURL(), true);
 
         if (isDialogue()) {
@@ -90,24 +82,20 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
                     if (getValue() != null && getValue()) {
                         getAliasItem().setEnabled(false);
                         getAliasItem().setRequired(false);
-                        ignoreIncomingSignature.setEnabled(false);
-                        signOutgoingMessages.setEnabled(false);
                     } else {
                         getAliasItem().setEnabled(true);
                         getAliasItem().setRequired(true);
-                        ignoreIncomingSignature.setEnabled(true);
-                        signOutgoingMessages.setEnabled(true);
                     }
                 }
             };
 
-            formItems = new FormItem<?>[] { externalIDP, aliasItem, url, signOutgoingMessages, ignoreIncomingSignature };
+            formItems = new FormItem<?>[] { externalIDP, aliasItem, url};
         } else {
             editAliasesItem = new TextItem("name", "Alias");
             
             editAliasesItem.setEnabled(true);
 
-            formItems = new FormItem<?>[] { editAliasesItem, url, signOutgoingMessages, ignoreIncomingSignature };
+            formItems = new FormItem<?>[] { editAliasesItem, url};
         }
 
         return formItems;
@@ -134,8 +122,6 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
         if (getPresenter().getIdentityProvider() != null && getPresenter().getIdentityProvider().getIdentityProvider() != null
                 && getPresenter().getIdentityProvider().getIdentityProvider().getName().indexOf("external") != -1) {
             editAliasesItem.setEnabled(false);
-            signOutgoingMessages.setEnabled(false);
-            ignoreIncomingSignature.setEnabled(false);
         }
     }
 

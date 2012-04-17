@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
@@ -113,18 +114,19 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
         return new NewServiceProviderWizard(this, getEntityClass(), getPresenter(), "service-provider");
     }
 
-    /**
-     * @param name
-     * @param modules
-     * @param resourceExists
-     */
-    public void setServiceProviders(String name, List<ServiceProvider> modules) {
-        setData(getPresenter().getView().getCurrentFederation().getName(), modules);
-    }
-
     public void updateDeployments(List<DeploymentRecord> deployments) {
         if (getWizard() != null) {
             ((NewServiceProviderWizard) getWizard()).updateAliasItems();
         }
+    }
+
+    public void updateServiceProviders(FederationWrapper federation) {
+        if (federation.getIdentityProvider() == null && !federation.getServiceProviders().isEmpty()) {
+            addErrorMessage("You have Service Providers configured but there is no IDP for them.");
+        } else {
+            removeErrorMessage();
+        }
+        
+        setData(federation, federation.getServiceProviders());
     }
 }
