@@ -34,11 +34,14 @@ import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.DefaultWindow;
 import org.jboss.ballroom.client.widgets.window.Feedback;
+import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.TabPanel;
@@ -62,6 +65,8 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
     private ContentHeaderLabel headerLabel;
 
     private Wizard<T> wizard;
+    private Federation federation;
+    private HTML errorMessage;
 
     public AbstractFederationDetailEditor(FederationPresenter presenter, AbstractModelElementTable<T> table,
             Class<T> entityClass) {
@@ -220,6 +225,10 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
      * @param vpanel
      */
     private void createTableTools(VerticalPanel vpanel) {
+        HorizontalPanel horizontalPanel = new HorizontalPanel();
+        
+        horizontalPanel.setStyleName("fill-layout-width");
+        
         ToolStrip tableTools = new ToolStrip();
 
         addModule = new ToolButton(Console.CONSTANTS.common_label_add());
@@ -257,7 +266,14 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
             }
         }));
 
-        vpanel.add(tableTools);
+        errorMessage = new HTML();
+        
+        errorMessage.setStyleName("error-panel");
+        
+        horizontalPanel.add(errorMessage);
+        horizontalPanel.add(tableTools);
+        
+        vpanel.add(horizontalPanel);
     }
     
     /**
@@ -294,8 +310,10 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
         return ((SingleSelectionModel<T>) table.getCellTable().getSelectionModel()).getSelectedObject();
     }
 
-    public void setData(String federationName, List<T> newList) {
-        this.headerLabel.setText("Federation: " + federationName);
+    public void setData(Federation federation, List<? extends T> newList) {
+        this.federation = federation;
+        
+        this.headerLabel.setText("Federation: " + this.federation.getName());
 
         List<T> list = table.getDataProvider().getList();
         list.clear();
@@ -390,5 +408,17 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
     
     public Wizard<T> getWizard() {
         return wizard;
+    }
+    
+    protected Federation getFederation() {
+        return this.federation;
+    }
+    
+    protected void addErrorMessage(String message) {
+        errorMessage.setHTML(message);
+    }
+    
+    protected void removeErrorMessage() {
+        errorMessage.setHTML("");
     }
 }

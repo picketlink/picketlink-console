@@ -66,7 +66,19 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
             updateAliasItems();
         }
         
-        FormItem<?>[] formItems = new FormItem<?>[] { aliasItem,
+        ComboBoxItem securityDomainsItem =  new ComboBoxItem("securityDomain", "Security Domain");
+        
+        if (this.getPresenter().getSecurityDomains() != null) {
+            String[] securityDomains = new String[this.getPresenter().getSecurityDomains().size()];
+
+            for (int i = 0; i < this.getPresenter().getSecurityDomains().size(); i++) {
+                securityDomains[i] = this.getPresenter().getSecurityDomains().get(i).getName();
+            }
+            
+            securityDomainsItem.setValueMap(securityDomains);
+        }
+        
+        FormItem<?>[] formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
                 new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true),
                 new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), };
 

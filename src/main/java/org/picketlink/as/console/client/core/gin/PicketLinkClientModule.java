@@ -20,6 +20,8 @@
 package org.picketlink.as.console.client.core.gin;
 
 import org.jboss.as.console.spi.GinExtensionBinding;
+import org.picketlink.as.console.client.shared.subsys.model.DeploymentFederationStore;
+import org.picketlink.as.console.client.shared.subsys.model.DeploymentFederationStoreImpl;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStoreImpl;
 import org.picketlink.as.console.client.ui.federation.DeploymentManager;
@@ -53,6 +55,7 @@ public class PicketLinkClientModule extends AbstractPresenterModule {
         bindPresenter(FederationPresenter.class, FederationPresenter.MyView.class, NewFederationView.class,
                 FederationPresenter.MyProxy.class);
         bind(FederationStore.class).to(FederationStoreImpl.class).in(Singleton.class);
+        bind(DeploymentFederationStore.class).to(DeploymentFederationStoreImpl.class).in(Singleton.class);
         bind(DeploymentManager.class).in(Singleton.class);
         bind(FederationManager.class);
     }

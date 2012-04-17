@@ -54,6 +54,10 @@ public interface ServiceProvider extends DeploymentRecord, NamedEntity, GenericF
     String getUrl();
     void setUrl(String url);
     
+    @Binding (detypedName="security-domain")
+    String getSecurityDomain();
+    void setSecurityDomain(String securityDomain);
+    
     @Binding (detypedName="post-binding")
     boolean isPostBinding();
     void setPostBinding(boolean postBinding);

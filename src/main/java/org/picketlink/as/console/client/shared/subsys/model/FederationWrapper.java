@@ -3,7 +3,7 @@ package org.picketlink.as.console.client.shared.subsys.model;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FederationWrapper {
+public class FederationWrapper implements Federation {
 
     private Federation federation;
 
@@ -12,14 +12,10 @@ public class FederationWrapper {
 
     private List<KeyStore> keyStores;
 
-    public Federation getFederation() {
-        return federation;
-    }
-
-    public void setFederation(Federation federation) {
+    public FederationWrapper(Federation federation) {
         this.federation = federation;
     }
-
+    
     public IdentityProviderWrapper getIdentityProvider() {
         IdentityProviderWrapper identityProvider = null;
         
@@ -61,4 +57,14 @@ public class FederationWrapper {
 
         return this.keyStores;
     }
+
+    public String getName() {
+        return federation.getName();
+    }
+
+    public void setName(String alias) {
+        federation.setName(alias);
+    }
+    
+    
 }

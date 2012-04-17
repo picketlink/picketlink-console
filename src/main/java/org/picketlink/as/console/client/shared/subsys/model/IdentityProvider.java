@@ -62,6 +62,11 @@ public interface IdentityProvider extends DeploymentRecord, NamedEntity, Generic
     boolean isIgnoreIncomingSignatures();
     void setIgnoreIncomingSignatures(boolean url);
 
+    @Binding (detypedName="security-domain")
+    String getSecurityDomain();
+    void setSecurityDomain(String securityDomain);
+    
     boolean isExternal();
     void setExternal(boolean external);
+    
 }

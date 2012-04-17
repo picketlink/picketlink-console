@@ -31,9 +31,11 @@ import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.model.DeploymentStore;
 import org.jboss.ballroom.client.widgets.window.Feedback;
 import org.jboss.dmr.client.ModelNode;
+import org.picketlink.as.console.client.shared.subsys.model.DeploymentFederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
 
@@ -44,23 +46,24 @@ import com.google.inject.Inject;
 public class DeploymentManager {
     
     private DeploymentStore deploymentStore;
-    private FederationPresenter presenter;
+    private DeploymentFederationStore deploymentFederationStore;
 
     @Inject
-    public DeploymentManager(DeploymentStore deploymentStore) {
+    public DeploymentManager(DeploymentFederationStore deploymentFederationStore, DeploymentStore deploymentStore) {
+        this.deploymentFederationStore = deploymentFederationStore;
         this.deploymentStore = deploymentStore;
     }
     
     public void restartIdentityProvider(IdentityProvider identityProvider) {
         identityProvider.setName(identityProvider.getName());
         identityProvider.setRuntimeName(identityProvider.getName());
-        enableDisableDeployment(identityProvider);
+        redeployDeployment(identityProvider);
     }
 
     public void restartServiceProvider(ServiceProvider serviceProvider) {
         serviceProvider.setName(serviceProvider.getName());
         serviceProvider.setRuntimeName(serviceProvider.getName());
-        enableDisableDeployment(serviceProvider);
+        redeployDeployment(serviceProvider);
     }
     
     /**
@@ -79,7 +82,7 @@ public class DeploymentManager {
         });
     }
     
-    public void enableDisableDeployment(final DeploymentRecord record) {
+    public void redeployDeployment(final DeploymentRecord record) {
         final PopupPanel loading = Feedback.loading(Console.CONSTANTS.common_label_plaseWait(),
                 Console.CONSTANTS.common_label_requestProcessed(), new Feedback.LoadingCallback() {
                     @Override
@@ -88,9 +91,7 @@ public class DeploymentManager {
                     }
                 });
 
-        record.setEnabled(true);
-
-        deploymentStore.enableDisableDeployment(record, new SimpleCallback<DMRResponse>() {
+        deploymentFederationStore.redeploy(record, new SimpleCallback<DMRResponse>() {
 
             @Override
             public void onSuccess(DMRResponse response) {
@@ -99,6 +100,7 @@ public class DeploymentManager {
                 ModelNode result = response.get();
 
                 if (result.isFailure()) {
+                    Window.alert("Could not undeploy the deployment " + record.getName() + ". Make sure it is deployed and check the logs.");
                     Console.error(Console.MESSAGES.modificationFailed("Deployment " + record.getRuntimeName()),
                             result.getFailureDescription());
                 } else {
@@ -107,30 +109,7 @@ public class DeploymentManager {
             }
         });
 
-        record.setEnabled(false);
-
-        deploymentStore.enableDisableDeployment(record, new SimpleCallback<DMRResponse>() {
-
-            @Override
-            public void onSuccess(DMRResponse response) {
-                loading.hide();
-
-                ModelNode result = response.get();
-
-                if (result.isFailure()) {
-                    Console.error(Console.MESSAGES.modificationFailed("Deployment " + record.getRuntimeName()),
-                            result.getFailureDescription());
-                } else {
-                    Console.info(Console.MESSAGES.modified("Deployment " + record.getRuntimeName()));
-                }
-            }
-        });
-        
         record.setEnabled(true);
-    }
-
-    public void setPresenter(FederationPresenter federationPresenter) {
-        this.presenter = federationPresenter;
     }
     
 }

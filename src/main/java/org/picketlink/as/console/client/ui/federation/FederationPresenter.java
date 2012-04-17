@@ -29,15 +29,14 @@ import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
 import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
 import org.jboss.as.console.spi.Subsystem;
 import org.jboss.ballroom.client.layout.LHSHighlightEvent;
 import org.picketlink.as.console.client.NameTokens;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
-import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
-import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.shared.EventBus;
@@ -69,17 +68,11 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
 
         void initialLoad();
 
-        void setSelectedFederation(String selectedFederation);
-
-        void setIdentityProviders(String name, List<IdentityProviderWrapper> identityProviders);
-
-        void setServiceProviders(String string, List<ServiceProvider> result);
-
-        void setTrustedDomains(List<TrustDomain> result);
-
-        void setKeyStore(String name, KeyStore keyStore);
+        void selectFederation(FederationWrapper federation);
 
         void updateDeployments(List<DeploymentRecord> deployments);
+
+        void updateFederation(FederationWrapper selectedFederationConfig);
     }
 
     @ProxyCodeSplit
@@ -99,6 +92,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     private List<DeploymentRecord> allDeployments;
     
     private String selectedFederation;
+    private List<SecurityDomain> securityDomains;
 
     @Inject
     public FederationPresenter(final EventBus eventBus, BeanFactory beanFactory, final MyView view, final MyProxy proxy,
@@ -111,7 +105,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         this.beanFactory = beanFactory;
         this.federationManager = federationManager;
         this.federationManager.setPresenter(this);
-        this.deploymentManager.setPresenter(this);
     }
 
     /*
@@ -156,6 +149,11 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         super.onBind();
         getView().setPresenter(this);
         loadDeployments();
+        loadSecurityDomains();
+    }
+
+    private void loadSecurityDomains() {
+        this.federationManager.loadAllSecurityDomains(this);
     }
 
     /*
@@ -167,7 +165,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     protected void onReset() {
         super.onReset();
         getView().initialLoad();
-        getView().setSelectedFederation(this.selectedFederation);
+        getView().selectFederation(this.getFederationManager().getFederations().get(this.selectedFederation));
     }
 
     /**
@@ -185,6 +183,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
      * @param currentSelection
      */
     public void updateFederationSelection(final Federation currentSelection) {
+        this.selectedFederation = currentSelection.getName();
         getFederationManager().loadAllFederations();
     }
 
@@ -199,10 +198,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         
         // if a federation was selected update the view with the informations
         if (selectedFederationConfig != null) {
-            if (!selectedFederationConfig.getKeyStores().isEmpty()) {
-                getView().setKeyStore(selectedFederation, selectedFederationConfig.getKeyStores().get(0));            
-            }
-            
             List<IdentityProviderWrapper> identityProviders = selectedFederationConfig.getIdentityProviders();
             
             for (DeploymentRecord deployment : deployments) {
@@ -212,9 +207,8 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
                     }
                 }
             }
-            
-            getView().setIdentityProviders(selectedFederation, identityProviders);
-            getView().setServiceProviders(selectedFederation, selectedFederationConfig.getServiceProviders());
+
+            getView().updateFederation(selectedFederationConfig);
         }
         
         // updates the deployments list
@@ -318,5 +312,23 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     
     public List<DeploymentRecord> getAllDeployments() {
         return this.allDeployments;
+    }
+
+    public FederationWrapper getCurrentFederation() {
+        FederationWrapper federation = null;
+        
+        if (this.selectedFederation != null) {
+            federation = getFederationManager().getFederations().get(this.selectedFederation);
+        }
+        
+        return federation;
+    }
+
+    public void onLoadSecurityDomains(List<SecurityDomain> result) {
+        this.securityDomains = result;
+    }
+
+    public List<SecurityDomain> getSecurityDomains() {
+        return this.securityDomains;
     }
 }

@@ -22,7 +22,6 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -42,11 +41,7 @@ import org.jboss.ballroom.client.widgets.tables.DefaultCellTable;
 import org.jboss.ballroom.client.widgets.tabs.FakeTabPanel;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
-import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
-import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
+import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.ui.federation.idp.IdentityProviderEditor;
 import org.picketlink.as.console.client.ui.federation.sp.ServiceProviderEditor;
 
@@ -71,10 +66,10 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     private FederationPresenter presenter;
     private PagedView pages;
     private IdentityProviderEditor identityProviderEditor;
-    private String selectedFederation;
     private FederationTable federationsTable;
     private ServiceProviderEditor serviceProviderEditor;
     private NewFederationDetails federationDetails;
+    private FederationWrapper selectedFederation;
 
     /**
      * @param beanType
@@ -118,26 +113,14 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
         return layout;
     }
-
-    /**
-     * @return
-     */
-    private IdentityProviderEditor getIdentityProviderEditor() {
-        if (this.identityProviderEditor == null) {
-            this.identityProviderEditor = new IdentityProviderEditor(this.presenter);
-        }
-
-        return this.identityProviderEditor;
+    
+    @Override
+    public void updateFederation(FederationWrapper federation) {
+        this.federationDetails.updateKeyStore(federation);            
+        getIdentityProviderEditor().updateIdentityProviders(federation);
+        getServiceProviderEditor().updateServiceProviders(federation);
     }
-
-    private ServiceProviderEditor getServiceProviderEditor() {
-        if (this.serviceProviderEditor == null) {
-            this.serviceProviderEditor = new ServiceProviderEditor(this.presenter);
-        }
-
-        return this.serviceProviderEditor;
-    }
-
+    
     private Widget createDomainList(String description) {
         VerticalPanel panel = new VerticalPanel();
         panel.setStyleName("rhs-content-panel");
@@ -172,52 +155,25 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         getServiceProviderEditor().updateDeployments(deployments);
     }
     
-    @Override
-    public void refresh() {
-        super.refresh();
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#setIdentityProviders(java.lang.String,
-     * java.util.List, boolean)
+    /**
+     * @return
      */
-    @Override
-    public void setIdentityProviders(String name, List<IdentityProviderWrapper> identityProviders) {
-        List<IdentityProvider> list = new ArrayList<IdentityProvider>();
-        List<TrustDomain> trustDomains = new ArrayList<TrustDomain>();
-        
-        for (IdentityProviderWrapper identityProvider : identityProviders) {
-            list.add(identityProvider.getIdentityProvider());
-            
-            trustDomains.addAll(identityProvider.getTrustDomains());
+    private IdentityProviderEditor getIdentityProviderEditor() {
+        if (this.identityProviderEditor == null) {
+            this.identityProviderEditor = new IdentityProviderEditor(this.presenter);
         }
 
-        getIdentityProviderEditor().setIdentityProviders(name, list);
-        getIdentityProviderEditor().setTrustedDomains(trustDomains);
+        return this.identityProviderEditor;
+    }
+
+    private ServiceProviderEditor getServiceProviderEditor() {
+        if (this.serviceProviderEditor == null) {
+            this.serviceProviderEditor = new ServiceProviderEditor(this.presenter);
+        }
+
+        return this.serviceProviderEditor;
     }
     
-    @Override
-    public void setKeyStore(String name, KeyStore keyStore) {
-        this.federationDetails.setKeyStore(keyStore);
-    }
-
-    @Override
-    public void setServiceProviders(String name, List<ServiceProvider> serviceProviders) {
-        getServiceProviderEditor().setServiceProviders(name, serviceProviders);
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#setTrustedDomains(java.util.List)
-     */
-    @Override
-    public void setTrustedDomains(List<TrustDomain> result) {
-        getIdentityProviderEditor().setTrustedDomains(result);
-    }
-
     /*
      * (non-Javadoc)
      * 
@@ -275,12 +231,12 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
      * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#setSelectedFederation(java.lang.String)
      */
     @Override
-    public void setSelectedFederation(String alias) {
-        this.selectedFederation = alias;
+    public void selectFederation(FederationWrapper federation) {
+        this.selectedFederation = federation;
         
         if (selectedFederation != null) {
             pages.showPage(1);
-            bridge.loadEntities(alias);
+            bridge.loadEntities(federation.getName());
         } else {
             pages.showPage(0);
         }

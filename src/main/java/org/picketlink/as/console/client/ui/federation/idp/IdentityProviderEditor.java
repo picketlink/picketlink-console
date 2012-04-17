@@ -22,12 +22,15 @@
 
 package org.picketlink.as.console.client.ui.federation.idp;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
@@ -42,6 +45,7 @@ import com.google.gwt.user.client.ui.TabPanel;
 public class IdentityProviderEditor extends AbstractFederationDetailEditor<IdentityProvider> {
 
     private TrustedDomainTabEditor trustedDomainTabEditor;
+    private SignatureSupportTabEditor signatureSupportTabEditor;
 
     public IdentityProviderEditor(FederationPresenter presenter) {
         super(presenter, new IdentityProviderTable(presenter), IdentityProvider.class);
@@ -74,7 +78,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     @Override
     protected boolean doInsert(IdentityProvider identityProvider) {
         if (identityProvider.isExternal()) {
-            identityProvider.setName(this.getPresenter().getView().getCurrentFederation().getName() + "-" + "external-idp");
+            identityProvider.setName(getFederation().getName() + "-" + "external-idp");
         }
         
         getPresenter().getFederationManager().onCreateIdentityProvider(identityProvider);
@@ -91,6 +95,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      */
     @Override
     protected void addDetailsSectionTabs(TabPanel bottomTabs) {
+        bottomTabs.add(getSignatureSupportTabEditor().asWidget(), "Signature Support");
         bottomTabs.add(getTrustedDomainTabEditor().asWidget(), "Trusted Domains");
     }
 
@@ -104,7 +109,15 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
         return this.trustedDomainTabEditor;
     }
-    
+
+    private SignatureSupportTabEditor getSignatureSupportTabEditor() {
+        if (this.signatureSupportTabEditor == null) {
+            this.signatureSupportTabEditor = new SignatureSupportTabEditor(getPresenter());
+        }
+
+        return this.signatureSupportTabEditor;
+    }
+
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor#doUpdateSelection(org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity)
      */
@@ -142,21 +155,18 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     }
 
     /**
-     * @param federations
-     */
-    public void updateIdentityProviders(List<IdentityProvider> federations) {
-        if (getPresenter().getView().getCurrentFederation() != null) {
-            setData(getPresenter().getView().getCurrentFederation().getName(), federations);
-        }
-    }
-
-    /**
      * @param name
      * @param identityProviders
      * @param resourceExists
      */
-    public void setIdentityProviders(String name, List<IdentityProvider> identityProviders) {
-        setData(name, identityProviders);
+    public void updateIdentityProviders(FederationWrapper federation) {
+        List<IdentityProvider> identityProviders = new ArrayList<IdentityProvider>();
+        
+        for (IdentityProviderWrapper identityProviderWrapper : federation.getIdentityProviders()) {
+            identityProviders.add(identityProviderWrapper.getIdentityProvider());
+        }
+        
+        setData(federation, identityProviders);
         
         // disables the add button since we already have a idp configuration
         if (!identityProviders.isEmpty()) {
@@ -164,13 +174,25 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
         } else {
             enableAddButton();
         }
+        
+        if (!identityProviders.isEmpty()) {
+            getSignatureSupportTabEditor().setIdentityProvider(identityProviders.get(0));
+        }
+        
+        updateTrustedDomains(federation);
     }
 
     /**
-     * @param result
+     * @param federation
      */
-    public void setTrustedDomains(List<TrustDomain> result) {
-        this.getTrustedDomainTabEditor().getTrustDomainTable().getDataProvider().setList(result);
+    private void updateTrustedDomains(FederationWrapper federation) {
+        List<TrustDomain> trustDomains = new ArrayList<TrustDomain>();
+        
+        for (IdentityProviderWrapper identityProvider : federation.getIdentityProviders()) {
+            trustDomains.addAll(identityProvider.getTrustDomains());
+        }
+
+        this.getTrustedDomainTabEditor().getTrustDomainTable().getDataProvider().setList(trustDomains);
     }
 
     public void updateDeployments(List<DeploymentRecord> deployments) {

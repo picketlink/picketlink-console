@@ -27,6 +27,7 @@ import java.util.Map;
 
 import org.jboss.as.console.client.domain.model.SimpleCallback;
 import org.jboss.as.console.client.shared.model.ResponseWrapper;
+import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -37,7 +38,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  * @since Mar 14, 2012
  */
 public interface FederationStore {
-
+    
+    void loadSecurityDomains(final SimpleCallback<List<SecurityDomain>> simpleCallback);
+    
     /**
      * Loads all federation configurations.
      * 

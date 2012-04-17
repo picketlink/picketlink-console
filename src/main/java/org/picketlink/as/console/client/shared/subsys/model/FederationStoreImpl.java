@@ -31,6 +31,7 @@ import static org.jboss.dmr.client.ModelDescriptionConstants.REMOVE;
 import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
 import static org.jboss.dmr.client.ModelDescriptionConstants.SUCCESS;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +45,7 @@ import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
 import org.jboss.as.console.client.shared.model.ModelAdapter;
 import org.jboss.as.console.client.shared.model.ResponseWrapper;
 import org.jboss.as.console.client.shared.subsys.Baseadress;
+import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
 import org.jboss.as.console.client.widgets.forms.AddressBinding;
 import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
 import org.jboss.as.console.client.widgets.forms.BeanMetaData;
@@ -69,14 +71,18 @@ public class FederationStoreImpl implements FederationStore {
     private final EntityAdapter<KeyStore> keyStoreAdapter;
     private final EntityAdapter<IdentityProvider> identityProviderAdapter;
     private final EntityAdapter<ServiceProvider> serviceProviderAdapter;
+    private final EntityAdapter<TrustDomain> trustDomainAdapter;
+    
+    private final EntityAdapter<SecurityDomain> securityDomainAdapter;
 
-    private Baseadress baseadress;
-    private BeanMetaData federationMetaData;
-    private BeanMetaData keyStoreMetaData;
-    private BeanMetaData identityProviderMetaData;
-    private BeanMetaData serviceProviderMetaData;
-    private BeanMetaData trustDomainMetaData;
-    private EntityAdapter<TrustDomain> trustDomainAdapter;
+    private final Baseadress baseadress;
+    private final BeanMetaData federationMetaData;
+    private final BeanMetaData keyStoreMetaData;
+    private final BeanMetaData identityProviderMetaData;
+    private final BeanMetaData serviceProviderMetaData;
+    private final BeanMetaData trustDomainMetaData;
+    private final BeanMetaData securityDomainMetaData;
+    
 
     @Inject
     public FederationStoreImpl(DispatchAsync dispatcher, ApplicationMetaData propertyMetaData, Baseadress baseadress) {
@@ -93,8 +99,43 @@ public class FederationStoreImpl implements FederationStore {
         this.identityProviderAdapter = new EntityAdapter<IdentityProvider>(IdentityProvider.class, propertyMetaData);
         this.serviceProviderAdapter = new EntityAdapter<ServiceProvider>(ServiceProvider.class, propertyMetaData);
         this.trustDomainAdapter = new EntityAdapter<TrustDomain>(TrustDomain.class, propertyMetaData);
+        this.securityDomainAdapter = new EntityAdapter<SecurityDomain>(SecurityDomain.class, propertyMetaData);
+        this.securityDomainMetaData = metaData.getBeanMetaData(SecurityDomain.class);
     }
 
+    public void loadSecurityDomains(final SimpleCallback<List<SecurityDomain>> callback) {
+        AddressBinding address = securityDomainMetaData.getAddress();
+        ModelNode operation = address.asSubresource(baseadress.getAdress());
+        operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
+        operation.get(ModelDescriptionConstants.RECURSIVE).set(true);
+        
+        dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode response = result.get();
+
+                if (response.isFailure()) {
+                    callback.onFailure(new RuntimeException(response.getFailureDescription()));
+                } else {
+                    List<SecurityDomain> securityDomains = new ArrayList<SecurityDomain>();
+                    
+                    for (ModelNode securityDomainNode : response.get(RESULT).asList()) {
+                        SecurityDomain securityDomain = securityDomainAdapter.fromDMR(securityDomainNode);
+                        
+                        securityDomains.add(securityDomain);
+                    }
+                    
+                    callback.onSuccess(securityDomains);
+                }
+            }
+        });        
+    }
+    
     /*
      * (non-Javadoc)
      * 
@@ -589,9 +630,9 @@ public class FederationStoreImpl implements FederationStore {
                     Map<String, FederationWrapper> federations = new HashMap<String, FederationWrapper>();
                     
                     for (ModelNode federationNode : response.get(RESULT).asList()) {
-                        FederationWrapper wrapper = new FederationWrapper();
                         Federation federation = federationAdapter.fromDMR(federationNode);
-
+                        FederationWrapper wrapper = new FederationWrapper(federation);
+                        
                         if (federationNode.asProperty().getValue().get("key-store").isDefined()) {
                             List<KeyStore> keyStores = keyStoreAdapter.fromDMRList(federationNode.asProperty().getValue().get("key-store").asList());
                             

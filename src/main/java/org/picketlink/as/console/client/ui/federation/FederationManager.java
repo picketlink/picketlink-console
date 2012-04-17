@@ -1,11 +1,13 @@
 package org.picketlink.as.console.client.ui.federation;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
 import org.jboss.as.console.client.shared.model.ResponseWrapper;
+import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
@@ -369,5 +371,17 @@ public class FederationManager {
 
     public Map<String, FederationWrapper> getFederations() {
         return this.federations;
+    }
+
+    public void loadAllSecurityDomains(final FederationPresenter federationPresenter) {
+        this.federationStore.loadSecurityDomains(new SimpleCallback<List<SecurityDomain>>() {
+            @Override
+            public void onSuccess(List<SecurityDomain> result) {
+                if (result.isEmpty()) {
+                    return;
+                }
+                federationPresenter.onLoadSecurityDomains(result);
+            }
+        });
     }
 }
