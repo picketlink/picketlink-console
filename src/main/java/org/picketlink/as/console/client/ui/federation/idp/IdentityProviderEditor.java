@@ -79,6 +79,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     protected boolean doInsert(IdentityProvider identityProvider) {
         if (identityProvider.isExternal()) {
             identityProvider.setName(getFederation().getName() + "-" + "external-idp");
+            identityProvider.setSecurityDomain("no-defined");
         }
         
         getPresenter().getFederationManager().onCreateIdentityProvider(identityProvider);
@@ -137,6 +138,9 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     protected void doDelete(IdentityProvider identityProvider) {
         this.getPresenter().getFederationManager().onRemoveIdentityProvider(identityProvider);
         enableAddButton();
+        if (identityProvider.getName().indexOf("external") == -1) {
+            getPresenter().getDeploymentManager().restartIdentityProvider(identityProvider);
+        }
     }
 
     /* (non-Javadoc)

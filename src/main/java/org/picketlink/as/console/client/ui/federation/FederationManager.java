@@ -294,7 +294,6 @@ public class FederationManager {
                                     .toString());
                     }
                 });
-        this.deploymentManager.restartIdentityProvider(identityProvider);
         this.eventBus.fireEvent(new AddIdentityProviderEvent(identityProvider));
     }
 
@@ -318,7 +317,6 @@ public class FederationManager {
                         }
                     }
                 });
-        this.deploymentManager.restartIdentityProvider(identityProvider);
         this.eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
     }
 

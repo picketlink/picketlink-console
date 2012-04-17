@@ -49,6 +49,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     private ComboBoxItem deploymentsItem;
     private TextBoxItem url;
     private CheckBoxItem externalIDP;
+    private ComboBoxItem securityDomainsItem;
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
             String type) {
@@ -75,7 +76,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
         url = new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_identityURL(), true);
         
-        ComboBoxItem securityDomainsItem =  new ComboBoxItem("securityDomain", "Security Domain");
+        securityDomainsItem =  new ComboBoxItem("securityDomain", "Security Domain");
         
         if (this.getPresenter().getSecurityDomains() != null) {
             String[] securityDomains = new String[this.getPresenter().getSecurityDomains().size()];
@@ -95,9 +96,13 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
                     if (getValue() != null && getValue()) {
                         getAliasItem().setEnabled(false);
                         getAliasItem().setRequired(false);
+                        securityDomainsItem.setEnabled(false);
+                        securityDomainsItem.setRequired(false);
                     } else {
                         getAliasItem().setEnabled(true);
                         getAliasItem().setRequired(true);
+                        securityDomainsItem.setEnabled(true);
+                        securityDomainsItem.setRequired(true);
                     }
                 }
             };
@@ -135,6 +140,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
         if (getPresenter().getIdentityProvider() != null && getPresenter().getIdentityProvider().getIdentityProvider() != null
                 && getPresenter().getIdentityProvider().getIdentityProvider().getName().indexOf("external") != -1) {
             editAliasesItem.setEnabled(false);
+            securityDomainsItem.setEnabled(false);
         }
     }
 

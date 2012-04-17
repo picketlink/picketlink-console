@@ -112,7 +112,7 @@ public class SignatureSupportTabEditor {
                 errorMessage.setHTML("");
             }
             
-            if (getPresenter().getCurrentFederation().getKeyStores().isEmpty()) {
+            if (getPresenter().getCurrentFederation().getKeyStores().isEmpty() || (this.identityProvider != null && this.identityProvider.getName().indexOf("external") != -1)) {
                 signOutgoingMessages.setEnabled(false);
                 ignoreIncomingSignature.setEnabled(false);
                 
