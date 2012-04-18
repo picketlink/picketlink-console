@@ -50,6 +50,8 @@ public class TrustedDomainTabEditor {
     private TrustDomainTable trustDomainTable;
     private FederationPresenter presenter;
     private IdentityProvider identityProvider;
+    private ToolButton removeTrustedDomainBtn;
+    private ToolButton addTrustedDomainBtn;
 
     public TrustedDomainTabEditor(FederationPresenter presenter) {
         this.presenter = presenter;
@@ -82,7 +84,7 @@ public class TrustedDomainTabEditor {
     private void addTrustDomainActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
 
-        ToolButton addTrustedDomainBtn = new ToolButton(Console.CONSTANTS.common_label_add());
+        addTrustedDomainBtn = new ToolButton(Console.CONSTANTS.common_label_add());
 
         addTrustedDomainBtn.addClickHandler(new ClickHandler() {
 
@@ -109,7 +111,7 @@ public class TrustedDomainTabEditor {
 
         trustDomainTools.addToolButtonRight(addTrustedDomainBtn);
 
-        ToolButton removeTrustedDomainBtn = new ToolButton(Console.CONSTANTS.common_label_delete());
+        removeTrustedDomainBtn = new ToolButton(Console.CONSTANTS.common_label_delete());
 
         removeTrustedDomainBtn.addClickHandler(new ClickHandler() {
 
@@ -174,10 +176,20 @@ public class TrustedDomainTabEditor {
     }
     
     /**
-     * @param policy
+     * @param identityProvider
      */
-    public void setIdentityProvider(IdentityProvider policy) {
-        this.identityProvider = policy;
+    public void setIdentityProvider(IdentityProvider identityProvider) {
+        if (identityProvider == null || identityProvider.isExternal()) {
+            this.trustDomainForm.setEnabled(false);
+            this.addTrustedDomainBtn.setEnabled(false);
+            this.removeTrustedDomainBtn.setEnabled(false);
+        } else {
+            this.trustDomainForm.setEnabled(true);
+            this.addTrustedDomainBtn.setEnabled(true);
+            this.removeTrustedDomainBtn.setEnabled(true);
+        }
+        
+        this.identityProvider = identityProvider;
     }
 
 }

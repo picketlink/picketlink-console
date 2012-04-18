@@ -66,6 +66,7 @@ public interface IdentityProvider extends DeploymentRecord, NamedEntity, Generic
     String getSecurityDomain();
     void setSecurityDomain(String securityDomain);
     
+    @Binding (detypedName="external")
     boolean isExternal();
     void setExternal(boolean external);
     

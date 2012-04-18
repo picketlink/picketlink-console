@@ -29,6 +29,7 @@ import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.ui.federation.AsyncHelpText;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
 import com.google.gwt.user.client.ui.HTML;
@@ -54,14 +55,15 @@ public class SignatureSupportTabEditor {
     }
     
     public Widget asWidget() {
-        // adds the key store section
-        VerticalPanel keyStoreHeader = new VerticalPanel();
+        VerticalPanel layout = new VerticalPanel();
 
-        keyStoreHeader.setStyleName("fill-layout-width");
+        layout.setStyleName("fill-layout-width");
+        
+        new AsyncHelpText("identity-provider", new String[] {"signOutgoingMessages", "ignoreIncomingSignatures"}, this.presenter, layout, false);
+        
+        addIdentityProviderForm(layout);
 
-        addIdentityProviderForm(keyStoreHeader);
-
-        return keyStoreHeader;
+        return layout;
     }
 
     /**

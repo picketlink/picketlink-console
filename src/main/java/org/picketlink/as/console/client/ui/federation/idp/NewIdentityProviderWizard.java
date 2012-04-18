@@ -53,7 +53,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
             String type) {
-        super(editor, cls, presenter, type, "alias", "url", "signOutgoingMessages", "ignoreIncomingSignatures");
+        super(editor, cls, presenter, type, "alias", "security-domain", "url");
     }
 
     @Override
@@ -138,7 +138,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
         updateAliasComboBox(getAliasItem(), this.getPresenter().getAvailableDeployments());
 
         if (getPresenter().getIdentityProvider() != null && getPresenter().getIdentityProvider().getIdentityProvider() != null
-                && getPresenter().getIdentityProvider().getIdentityProvider().getName().indexOf("external") != -1) {
+                && getPresenter().getIdentityProvider().getIdentityProvider().isExternal()) {
             editAliasesItem.setEnabled(false);
             securityDomainsItem.setEnabled(false);
         }

@@ -138,7 +138,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     protected void doDelete(IdentityProvider identityProvider) {
         this.getPresenter().getFederationManager().onRemoveIdentityProvider(identityProvider);
         enableAddButton();
-        if (identityProvider.getName().indexOf("external") == -1) {
+        if (!identityProvider.isExternal()) {
             getPresenter().getDeploymentManager().restartIdentityProvider(identityProvider);
         }
     }
@@ -148,7 +148,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      */
     public void doUpdate(IdentityProvider identityProvider, Map<String, Object> changedValues) {
         this.getPresenter().getFederationManager().onUpdateIdentityProvider(identityProvider, changedValues);
-        if (identityProvider.getName().indexOf("external") == -1) {
+        if (!getPresenter().getCurrentFederation().getIdentityProvider().getIdentityProvider().isExternal()) {
             this.getPresenter().getDeploymentManager().restartIdentityProvider(identityProvider);
         }
     }
@@ -197,6 +197,12 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
         }
 
         this.getTrustedDomainTabEditor().getTrustDomainTable().getDataProvider().setList(trustDomains);
+        
+        if (federation.getIdentityProvider() != null) {
+            this.getTrustedDomainTabEditor().setIdentityProvider(federation.getIdentityProvider().getIdentityProvider());
+        } else {
+            this.getTrustedDomainTabEditor().setIdentityProvider(null);
+        }
     }
 
     public void updateDeployments(List<DeploymentRecord> deployments) {
