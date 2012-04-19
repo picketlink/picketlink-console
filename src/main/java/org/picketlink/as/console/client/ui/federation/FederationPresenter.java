@@ -64,15 +64,13 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     public interface MyView extends View {
         void setPresenter(FederationPresenter presenter);
 
-        Federation getCurrentFederation();
-
         void initialLoad();
 
         void selectFederation(FederationWrapper federation);
 
         void updateDeployments(List<DeploymentRecord> deployments);
 
-        void updateFederation(FederationWrapper selectedFederationConfig);
+        void updateSelectedFederation(FederationWrapper selectedFederationConfig);
     }
 
     @ProxyCodeSplit
@@ -194,9 +192,8 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
      */
     @Override
     public void onLoadDeployments(List<DeploymentRecord> deployments) {
-        FederationWrapper selectedFederationConfig = getSelectedFederationConfig();
+        FederationWrapper selectedFederationConfig = getCurrentFederation();
         
-        // if a federation was selected update the view with the informations
         if (selectedFederationConfig != null) {
             List<IdentityProviderWrapper> identityProviders = selectedFederationConfig.getIdentityProviders();
             
@@ -208,7 +205,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
                 }
             }
 
-            getView().updateFederation(selectedFederationConfig);
+            getView().updateSelectedFederation(selectedFederationConfig);
         }
         
         // updates the deployments list
@@ -216,23 +213,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         
         // updates the available deployments list 
         updateAvailableDeployments();
-    }
-
-    /**
-     * <p>
-     * Returns the selected federation configuration.
-     * </p>
-     * 
-     * @return
-     */
-    private FederationWrapper getSelectedFederationConfig() {
-        FederationWrapper federation = null;
-        
-        if (this.selectedFederation != null) {
-            federation = this.federationManager.getFederations().get(selectedFederation);
-        }
-        
-        return federation;
     }
 
     /**
@@ -259,7 +239,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
             for (DeploymentRecord deploymentRecord : new ArrayList<DeploymentRecord>(this.availableDeployments)) {
                 for (ServiceProvider serviceProvider : federation.getServiceProviders()) {
                     if (deploymentRecord.getName().equals(serviceProvider.getName())) {
-                        serviceProvider.setEnabled(true);
+                        serviceProvider.setEnabled(deploymentRecord.isEnabled());
                         this.availableDeployments.remove(deploymentRecord);
                     }
                 }
@@ -279,8 +259,8 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     public IdentityProviderWrapper getIdentityProvider(){
         IdentityProviderWrapper identityProvider = null;
         
-        if (getSelectedFederationConfig() != null) {
-            identityProvider = getSelectedFederationConfig().getIdentityProvider();
+        if (getCurrentFederation() != null) {
+            identityProvider = getCurrentFederation().getIdentityProvider();
         }
         
         return identityProvider;

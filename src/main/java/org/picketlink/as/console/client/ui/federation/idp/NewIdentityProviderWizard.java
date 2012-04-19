@@ -78,16 +78,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
         
         securityDomainsItem =  new ComboBoxItem("securityDomain", "Security Domain");
         
-        if (this.getPresenter().getSecurityDomains() != null) {
-            String[] securityDomains = new String[this.getPresenter().getSecurityDomains().size()];
-
-            for (int i = 0; i < this.getPresenter().getSecurityDomains().size(); i++) {
-                securityDomains[i] = this.getPresenter().getSecurityDomains().get(i).getName();
-            }
-            
-            securityDomainsItem.setValueMap(securityDomains);
-        }
-
+        updateSecurityDomains();
 
         if (isDialogue()) {
             externalIDP = new CheckBoxItem("external", "Is external?") {
@@ -119,6 +110,25 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
         return formItems;
     }
 
+    private void updateSecurityDomains() {
+        if (this.getPresenter().getSecurityDomains() != null && this.securityDomainsItem != null) {
+            String[] securityDomains = new String[this.getPresenter().getSecurityDomains().size()];
+
+            for (int i = 0; i < this.getPresenter().getSecurityDomains().size(); i++) {
+                securityDomains[i] = this.getPresenter().getSecurityDomains().get(i).getName();
+            }
+            
+            securityDomainsItem.setValueMap(securityDomains);
+        }
+        
+        if (!isDialogue()) {
+            if (this.getIdentityProviderEditor().getCurrentSelection() != null) {
+                securityDomainsItem.setValue(this.getIdentityProviderEditor().getCurrentSelection().getSecurityDomain());
+            }
+        }
+
+    }
+
     /**
      * @return
      */
@@ -142,6 +152,8 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
             editAliasesItem.setEnabled(false);
             securityDomainsItem.setEnabled(false);
         }
+        
+        updateSecurityDomains();
     }
 
     private void updateAliasComboBox(ComboBoxItem aliasItem, List<DeploymentRecord> deployments) {

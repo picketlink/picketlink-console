@@ -198,11 +198,13 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
         this.getTrustedDomainTabEditor().getTrustDomainTable().getDataProvider().setList(trustDomains);
         
+        IdentityProvider identityProvider = null;
+        
         if (federation.getIdentityProvider() != null) {
-            this.getTrustedDomainTabEditor().setIdentityProvider(federation.getIdentityProvider().getIdentityProvider());
-        } else {
-            this.getTrustedDomainTabEditor().setIdentityProvider(null);
+            identityProvider = federation.getIdentityProvider().getIdentityProvider();
         }
+        
+        this.getTrustedDomainTabEditor().setIdentityProvider(identityProvider);
     }
 
     public void updateDeployments(List<DeploymentRecord> deployments) {

@@ -69,7 +69,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     private FederationTable federationsTable;
     private ServiceProviderEditor serviceProviderEditor;
     private NewFederationDetails federationDetails;
-    private FederationWrapper selectedFederation;
 
     /**
      * @param beanType
@@ -115,7 +114,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     }
     
     @Override
-    public void updateFederation(FederationWrapper federation) {
+    public void updateSelectedFederation(FederationWrapper federation) {
         this.federationDetails.updateKeyStore(federation);            
         getIdentityProviderEditor().updateIdentityProviders(federation);
         getServiceProviderEditor().updateServiceProviders(federation);
@@ -135,16 +134,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         panel.add(editorWidget);
 
         return scrollPanel;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#getCurrentFederation()
-     */
-    @Override
-    public Federation getCurrentFederation() {
-        return this.federationsTable.getSelectedFederation();
     }
 
     /* (non-Javadoc)
@@ -232,9 +221,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
      */
     @Override
     public void selectFederation(FederationWrapper federation) {
-        this.selectedFederation = federation;
-        
-        if (selectedFederation != null) {
+        if (federation != null) {
             pages.showPage(1);
             bridge.loadEntities(federation.getName());
         } else {

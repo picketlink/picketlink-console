@@ -100,7 +100,7 @@ public class FederationManager {
      * @param federation
      */
     public void onCreateKeyStore(KeyStore keyStore) {
-        this.federationStore.createKeyStore(presenter.getView().getCurrentFederation(), keyStore,
+        this.federationStore.createKeyStore(presenter.getCurrentFederation(), keyStore,
                 new SimpleCallback<ResponseWrapper<Boolean>>() {
 
                     @Override
@@ -117,7 +117,7 @@ public class FederationManager {
     
     public void onUpdateKeyStore(KeyStore updatedEntity, final Map<String, Object> changedValues) {
         if (changedValues.size() > 0) {
-            this.federationStore.updateKeyStore(presenter.getView().getCurrentFederation(), updatedEntity, changedValues,
+            this.federationStore.updateKeyStore(presenter.getCurrentFederation(), updatedEntity, changedValues,
                     new SimpleCallback<ResponseWrapper<Boolean>>() {
                         @Override
                         public void onSuccess(ResponseWrapper<Boolean> response) {
@@ -140,7 +140,7 @@ public class FederationManager {
      * @param keyStore
      */
     public void onRemoveKeyStore(KeyStore keyStore) {
-        this.federationStore.deleteKeyStore(presenter.getView().getCurrentFederation(), keyStore, new SimpleCallback<Boolean>() {
+        this.federationStore.deleteKeyStore(presenter.getCurrentFederation(), keyStore, new SimpleCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean success) {
                 if (success) {
@@ -157,7 +157,7 @@ public class FederationManager {
      * @param updatedEntity
      */
     public void onCreateTrustDomain(IdentityProvider identityProvider, final TrustDomain trustDomain) {
-        this.federationStore.createTrustDomain(this.presenter.getView().getCurrentFederation(), identityProvider, trustDomain,
+        this.federationStore.createTrustDomain(this.presenter.getCurrentFederation(), identityProvider, trustDomain,
                 new SimpleCallback<ResponseWrapper<Boolean>>() {
 
                     @Override
@@ -178,7 +178,7 @@ public class FederationManager {
      * @param updatedEntity
      */
     public void onRemoveTrustDomain(IdentityProvider identityProvider, final TrustDomain trustDomain) {
-        this.federationStore.deleteTrustDomain(presenter.getView().getCurrentFederation(), identityProvider, trustDomain,
+        this.federationStore.deleteTrustDomain(presenter.getCurrentFederation(), identityProvider, trustDomain,
                 new SimpleCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
@@ -201,7 +201,7 @@ public class FederationManager {
      */
     public void onUpdateServiceProvider(final ServiceProvider currentSelection, Map<String, Object> changedValues) {
         if (changedValues.size() > 0) {
-            this.federationStore.updateServiceProvider(presenter.getView().getCurrentFederation(), currentSelection, changedValues,
+            this.federationStore.updateServiceProvider(presenter.getCurrentFederation(), currentSelection, changedValues,
                     new SimpleCallback<ResponseWrapper<Boolean>>() {
                         @Override
                         public void onSuccess(ResponseWrapper<Boolean> response) {
@@ -225,7 +225,7 @@ public class FederationManager {
      * @param serviceProvider
      */
     public void onCreateServiceProvider(final ServiceProvider serviceProvider) {
-        this.federationStore.createServiceProvider(this.presenter.getView().getCurrentFederation(), serviceProvider,
+        this.federationStore.createServiceProvider(this.presenter.getCurrentFederation(), serviceProvider,
                 new SimpleCallback<ResponseWrapper<Boolean>>() {
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
@@ -248,7 +248,7 @@ public class FederationManager {
      * @param serviceProvider
      */
     public void onRemoveServiceProvider(final ServiceProvider serviceProvider) {
-        this.federationStore.deleteServiceProvider(presenter.getView().getCurrentFederation(), serviceProvider,
+        this.federationStore.deleteServiceProvider(presenter.getCurrentFederation(), serviceProvider,
                 new SimpleCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
@@ -279,7 +279,7 @@ public class FederationManager {
      * @param changeset
      */
     public void onCreateIdentityProvider(final IdentityProvider identityProvider) {
-        this.federationStore.createIdentityProvider(this.presenter.getView().getCurrentFederation(), identityProvider,
+        this.federationStore.createIdentityProvider(this.presenter.getCurrentFederation(), identityProvider,
                 new SimpleCallback<ResponseWrapper<Boolean>>() {
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
@@ -301,7 +301,7 @@ public class FederationManager {
      * @param identityProvider
      */
     public void onRemoveIdentityProvider(final IdentityProvider identityProvider) {
-        this.federationStore.deleteIdentityProvider(presenter.getView().getCurrentFederation(), identityProvider,
+        this.federationStore.deleteIdentityProvider(presenter.getCurrentFederation(), identityProvider,
                 new SimpleCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
@@ -329,7 +329,7 @@ public class FederationManager {
      */
     public void onUpdateIdentityProvider(final IdentityProvider identityProvider, final Map<String, Object> changedValues) {
         if (changedValues.size() > 0) {
-            this.federationStore.updateIdentityProvider(presenter.getView().getCurrentFederation(), identityProvider, changedValues,
+            this.federationStore.updateIdentityProvider(presenter.getCurrentFederation(), identityProvider, changedValues,
                     new SimpleCallback<ResponseWrapper<Boolean>>() {
                         @Override
                         public void onSuccess(ResponseWrapper<Boolean> response) {
