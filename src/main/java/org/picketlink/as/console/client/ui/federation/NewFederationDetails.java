@@ -227,6 +227,8 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     public void updateKeyStore(FederationWrapper federation) {
         if (!federation.getKeyStores().isEmpty()) {
             this.digitalCertificateDetails.setKeyStore(federation.getKeyStores().get(0));            
+        } else {
+            this.digitalCertificateDetails.setKeyStore(null);
         }
     }
 

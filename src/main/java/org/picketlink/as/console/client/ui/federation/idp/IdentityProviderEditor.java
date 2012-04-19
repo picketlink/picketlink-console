@@ -82,6 +82,8 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
             identityProvider.setSecurityDomain("no-defined");
         }
         
+        identityProvider.setIgnoreIncomingSignatures(true);
+        
         getPresenter().getFederationManager().onCreateIdentityProvider(identityProvider);
         
         if (!identityProvider.isExternal()) {
