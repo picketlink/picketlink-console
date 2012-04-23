@@ -26,6 +26,7 @@ import org.jboss.as.console.spi.BeanFactoryExtension;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
+import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 
@@ -45,6 +46,8 @@ public interface PicketlinkBeanFactory {
     AutoBean<Federation> federation();
     
     AutoBean<IdentityProvider> identityProvider();
+    
+    AutoBean<SecurityTokenService> securityTokenService();
     
     AutoBean<ServiceProvider> serviceProvider();
     

@@ -186,4 +186,16 @@ public interface FederationStore {
 
     void loadConfiguration(SimpleCallback<Map<String, FederationWrapper>> callback);
 
+    void reloadIdentityProvider(Federation federation, IdentityProvider identityProvider);
+    
+    void reloadServiceProvider(Federation federation, ServiceProvider serviceProvider);
+    
+    void reloadKeyProvider(Federation federation, KeyStore keyStore);
+
+    void createSecurityTokenService(FederationWrapper currentFederation, SecurityTokenService securitytokenService,
+            SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    void deleteSecurityTokenService(FederationWrapper currentFederation, SecurityTokenService securityTokenService,
+            SimpleCallback<Boolean> simpleCallback);
+
 }

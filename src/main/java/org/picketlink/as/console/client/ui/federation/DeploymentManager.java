@@ -32,7 +32,9 @@ import org.jboss.as.console.client.shared.model.DeploymentStore;
 import org.jboss.ballroom.client.widgets.window.Feedback;
 import org.jboss.dmr.client.ModelNode;
 import org.picketlink.as.console.client.shared.subsys.model.DeploymentFederationStore;
+import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 
 import com.google.gwt.user.client.Window;
@@ -49,7 +51,7 @@ public class DeploymentManager {
     private DeploymentFederationStore deploymentFederationStore;
 
     @Inject
-    public DeploymentManager(DeploymentFederationStore deploymentFederationStore, DeploymentStore deploymentStore) {
+    public DeploymentManager(DeploymentFederationStore deploymentFederationStore, DeploymentStore deploymentStore, FederationStore federationStore) {
         this.deploymentFederationStore = deploymentFederationStore;
         this.deploymentStore = deploymentStore;
     }
@@ -110,6 +112,10 @@ public class DeploymentManager {
         });
 
         record.setEnabled(true);
+    }
+
+    public void restartSecurityTokenService(SecurityTokenService serviceProvider) {
+        
     }
     
 }

@@ -20,18 +20,14 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.ui.federation.sp;
+package org.picketlink.as.console.client.ui.federation.sts;
 
-import java.util.List;
-
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationWizard;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
@@ -41,29 +37,22 @@ import org.picketlink.as.console.client.ui.federation.Wizard;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 30, 2012
  */
-public class NewServiceProviderWizard<T extends GenericFederationEntity> extends AbstractFederationWizard<T> implements Wizard<T> {
+public class NewSecurityTokenServiceWizard<T extends GenericFederationEntity> extends AbstractFederationWizard<T> implements Wizard<T> {
 
-    private ComboBoxItem aliasesItem;
-    private ComboBoxItem deploymentsItem;
-
-    public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
-        super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain");
+    public NewSecurityTokenServiceWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
+        super(editor, cls, presenter, type, "alias", "endpoint", "security-domain");
     }
 
     @Override
     protected FormItem<?>[] doGetCustomFields() {
-        ComboBoxItem aliasItem = null;
+        TextBoxItem aliasItem = new TextBoxItem("name", "Alias");
         
         if (!isDialogue()) {
-            this.deploymentsItem = new ComboBoxItem("name", "Alias");
-            aliasItem = this.deploymentsItem;
-            updateAliasComboBox(aliasItem, this.getPresenter().getAllDeployments());
             aliasItem.setEnabled(false);
             aliasItem.setRequired(false);
         } else {
-            aliasItem = getAliasItem();
+            aliasItem.setEnabled(true);
             aliasItem.setRequired(true);
-            updateAliasItems();
         }
         
         ComboBoxItem securityDomainsItem =  new ComboBoxItem("securityDomain", "Security Domain");
@@ -79,59 +68,13 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
         }
         
         FormItem<?>[] formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
-                new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true),
-                new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), };
+                new TextBoxItem("endpoint", PicketLinkConsoleFramework.CONSTANTS.common_label_endpoint(), true)};
 
         return formItems;
     }
 
-    /**
-     * @param result
-     */
-    public void setServiceProviders(List<ServiceProvider> result) {
-        updateAliasItems();
-    }
-
-    /**
-     * @return
-     */
-    private ComboBoxItem getAliasItem() {
-        if (this.aliasesItem == null) {
-            this.aliasesItem = new ComboBoxItem("name", "Alias");
-        }
-
-        return this.aliasesItem;
-    }
-
-    public void updateAliasItems() {
-        if (this.deploymentsItem != null) {
-            updateAliasComboBox(this.deploymentsItem, this.getPresenter().getAllDeployments());            
-        }
-        updateAliasComboBox(getAliasItem(), this.getPresenter().getAvailableDeployments());
-    }
-
-    private void updateAliasComboBox(ComboBoxItem aliasItem, List<DeploymentRecord> deployments) {
-        if (getPresenter().getAllDeployments() == null) {
-            return;
-        }
-        
-        String[] aliases = new String[deployments.size()];
-        
-        for (int i = 0; i < deployments.size(); i++) {
-            aliases[i] = deployments.get(i).getName();
-        }
-
-        aliasItem.setValueMap(aliases);
-        
-        if (!isDialogue()) {
-            if (this.getServiceProviderEditor().getCurrentSelection() != null) {
-                aliasItem.setValue(this.getServiceProviderEditor().getCurrentSelection().getName());            
-            }
-        }
-    }
-
-    public ServiceProviderEditor getServiceProviderEditor() {
-        return (ServiceProviderEditor) this.getEditor();
+    public SecurityTokenServiceEditor getSecurityTokenServiceEditor() {
+        return (SecurityTokenServiceEditor) this.getEditor();
     }
 
 }

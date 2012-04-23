@@ -68,8 +68,9 @@ public class FederationStoreImpl implements FederationStore {
     private final DispatchAsync dispatcher;
     private final ApplicationMetaData metaData;
     private final EntityAdapter<Federation> federationAdapter;
-    private final EntityAdapter<KeyStore> keyStoreAdapter;
+    private final EntityAdapter<KeyStore> keyProviderAdapter;
     private final EntityAdapter<IdentityProvider> identityProviderAdapter;
+    private final EntityAdapter<SecurityTokenService> securityTokenServiceAdapter;
     private final EntityAdapter<ServiceProvider> serviceProviderAdapter;
     private final EntityAdapter<TrustDomain> trustDomainAdapter;
     
@@ -77,8 +78,9 @@ public class FederationStoreImpl implements FederationStore {
 
     private final Baseadress baseadress;
     private final BeanMetaData federationMetaData;
-    private final BeanMetaData keyStoreMetaData;
+    private final BeanMetaData keyProviderMetaData;
     private final BeanMetaData identityProviderMetaData;
+    private final BeanMetaData securityTokenServiceMetaData;
     private final BeanMetaData serviceProviderMetaData;
     private final BeanMetaData trustDomainMetaData;
     private final BeanMetaData securityDomainMetaData;
@@ -90,17 +92,88 @@ public class FederationStoreImpl implements FederationStore {
         this.metaData = propertyMetaData;
         this.baseadress = baseadress;
         this.federationMetaData = metaData.getBeanMetaData(Federation.class);
-        this.keyStoreMetaData = metaData.getBeanMetaData(KeyStore.class);
+        this.keyProviderMetaData = metaData.getBeanMetaData(KeyStore.class);
         this.identityProviderMetaData = metaData.getBeanMetaData(IdentityProvider.class);
+        this.securityTokenServiceMetaData = metaData.getBeanMetaData(SecurityTokenService.class);
         this.serviceProviderMetaData = metaData.getBeanMetaData(ServiceProvider.class);
         this.trustDomainMetaData = metaData.getBeanMetaData(TrustDomain.class);
         this.federationAdapter = new EntityAdapter<Federation>(Federation.class, propertyMetaData);
-        this.keyStoreAdapter = new EntityAdapter<KeyStore>(KeyStore.class, propertyMetaData);
+        this.keyProviderAdapter = new EntityAdapter<KeyStore>(KeyStore.class, propertyMetaData);
         this.identityProviderAdapter = new EntityAdapter<IdentityProvider>(IdentityProvider.class, propertyMetaData);
+        this.securityTokenServiceAdapter = new EntityAdapter<SecurityTokenService>(SecurityTokenService.class, propertyMetaData);
         this.serviceProviderAdapter = new EntityAdapter<ServiceProvider>(ServiceProvider.class, propertyMetaData);
         this.trustDomainAdapter = new EntityAdapter<TrustDomain>(TrustDomain.class, propertyMetaData);
         this.securityDomainAdapter = new EntityAdapter<SecurityDomain>(SecurityDomain.class, propertyMetaData);
         this.securityDomainMetaData = metaData.getBeanMetaData(SecurityDomain.class);
+    }
+
+    @Override
+    public void reloadIdentityProvider(Federation federation, IdentityProvider identityProvider) {
+        AddressBinding address = identityProviderMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), identityProvider.getName());
+
+        ModelNode operation = identityProviderAdapter.fromEntity(identityProvider);
+        operation.get(OP).set("reload");
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                System.out.println(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                System.out.println(result);
+            }
+        });
+    }
+
+    @Override
+    public void reloadServiceProvider(Federation federation, ServiceProvider serviceProvider) {
+        AddressBinding address = serviceProviderMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), serviceProvider.getName());
+
+        ModelNode operation = serviceProviderAdapter.fromEntity(serviceProvider);
+        operation.get(OP).set("reload");
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                System.out.println(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                System.out.println(result);
+            }
+        });
+    }
+
+    @Override
+    public void reloadKeyProvider(Federation federation, KeyStore keyProvider) {
+        AddressBinding address = keyProviderMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), keyProvider.getName());
+
+        ModelNode operation = keyProviderAdapter.fromEntity(keyProvider);
+        operation.get(OP).set("reload");
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                System.out.println(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                System.out.println(result);
+            }
+        });
     }
 
     public void loadSecurityDomains(final SimpleCallback<List<SecurityDomain>> callback) {
@@ -174,10 +247,10 @@ public class FederationStoreImpl implements FederationStore {
      */
     @Override
     public void createKeyStore(Federation federation, KeyStore keyStore, final SimpleCallback<ResponseWrapper<Boolean>> callback) {
-        AddressBinding address = keyStoreMetaData.getAddress();
+        AddressBinding address = keyProviderMetaData.getAddress();
         ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), keyStore.getSignKeyAlias());
 
-        ModelNode operation = keyStoreAdapter.fromEntity(keyStore);
+        ModelNode operation = keyProviderAdapter.fromEntity(keyStore);
         operation.get(OP).set(ADD);
         operation.get(ADDRESS).set(addressModel.get(ADDRESS));
 
@@ -212,6 +285,33 @@ public class FederationStoreImpl implements FederationStore {
         ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), identityProvider.getName());
 
         ModelNode operation = identityProviderAdapter.fromEntity(identityProvider);
+        operation.get(OP).set(ADD);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });
+    }
+    
+    @Override
+    public void createSecurityTokenService(FederationWrapper federation, SecurityTokenService securityTokenService,
+            final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = securityTokenServiceMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), securityTokenService.getName());
+
+        ModelNode operation = securityTokenServiceAdapter.fromEntity(securityTokenService);
         operation.get(OP).set(ADD);
         operation.get(ADDRESS).set(addressModel.get(ADDRESS));
 
@@ -338,9 +438,9 @@ public class FederationStoreImpl implements FederationStore {
     @Override
     public void updateKeyStore(Federation federation, KeyStore keyStore, Map<String, Object> changedValues,
             final SimpleCallback<ResponseWrapper<Boolean>> callback) {
-        AddressBinding address = this.keyStoreMetaData.getAddress();
+        AddressBinding address = this.keyProviderMetaData.getAddress();
         ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), keyStore.getSignKeyAlias());
-        ModelNode operation = this.keyStoreAdapter.fromChangeset(changedValues, addressModel);
+        ModelNode operation = this.keyProviderAdapter.fromChangeset(changedValues, addressModel);
 
         dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
 
@@ -521,15 +621,41 @@ public class FederationStoreImpl implements FederationStore {
         });
     }
     
+    @Override
+    public void deleteSecurityTokenService(FederationWrapper federation, SecurityTokenService securityTokenService,
+            final SimpleCallback<Boolean> callback) {
+        AddressBinding address = this.securityTokenServiceMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), securityTokenService.getName());
+
+        ModelNode operation = securityTokenServiceAdapter.fromEntity(securityTokenService);
+        operation.get(OP).set(REMOVE);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+                callback.onSuccess(wasSuccessful);
+            }
+        });
+    }
+    
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#deleteKeyStore(org.picketlink.as.console.client.shared.subsys.model.Federation, org.picketlink.as.console.client.shared.subsys.model.KeyStore, org.jboss.as.console.client.domain.model.SimpleCallback)
      */
     @Override
     public void deleteKeyStore(Federation federation, KeyStore keyStore, final SimpleCallback<Boolean> callback) {
-        AddressBinding address = this.keyStoreMetaData.getAddress();
+        AddressBinding address = this.keyProviderMetaData.getAddress();
         ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), keyStore.getSignKeyAlias());
 
-        ModelNode operation = keyStoreAdapter.fromEntity(keyStore);
+        ModelNode operation = keyProviderAdapter.fromEntity(keyStore);
         operation.get(OP).set(REMOVE);
         operation.get(ADDRESS).set(addressModel.get(ADDRESS));
 
@@ -634,7 +760,7 @@ public class FederationStoreImpl implements FederationStore {
                         FederationWrapper wrapper = new FederationWrapper(federation);
                         
                         if (federationNode.asProperty().getValue().get("key-store").isDefined()) {
-                            List<KeyStore> keyStores = keyStoreAdapter.fromDMRList(federationNode.asProperty().getValue().get("key-store").asList());
+                            List<KeyStore> keyStores = keyProviderAdapter.fromDMRList(federationNode.asProperty().getValue().get("key-store").asList());
                             
                             wrapper.getKeyStores().addAll(keyStores);
                         }
@@ -652,6 +778,14 @@ public class FederationStoreImpl implements FederationStore {
                                 }
                                 
                                 wrapper.addIdentityProvider(idpWrapper);
+                            }
+                        }
+                        
+                        if (federationNode.asProperty().getValue().get("security-token-service").isDefined()) {
+                            for (ModelNode idpNode : federationNode.asProperty().getValue().get("security-token-service").asList()) {
+                                SecurityTokenService idpWrapper = securityTokenServiceAdapter.fromDMR(idpNode);
+                                
+                                wrapper.addSecurityTokenService(idpWrapper);
                             }
                         }
 
@@ -676,7 +810,7 @@ public class FederationStoreImpl implements FederationStore {
      */
     @Override
     public void loadKeyStore(Federation federation, final SimpleCallback<List<KeyStore>> callback) {
-        AddressBinding address = this.keyStoreMetaData.getAddress();
+        AddressBinding address = this.keyProviderMetaData.getAddress();
 
         ModelNode operation = address.asSubresource(federation.getName());
         operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
@@ -694,7 +828,7 @@ public class FederationStoreImpl implements FederationStore {
                 if (response.isFailure()) {
                     callback.onFailure(new RuntimeException(response.getFailureDescription()));
                 } else {
-                    List<KeyStore> keyStores = keyStoreAdapter.fromDMRList(response.get(RESULT).asList());
+                    List<KeyStore> keyStores = keyProviderAdapter.fromDMRList(response.get(RESULT).asList());
                     callback.onSuccess(keyStores);
                 }
             }

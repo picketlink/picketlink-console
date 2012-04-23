@@ -12,6 +12,8 @@ public class FederationWrapper implements Federation {
 
     private List<KeyStore> keyStores;
 
+    public List<SecurityTokenService> securityTokenServices;
+
     public FederationWrapper(Federation federation) {
         this.federation = federation;
     }
@@ -42,12 +44,24 @@ public class FederationWrapper implements Federation {
         return this.serviceProviders;
     }
 
+    public List<SecurityTokenService> getSecurityTokenServices() {
+        if (this.securityTokenServices == null) {
+            this.securityTokenServices = new ArrayList<SecurityTokenService>();
+        }
+
+        return this.securityTokenServices;
+    }
+    
     public void addIdentityProvider(IdentityProviderWrapper identityProvider) {
         this.getIdentityProviders().add(identityProvider);
     }
     
     public void addServiceProvider(ServiceProvider serviceProvider) {
         this.getServiceProviders().add(serviceProvider);
+    }
+
+    public void addSecurityTokenService(SecurityTokenService securityTokenService) {
+        this.getSecurityTokenServices().add(securityTokenService);
     }
 
     public List<KeyStore> getKeyStores() {

@@ -14,6 +14,7 @@ import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
+import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 import org.picketlink.as.console.client.ui.federation.idp.AddIdentityProviderEvent;
@@ -29,18 +30,18 @@ public class FederationManager {
     private final FederationStore federationStore;
     private final DeploymentManager deploymentManager;
     private final EventBus eventBus;
-    
+
     private FederationPresenter presenter;
-    
+
     private Map<String, FederationWrapper> federations = new HashMap<String, FederationWrapper>();
-    
+
     @Inject
     public FederationManager(FederationStore federationStore, DeploymentManager deploymentManager, EventBus eventBus) {
         this.federationStore = federationStore;
         this.deploymentManager = deploymentManager;
         this.eventBus = eventBus;
     }
-    
+
     /**
      * <p>
      * Creates the given federation instance in the subsystem.
@@ -65,7 +66,7 @@ public class FederationManager {
             }
         });
     }
-    
+
     /**
      * <p>
      * Removes the selected federation instance from the subsystem.
@@ -113,8 +114,9 @@ public class FederationManager {
                                     .common_label_key_store()));
                     }
                 });
+        this.federationStore.reloadKeyProvider(this.presenter.getCurrentFederation(), keyStore);
     }
-    
+
     public void onUpdateKeyStore(KeyStore updatedEntity, final Map<String, Object> changedValues) {
         if (changedValues.size() > 0) {
             this.federationStore.updateKeyStore(presenter.getCurrentFederation(), updatedEntity, changedValues,
@@ -130,13 +132,15 @@ public class FederationManager {
                         }
 
                     });
+            this.federationStore.reloadKeyProvider(this.presenter.getCurrentFederation(), updatedEntity);
         }
     }
-    
+
     /**
      * <p>
      * Removes the selected keystore instance from the subsystem.
      * </p>
+     * 
      * @param keyStore
      */
     public void onRemoveKeyStore(KeyStore keyStore) {
@@ -146,12 +150,14 @@ public class FederationManager {
                 if (success) {
                     Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants().common_label_key_store()));
                 } else {
-                    Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants().common_label_key_store()));
+                    Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                            .common_label_key_store()));
                 }
             }
-        });        
+        });
+        this.federationStore.reloadKeyProvider(presenter.getCurrentFederation(), keyStore);
     }
-    
+
     /**
      * @param identityProvider
      * @param updatedEntity
@@ -194,30 +200,32 @@ public class FederationManager {
                     }
                 });
     }
-    
+
     /**
-     * @param currentSelection
+     * @param serviceProvider
      * @param changedValues
      */
-    public void onUpdateServiceProvider(final ServiceProvider currentSelection, Map<String, Object> changedValues) {
+    public void onUpdateServiceProvider(final ServiceProvider serviceProvider, Map<String, Object> changedValues) {
         if (changedValues.size() > 0) {
-            this.federationStore.updateServiceProvider(presenter.getCurrentFederation(), currentSelection, changedValues,
+            this.federationStore.updateServiceProvider(presenter.getCurrentFederation(), serviceProvider, changedValues,
                     new SimpleCallback<ResponseWrapper<Boolean>>() {
                         @Override
                         public void onSuccess(ResponseWrapper<Boolean> response) {
                             if (response.getUnderlying()) {
                                 loadAllFederations();
                                 Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
-                                        .common_label_serviceProvider() + " " + currentSelection.getName()));
+                                        .common_label_serviceProvider() + " " + serviceProvider.getName()));
                             } else {
                                 Console.error(
                                         Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
                                                 .common_label_serviceProvider() + " ")
-                                                + currentSelection.getName(), response.getResponse().toString());
+                                                + serviceProvider.getName(), response.getResponse().toString());
                             }
                         }
 
                     });
+            this.deploymentManager.restartServiceProvider(serviceProvider);
+            this.federationStore.reloadServiceProvider(this.presenter.getCurrentFederation(), serviceProvider);
         }
     }
 
@@ -240,10 +248,11 @@ public class FederationManager {
                                     .toString());
                     }
                 });
+        this.federationStore.reloadServiceProvider(this.presenter.getCurrentFederation(), serviceProvider);
         this.deploymentManager.restartServiceProvider(serviceProvider);
         this.eventBus.fireEvent(new AddServiceProviderEvent(serviceProvider));
     }
-    
+
     /**
      * @param serviceProvider
      */
@@ -294,6 +303,7 @@ public class FederationManager {
                                     .toString());
                     }
                 });
+        this.federationStore.reloadIdentityProvider(this.presenter.getCurrentFederation(), identityProvider);
         this.eventBus.fireEvent(new AddIdentityProviderEvent(identityProvider));
     }
 
@@ -317,6 +327,7 @@ public class FederationManager {
                         }
                     }
                 });
+        this.deploymentManager.restartIdentityProvider(identityProvider);
         this.eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
     }
 
@@ -346,6 +357,7 @@ public class FederationManager {
                         }
 
                     });
+            this.federationStore.reloadIdentityProvider(this.presenter.getCurrentFederation(), identityProvider);
         }
     }
 
@@ -360,7 +372,7 @@ public class FederationManager {
                 if (result.isEmpty()) {
                     return;
                 }
-                
+
                 federations = result;
                 presenter.loadDeployments();
             }
@@ -381,5 +393,46 @@ public class FederationManager {
                 federationPresenter.onLoadSecurityDomains(result);
             }
         });
+    }
+
+    public void onCreateSecurityTokenService(final SecurityTokenService securitytokenService) {
+        this.federationStore.createSecurityTokenService(this.presenter.getCurrentFederation(), securitytokenService,
+                new SimpleCallback<ResponseWrapper<Boolean>>() {
+                    @Override
+                    public void onSuccess(ResponseWrapper<Boolean> result) {
+                        if (result.getUnderlying()) {
+                            loadAllFederations();
+                            Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_securityTokenService() + " ")
+                                    + securitytokenService.getName());
+                        } else
+                            Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_securityTokenService() + " " + securitytokenService.getName()), result
+                                    .getResponse().toString());
+                    }
+                });
+    }
+
+    public void onUpdateSecurityTokenService(SecurityTokenService securityTokenService, Map<String, Object> changedValues) {
+
+    }
+
+    public void onRemoveSecurityTokenService(final SecurityTokenService securityTokenService) {
+        this.federationStore.deleteSecurityTokenService(presenter.getCurrentFederation(), securityTokenService,
+                new SimpleCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean success) {
+                        if (success) {
+                            loadAllFederations();
+                            Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_securityTokenService() + " ")
+                                    + securityTokenService.getName());
+                        } else {
+                            Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                                    .common_label_securityTokenService() + " ")
+                                    + securityTokenService.getName());
+                        }
+                    }
+                });
     }
 }
