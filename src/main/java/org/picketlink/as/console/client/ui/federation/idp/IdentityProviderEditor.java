@@ -86,10 +86,6 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
         
         getPresenter().getFederationManager().onCreateIdentityProvider(identityProvider);
         
-        if (!identityProvider.isExternal()) {
-            getPresenter().getDeploymentManager().restartIdentityProvider(identityProvider);
-        }
-        
         return true;
     }
 
@@ -140,9 +136,6 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     protected void doDelete(IdentityProvider identityProvider) {
         this.getPresenter().getFederationManager().onRemoveIdentityProvider(identityProvider);
         enableAddButton();
-        if (!identityProvider.isExternal()) {
-            getPresenter().getDeploymentManager().restartIdentityProvider(identityProvider);
-        }
     }
 
     /* (non-Javadoc)
@@ -150,9 +143,6 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      */
     public void doUpdate(IdentityProvider identityProvider, Map<String, Object> changedValues) {
         this.getPresenter().getFederationManager().onUpdateIdentityProvider(identityProvider, changedValues);
-        if (!getPresenter().getCurrentFederation().getIdentityProvider().getIdentityProvider().isExternal()) {
-            this.getPresenter().getDeploymentManager().restartIdentityProvider(identityProvider);
-        }
     }
 
     @Override

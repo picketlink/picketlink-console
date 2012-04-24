@@ -81,6 +81,11 @@ public class SignatureSupportTabEditor {
         FormToolStrip<IdentityProvider> toolStrip = new FormToolStrip<IdentityProvider>(this.identityProviderForm, new FormToolStrip.FormCallback<IdentityProvider>() {
             @Override
             public void onSave(Map<String, Object> changeset) {
+                IdentityProvider updatedIdentityProvider = identityProviderForm.getUpdatedEntity();
+                
+                identityProvider.setSignOutgoingMessages(updatedIdentityProvider.isSignOutgoingMessages());
+                identityProvider.setIgnoreIncomingSignatures(updatedIdentityProvider.isIgnoreIncomingSignatures());
+                
                 getPresenter().getFederationManager().onUpdateIdentityProvider(identityProvider, changeset);
             }
 

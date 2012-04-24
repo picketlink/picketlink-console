@@ -224,7 +224,6 @@ public class FederationManager {
                         }
 
                     });
-            this.deploymentManager.restartServiceProvider(serviceProvider);
             this.federationStore.reloadServiceProvider(this.presenter.getCurrentFederation(), serviceProvider);
         }
     }
@@ -249,7 +248,6 @@ public class FederationManager {
                     }
                 });
         this.federationStore.reloadServiceProvider(this.presenter.getCurrentFederation(), serviceProvider);
-        this.deploymentManager.restartServiceProvider(serviceProvider);
         this.eventBus.fireEvent(new AddServiceProviderEvent(serviceProvider));
     }
 
@@ -266,15 +264,14 @@ public class FederationManager {
                             Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
                                     .common_label_serviceProvider() + " ")
                                     + serviceProvider.getName());
+                            deploymentManager.restartServiceProvider(serviceProvider);
                         } else {
                             Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
                                     .common_label_serviceProvider() + " ")
                                     + serviceProvider.getName());
                         }
-
                     }
                 });
-        this.deploymentManager.restartServiceProvider(serviceProvider);
         this.eventBus.fireEvent(new RemoveServiceProviderEvent(serviceProvider));
     }
 
@@ -297,6 +294,7 @@ public class FederationManager {
                             Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
+                            federationStore.reloadIdentityProvider(presenter.getCurrentFederation(), identityProvider);
                         } else
                             Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " " + identityProvider.getName()), result.getResponse()
@@ -320,6 +318,7 @@ public class FederationManager {
                             Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
+                            deploymentManager.restartIdentityProvider(identityProvider);
                         } else {
                             Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")
@@ -327,7 +326,6 @@ public class FederationManager {
                         }
                     }
                 });
-        this.deploymentManager.restartIdentityProvider(identityProvider);
         this.eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
     }
 
@@ -348,6 +346,7 @@ public class FederationManager {
                                 loadAllFederations();
                                 Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
                                         .common_label_identityProvider() + " " + identityProvider.getName()));
+                                federationStore.reloadIdentityProvider(presenter.getCurrentFederation(), identityProvider);
                             } else {
                                 Console.error(
                                         Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
@@ -357,7 +356,6 @@ public class FederationManager {
                         }
 
                     });
-            this.federationStore.reloadIdentityProvider(this.presenter.getCurrentFederation(), identityProvider);
         }
     }
 

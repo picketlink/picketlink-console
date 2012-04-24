@@ -45,6 +45,7 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
 
     private ComboBoxItem aliasesItem;
     private ComboBoxItem deploymentsItem;
+    private ComboBoxItem securityDomainsItem;
 
     public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
         super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain");
@@ -66,7 +67,7 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
             updateAliasItems();
         }
         
-        ComboBoxItem securityDomainsItem =  new ComboBoxItem("securityDomain", "Security Domain");
+        this.securityDomainsItem =  new ComboBoxItem("securityDomain", "Security Domain");
         
         if (this.getPresenter().getSecurityDomains() != null) {
             String[] securityDomains = new String[this.getPresenter().getSecurityDomains().size()];
@@ -90,6 +91,7 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
      */
     public void setServiceProviders(List<ServiceProvider> result) {
         updateAliasItems();
+        updateSecurityDomains();
     }
 
     /**
@@ -132,6 +134,25 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
 
     public ServiceProviderEditor getServiceProviderEditor() {
         return (ServiceProviderEditor) this.getEditor();
+    }
+    
+    private void updateSecurityDomains() {
+        if (this.getPresenter().getSecurityDomains() != null && this.securityDomainsItem != null) {
+            String[] securityDomains = new String[this.getPresenter().getSecurityDomains().size()];
+
+            for (int i = 0; i < this.getPresenter().getSecurityDomains().size(); i++) {
+                securityDomains[i] = this.getPresenter().getSecurityDomains().get(i).getName();
+            }
+            
+            securityDomainsItem.setValueMap(securityDomains);
+        }
+        
+        if (!isDialogue()) {
+            if (this.getServiceProviderEditor().getCurrentSelection() != null) {
+                securityDomainsItem.setValue(this.getServiceProviderEditor().getCurrentSelection().getSecurityDomain());
+            }
+        }
+
     }
 
 }
