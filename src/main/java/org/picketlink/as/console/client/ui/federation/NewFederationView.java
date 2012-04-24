@@ -71,6 +71,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     private ServiceProviderEditor serviceProviderEditor;
     private NewFederationDetails federationDetails;
     private SecurityTokenServiceEditor securityTokenServiceEditor;
+    private FederationWrapper selectedFederation;
 
     /**
      * @param beanType
@@ -110,12 +111,12 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
         layout.setWidgetTopHeight(titleBar, 0, Style.Unit.PX, 40, Style.Unit.PX);
         layout.setWidgetTopHeight(pagesWidget, 40, Style.Unit.PX, 100, Style.Unit.PCT);
-        
+
         this.federationsTable.addSelectionChangeHandler();
 
         return layout;
     }
-    
+
     private SecurityTokenServiceEditor getSecurityTokenServiceEditor() {
         if (this.securityTokenServiceEditor == null) {
             this.securityTokenServiceEditor = new SecurityTokenServiceEditor(this.presenter);
@@ -126,12 +127,12 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     @Override
     public void updateSelectedFederation(FederationWrapper federation) {
-        this.federationDetails.updateKeyStore(federation);            
+        this.federationDetails.updateKeyStore(federation);
         getIdentityProviderEditor().updateIdentityProviders(federation);
         getServiceProviderEditor().updateServiceProviders(federation);
         getSecurityTokenServiceEditor().updateSecurityTokenServices(federation);
     }
-    
+
     private Widget createDomainList(String description) {
         VerticalPanel panel = new VerticalPanel();
         panel.setStyleName("rhs-content-panel");
@@ -140,7 +141,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
         entityEditor = makeEntityEditor();
         entityEditor.setDescription(description);
-        
+
         Widget editorWidget = entityEditor.setIncludeTools(true).asWidget();
 
         panel.add(editorWidget);
@@ -148,14 +149,16 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         return scrollPanel;
     }
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#updateDeployments(java.util.List)
      */
     public void updateDeployments(List<DeploymentRecord> deployments) {
         getIdentityProviderEditor().updateDeployments(deployments);
         getServiceProviderEditor().updateDeployments(deployments);
     }
-    
+
     /**
      * @return
      */
@@ -174,7 +177,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
         return this.serviceProviderEditor;
     }
-    
+
     /*
      * (non-Javadoc)
      * 
@@ -234,6 +237,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     public void selectFederation(FederationWrapper federation) {
         if (federation != null) {
+            this.selectedFederation = federation;
             pages.showPage(1);
             bridge.loadEntities(federation.getName());
         } else {
