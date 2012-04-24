@@ -38,6 +38,7 @@ import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.inject.Inject;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -48,6 +49,7 @@ public class DeploymentManager {
     private DeploymentStore deploymentStore;
     private DeploymentFederationStore deploymentFederationStore;
 
+    @Inject
     public DeploymentManager(DeploymentFederationStore deploymentFederationStore, DeploymentStore deploymentStore) {
         this.deploymentFederationStore = deploymentFederationStore;
         this.deploymentStore = deploymentStore;

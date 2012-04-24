@@ -87,9 +87,9 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
         Column<IdentityProvider, IdentityProvider> reloadColumn = new Column<IdentityProvider, IdentityProvider>(new TextLinkCell<IdentityProvider>(
                 "Restart", new ActionCell.Delegate<IdentityProvider>() {
                     @Override
-                    public void execute(IdentityProvider IdentityProvider) {
-                        if (IdentityProvider.getName().indexOf("external") == -1) {
-                            presenter.getDeploymentManager().restartIdentityProvider(IdentityProvider);
+                    public void execute(IdentityProvider identityProvider) {
+                        if (!identityProvider.isExternal()) {
+                            presenter.getDeploymentManager().restartIdentityProvider(identityProvider);
                             presenter.loadDeployments();
                         }
                     }
@@ -112,7 +112,7 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
                 
                 ImageResource res = null;
 
-                if (idp.isEnabled() || idp.getName().indexOf("external") != -1) {
+                if (idp.isEnabled() || idp.isExternal()) {
                     res = Icons.INSTANCE.status_good();
                 } else {
                     res = Icons.INSTANCE.status_bad();
