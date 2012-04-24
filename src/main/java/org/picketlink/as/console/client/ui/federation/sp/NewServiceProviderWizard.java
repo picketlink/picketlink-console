@@ -110,6 +110,7 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
             updateAliasComboBox(this.deploymentsItem, this.getPresenter().getAllDeployments());            
         }
         updateAliasComboBox(getAliasItem(), this.getPresenter().getAvailableDeployments());
+        updateSecurityDomains();
     }
 
     private void updateAliasComboBox(ComboBoxItem aliasItem, List<DeploymentRecord> deployments) {
