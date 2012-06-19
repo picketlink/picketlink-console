@@ -69,21 +69,31 @@ public class FederationStoreImpl implements FederationStore {
     private final ApplicationMetaData metaData;
     private final EntityAdapter<Federation> federationAdapter;
     private final EntityAdapter<KeyStore> keyProviderAdapter;
+    private final EntityAdapter<SAMLConfiguration> samlConfigurationAdapter;
     private final EntityAdapter<IdentityProvider> identityProviderAdapter;
     private final EntityAdapter<SecurityTokenService> securityTokenServiceAdapter;
     private final EntityAdapter<ServiceProvider> serviceProviderAdapter;
     private final EntityAdapter<TrustDomain> trustDomainAdapter;
+    private final EntityAdapter<IdentityProviderHandler> identityProviderHandlerAdapter;
+    private final EntityAdapter<IdentityProviderHandlerParameter> identityProviderHandlerParameterAdapter;
+    private final EntityAdapter<ServiceProviderHandler> serviceProviderHandlerAdapter;
+    private final EntityAdapter<ServiceProviderHandlerParameter> serviceProviderHandlerParameterAdapter;
     
     private final EntityAdapter<SecurityDomain> securityDomainAdapter;
 
     private final Baseadress baseadress;
     private final BeanMetaData federationMetaData;
     private final BeanMetaData keyProviderMetaData;
+    private final BeanMetaData samlConfigurationMetaData;
     private final BeanMetaData identityProviderMetaData;
     private final BeanMetaData securityTokenServiceMetaData;
     private final BeanMetaData serviceProviderMetaData;
     private final BeanMetaData trustDomainMetaData;
     private final BeanMetaData securityDomainMetaData;
+    private final BeanMetaData identityProviderHandlerMetaData;
+    private final BeanMetaData identityProviderHandlerParameterMetaData;
+    private final BeanMetaData serviceProviderHandlerMetaData;
+    private final BeanMetaData serviceProviderHandlerParameterMetaData;
     
 
     @Inject
@@ -93,18 +103,28 @@ public class FederationStoreImpl implements FederationStore {
         this.baseadress = baseadress;
         this.federationMetaData = metaData.getBeanMetaData(Federation.class);
         this.keyProviderMetaData = metaData.getBeanMetaData(KeyStore.class);
+        this.samlConfigurationMetaData = metaData.getBeanMetaData(SAMLConfiguration.class);
         this.identityProviderMetaData = metaData.getBeanMetaData(IdentityProvider.class);
         this.securityTokenServiceMetaData = metaData.getBeanMetaData(SecurityTokenService.class);
         this.serviceProviderMetaData = metaData.getBeanMetaData(ServiceProvider.class);
         this.trustDomainMetaData = metaData.getBeanMetaData(TrustDomain.class);
         this.federationAdapter = new EntityAdapter<Federation>(Federation.class, propertyMetaData);
         this.keyProviderAdapter = new EntityAdapter<KeyStore>(KeyStore.class, propertyMetaData);
+        this.samlConfigurationAdapter = new EntityAdapter<SAMLConfiguration>(SAMLConfiguration.class, propertyMetaData);
         this.identityProviderAdapter = new EntityAdapter<IdentityProvider>(IdentityProvider.class, propertyMetaData);
         this.securityTokenServiceAdapter = new EntityAdapter<SecurityTokenService>(SecurityTokenService.class, propertyMetaData);
         this.serviceProviderAdapter = new EntityAdapter<ServiceProvider>(ServiceProvider.class, propertyMetaData);
         this.trustDomainAdapter = new EntityAdapter<TrustDomain>(TrustDomain.class, propertyMetaData);
+        this.identityProviderHandlerAdapter = new EntityAdapter<IdentityProviderHandler>(IdentityProviderHandler.class, propertyMetaData);
+        this.identityProviderHandlerParameterAdapter = new EntityAdapter<IdentityProviderHandlerParameter>(IdentityProviderHandlerParameter.class, propertyMetaData);
+        this.serviceProviderHandlerAdapter = new EntityAdapter<ServiceProviderHandler>(ServiceProviderHandler.class, propertyMetaData);
+        this.serviceProviderHandlerParameterAdapter = new EntityAdapter<ServiceProviderHandlerParameter>(ServiceProviderHandlerParameter.class, propertyMetaData);
         this.securityDomainAdapter = new EntityAdapter<SecurityDomain>(SecurityDomain.class, propertyMetaData);
         this.securityDomainMetaData = metaData.getBeanMetaData(SecurityDomain.class);
+        this.identityProviderHandlerMetaData = metaData.getBeanMetaData(IdentityProviderHandler.class);
+        this.identityProviderHandlerParameterMetaData = metaData.getBeanMetaData(IdentityProviderHandlerParameter.class);
+        this.serviceProviderHandlerMetaData = metaData.getBeanMetaData(ServiceProviderHandler.class);
+        this.serviceProviderHandlerParameterMetaData = metaData.getBeanMetaData(ServiceProviderHandlerParameter.class);
     }
 
     @Override
@@ -764,6 +784,12 @@ public class FederationStoreImpl implements FederationStore {
                             
                             wrapper.getKeyStores().addAll(keyStores);
                         }
+                        
+                        if (federationNode.asProperty().getValue().get("saml").isDefined()) {
+                            List<SAMLConfiguration> samlConfigs = samlConfigurationAdapter.fromDMRList(federationNode.asProperty().getValue().get("saml").asList());
+                            
+                            wrapper.setSAMLConfiguration(samlConfigs.get(0));
+                        }
 
                         if (federationNode.asProperty().getValue().get("identity-provider").isDefined()) {
                             for (ModelNode idpNode : federationNode.asProperty().getValue().get("identity-provider").asList()) {
@@ -776,7 +802,24 @@ public class FederationStoreImpl implements FederationStore {
                                         idpWrapper.addTrustDomain(trustDomain);
                                     }
                                 }
-                                
+
+                                if (idpNode.asProperty().getValue().get("handler").isDefined()) {
+                                    for (ModelNode handlerNode : idpNode.asProperty().getValue().get("handler").asList()) {
+                                        IdentityProviderHandler handlers = identityProviderHandlerAdapter.fromDMR(handlerNode);
+                                        IdentityProviderHandlerWrapper handlerWrapper = new IdentityProviderHandlerWrapper(handlers);
+                                        
+                                        if (handlerNode.asProperty().getValue().get("handler-parameter").isDefined()) {
+                                            for (ModelNode handlerParameterNode : handlerNode.asProperty().getValue().get("handler-parameter").asList()) {
+                                                IdentityProviderHandlerParameter handlerParameter = identityProviderHandlerParameterAdapter.fromDMR(handlerParameterNode);
+                                                
+                                                handlerWrapper.addParameter(handlerParameter);
+                                            }
+                                        }
+                                        
+                                        idpWrapper.addHandler(handlerWrapper);
+                                    }
+                                }
+
                                 wrapper.addIdentityProvider(idpWrapper);
                             }
                         }
@@ -790,9 +833,28 @@ public class FederationStoreImpl implements FederationStore {
                         }
 
                         if (federationNode.asProperty().getValue().get("service-provider").isDefined()) {
-                            List<ServiceProvider> serviceProviders = serviceProviderAdapter.fromDMRList(federationNode.asProperty().getValue().get("service-provider").asList());
-                            
-                            wrapper.getServiceProviders().addAll(serviceProviders);
+                            for (ModelNode spNode : federationNode.asProperty().getValue().get("service-provider").asList()) {
+                                ServiceProviderWrapper spWrapper = new ServiceProviderWrapper(serviceProviderAdapter.fromDMR(spNode));
+                                
+                                if (spNode.asProperty().getValue().get("handler").isDefined()) {
+                                    for (ModelNode handlerNode : spNode.asProperty().getValue().get("handler").asList()) {
+                                        ServiceProviderHandler handlers = serviceProviderHandlerAdapter.fromDMR(handlerNode);
+                                        ServiceProviderHandlerWrapper handlerWrapper = new ServiceProviderHandlerWrapper(handlers);
+                                        
+                                        if (handlerNode.asProperty().getValue().get("handler-parameter").isDefined()) {
+                                            for (ModelNode handlerParameterNode : handlerNode.asProperty().getValue().get("handler-parameter").asList()) {
+                                                ServiceProviderHandlerParameter handlerParameter = serviceProviderHandlerParameterAdapter.fromDMR(handlerParameterNode);
+                                                
+                                                handlerWrapper.addParameter(handlerParameter);
+                                            }
+                                        }
+                                        
+                                        spWrapper.addHandler(handlerWrapper);
+                                    }
+                                }
+
+                                wrapper.addServiceProvider(spWrapper);
+                            }
                         }
                         
                         federations.put(federation.getName(), wrapper);
@@ -904,5 +966,294 @@ public class FederationStoreImpl implements FederationStore {
             }
         });
     }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#createIdentityProviderHandler(org.picketlink.as.console.client.shared.subsys.model.FederationWrapper, org.picketlink.as.console.client.shared.subsys.model.IdentityProvider, org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void createIdentityProviderHandler(FederationWrapper currentFederation, IdentityProvider identityProvider,
+            IdentityProviderHandler newHandler, final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = identityProviderHandlerMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), identityProvider.getName(),
+                newHandler.getClassName());
 
+        ModelNode operation = identityProviderHandlerAdapter.fromEntity(newHandler);
+        operation.get(OP).set(ADD);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });
+    }
+
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#deleteIdentityProviderHandler(org.picketlink.as.console.client.shared.subsys.model.FederationWrapper, org.picketlink.as.console.client.shared.subsys.model.IdentityProvider, org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void deleteIdentityProviderHandler(FederationWrapper federation, IdentityProvider identityProvider,
+            IdentityProviderHandler removedTrustedDomain, final SimpleCallback<Boolean> callback) {
+        AddressBinding address = this.identityProviderHandlerMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), identityProvider.getName(),
+                removedTrustedDomain.getClassName());
+
+        ModelNode operation = identityProviderHandlerAdapter.fromEntity(removedTrustedDomain);
+        operation.get(OP).set(REMOVE);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+                callback.onSuccess(wasSuccessful);
+            }
+        });
+    }
+
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#createIdentityProviderHandlerParameter(org.picketlink.as.console.client.shared.subsys.model.FederationWrapper, org.picketlink.as.console.client.shared.subsys.model.IdentityProvider, org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void createIdentityProviderHandlerParameter(FederationWrapper federation, IdentityProvider identityProvider, IdentityProviderHandler handler,
+            IdentityProviderHandlerParameter newHandlerParameter, final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = identityProviderHandlerParameterMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), identityProvider.getName(),
+                handler.getClassName(), newHandlerParameter.getName());
+
+        ModelNode operation = identityProviderHandlerParameterAdapter.fromEntity(newHandlerParameter);
+        operation.get(OP).set(ADD);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });        
+    }
+
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#deleteIdentityProviderHandlerParameter(org.picketlink.as.console.client.shared.subsys.model.FederationWrapper, org.picketlink.as.console.client.shared.subsys.model.IdentityProvider, org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void deleteIdentityProviderHandlerParameter(FederationWrapper federation, IdentityProvider identityProvider,IdentityProviderHandler handler,
+            IdentityProviderHandlerParameter removedHandlerParameter, final SimpleCallback<Boolean> callback) {
+        AddressBinding address = this.identityProviderHandlerParameterMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), identityProvider.getName(), handler.getClassName(),
+                removedHandlerParameter.getName());
+
+        ModelNode operation = identityProviderHandlerParameterAdapter.fromEntity(removedHandlerParameter);
+        operation.get(OP).set(REMOVE);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+                callback.onSuccess(wasSuccessful);
+            }
+        });        
+    }
+
+    @Override
+    public void createServiceProviderHandler(FederationWrapper currentFederation, ServiceProvider serviceProvider,
+            ServiceProviderHandler newTrustedDomain, final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = serviceProviderHandlerMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), serviceProvider.getName(),
+                newTrustedDomain.getClassName());
+
+        ModelNode operation = serviceProviderHandlerAdapter.fromEntity(newTrustedDomain);
+        operation.get(OP).set(ADD);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });
+    }
+
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.shared.subsys.model.FederationStore#deleteServiceProviderHandler(org.picketlink.as.console.client.shared.subsys.model.FederationWrapper, org.picketlink.as.console.client.shared.subsys.model.ServiceProvider, org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandler, org.jboss.as.console.client.domain.model.SimpleCallback)
+     */
+    @Override
+    public void deleteServiceProviderHandler(FederationWrapper currentFederation, ServiceProvider serviceProvider,
+            ServiceProviderHandler removedTrustedDomain, final SimpleCallback<Boolean> callback) {
+        AddressBinding address = this.serviceProviderHandlerMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), serviceProvider.getName(),
+                removedTrustedDomain.getClassName());
+
+        ModelNode operation = serviceProviderHandlerAdapter.fromEntity(removedTrustedDomain);
+        operation.get(OP).set(REMOVE);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+                callback.onSuccess(wasSuccessful);
+            }
+        });
+    }
+
+    @Override
+    public void createServiceProviderHandlerParameter(FederationWrapper currentFederation, ServiceProvider serviceProvider,
+            ServiceProviderHandler selectedHandler, ServiceProviderHandlerParameter newHandlerParameter,
+            final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = serviceProviderHandlerParameterMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), serviceProvider.getName(),
+                selectedHandler.getClassName(), newHandlerParameter.getName());
+
+        ModelNode operation = serviceProviderHandlerParameterAdapter.fromEntity(newHandlerParameter);
+        operation.get(OP).set(ADD);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });        
+    }
+
+    @Override
+    public void deleteServiceProviderHandlerParameter(FederationWrapper currentFederation, ServiceProvider serviceProvider,
+            ServiceProviderHandler selectedHandler, ServiceProviderHandlerParameter removedHandlerParameter,
+            final SimpleCallback<Boolean> callback) {
+        AddressBinding address = this.serviceProviderHandlerParameterMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), serviceProvider.getName(), selectedHandler.getClassName(),
+                removedHandlerParameter.getName());
+
+        ModelNode operation = serviceProviderHandlerParameterAdapter.fromEntity(removedHandlerParameter);
+        operation.get(OP).set(REMOVE);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+                callback.onSuccess(wasSuccessful);
+            }
+        });        
+    }
+
+    @Override
+    public void createSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration updatedEntity,
+            final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = samlConfigurationMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), currentFederation.getName() + "-saml");
+
+        ModelNode operation = samlConfigurationAdapter.fromEntity(updatedEntity);
+        operation.get(OP).set(ADD);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });
+    }
+
+    @Override
+    public void deleteSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration samlConfig,
+            final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = this.samlConfigurationMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), currentFederation.getName() + "-saml");
+
+        ModelNode operation = samlConfigurationAdapter.fromEntity(samlConfig);
+        operation.get(OP).set(REMOVE);
+        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
+
+        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                ModelNode modelNode = result.get();
+                boolean wasSuccessful = modelNode.get(OUTCOME).asString().equals(SUCCESS);
+                callback.onSuccess(new ResponseWrapper<Boolean>(wasSuccessful, modelNode));
+            }
+        });
+    }
 }

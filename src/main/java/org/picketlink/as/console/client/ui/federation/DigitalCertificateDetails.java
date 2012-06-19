@@ -23,6 +23,7 @@
 package org.picketlink.as.console.client.ui.federation;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jboss.as.console.client.widgets.forms.FormToolStrip;
@@ -30,6 +31,8 @@ import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.PasswordBoxItem;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.Window;
@@ -106,15 +109,20 @@ public class DigitalCertificateDetails {
                     signKeyAliasItem.setEnabled(true);
                     
                     if (presenter.getCurrentFederation().getIdentityProvider() != null) {
-                        presenter.getCurrentFederation().getIdentityProvider().getIdentityProvider().setSignOutgoingMessages(false);
-                        presenter.getCurrentFederation().getIdentityProvider().getIdentityProvider().setIgnoreIncomingSignatures(true);
+                        presenter.getCurrentFederation().getIdentityProvider().getIdentityProvider().setSupportsSignatures(true);
                         
                         HashMap<String, Object> changedValues = new HashMap<String, Object>();
                         
-                        changedValues.put("signOutgoingMessages", "false");
-                        changedValues.put("ignoreIncomingSignatures", "true");
+                        changedValues.put("supportsSignatures", "false");
                         
                         presenter.getFederationManager().onUpdateIdentityProvider(presenter.getCurrentFederation().getIdentityProvider().getIdentityProvider(), changedValues);
+                        
+                        List<ServiceProviderWrapper> serviceProviders = presenter.getCurrentFederation().getServiceProviders();
+                        
+                        for (ServiceProviderWrapper serviceProvider : serviceProviders) {
+                            presenter.getFederationManager().onUpdateServiceProvider(serviceProvider.getServiceProvider(), changedValues);
+                            
+                        }
                     }
                 } else {
                     Window.alert("You must save before removing.");

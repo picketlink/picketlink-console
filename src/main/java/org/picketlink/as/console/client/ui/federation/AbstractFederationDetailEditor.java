@@ -67,6 +67,7 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
     private Wizard<T> wizard;
     private Federation federation;
     private HTML errorMessage;
+    private TabPanel bottomTabs;
 
     public AbstractFederationDetailEditor(FederationPresenter presenter, AbstractModelElementTable<T> table,
             Class<T> entityClass) {
@@ -208,7 +209,7 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
         vpanel.add(new ContentGroupLabel("Details"));
 
         // adds the tabs for the details section
-        TabPanel bottomTabs = new TabPanel();
+        bottomTabs = new TabPanel();
         bottomTabs.setStyleName("default-tabpanel");
 
         wizard = doCreateWizard();
@@ -420,5 +421,9 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
     
     protected void removeErrorMessage() {
         errorMessage.setHTML("");
+    }
+    
+    protected TabPanel getBottomTabs() {
+        return this.bottomTabs;
     }
 }

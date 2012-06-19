@@ -22,6 +22,7 @@
 
 package org.picketlink.as.console.client.ui.federation.sp;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,17 +30,23 @@ import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
+import org.picketlink.as.console.client.ui.federation.idp.SignatureSupportTabEditor;
 
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.TabPanel;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 30, 2012
  */
 public class ServiceProviderEditor extends AbstractFederationDetailEditor<ServiceProvider> {
+
+    private SignatureSupportTabEditor signatureSupportTabEditor;
+    private ServiceProviderHandlersTabEditor handlersTabEditor;
 
     public ServiceProviderEditor(FederationPresenter presenter) {
         super(presenter, new ServiceProviderTable(presenter), ServiceProvider.class);
@@ -67,6 +74,31 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
     @Override
     public String doGetTableSectionName() {
         return "Service Providers";
+    }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor#addDetailsSectionTabs(com.google.gwt.user.client.ui.TabPanel)
+     */
+    @Override
+    protected void addDetailsSectionTabs(TabPanel bottomTabs) {
+        bottomTabs.add(getSignatureSupportTabEditor().asWidget(), "Signature Support");
+        bottomTabs.add(getHandlerTabEditor().asWidget(), "SAML Handlers");
+    }
+
+    private SignatureSupportTabEditor getSignatureSupportTabEditor() {
+        if (this.signatureSupportTabEditor == null) {
+            this.signatureSupportTabEditor = new ServiceProviderSignatureSupportEditor(getPresenter());
+        }
+
+        return this.signatureSupportTabEditor;
+    }
+    
+    private ServiceProviderHandlersTabEditor getHandlerTabEditor() {
+        if (this.handlersTabEditor == null) {
+            this.handlersTabEditor = new ServiceProviderHandlersTabEditor(getPresenter());
+        }
+
+        return this.handlersTabEditor;
     }
 
     @Override
@@ -119,12 +151,25 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
     }
 
     public void updateServiceProviders(FederationWrapper federation) {
+        getBottomTabs().selectTab(0);
+        
         if (federation.getIdentityProvider() == null && !federation.getServiceProviders().isEmpty()) {
             addErrorMessage("You have Service Providers configured but there is no IDP for them.");
         } else {
             removeErrorMessage();
         }
         
-        setData(federation, federation.getServiceProviders());
+        List<ServiceProvider> serviceProviders = new ArrayList<ServiceProvider>();
+        
+        for (ServiceProviderWrapper serviceProviderWrapper : federation.getServiceProviders()) {
+            serviceProviders.add(serviceProviderWrapper.getServiceProvider());
+        }
+        
+        setData(federation, serviceProviders);
+        
+        if (!federation.getServiceProviders().isEmpty()) {
+            getSignatureSupportTabEditor().setIdentityProvider(getCurrentSelection());
+            getHandlerTabEditor().setServiceProvider(getCurrentSelection());
+        }
     }
 }
