@@ -22,6 +22,8 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
+import org.jboss.as.console.client.widgets.forms.Binding;
+
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -31,5 +33,21 @@ public interface GenericFederationEntity {
 
     String getName();
     void setName(String alias);
+    
+    @Binding (detypedName="url")
+    String getUrl();
+    void setUrl(String url);
+    
+    @Binding (detypedName="supportsSignatures")
+    boolean isSupportsSignatures();
+    void setSupportsSignatures(boolean url);
+
+    @Binding (detypedName="security-domain")
+    String getSecurityDomain();
+    void setSecurityDomain(String securityDomain);
+    
+    @Binding (detypedName="strict-post-binding")
+    boolean isStrictPostBinding();
+    void setStrictPostBinding(boolean external);
 
 }

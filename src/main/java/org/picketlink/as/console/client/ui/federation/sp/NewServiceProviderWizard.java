@@ -46,9 +46,10 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
     private ComboBoxItem aliasesItem;
     private ComboBoxItem deploymentsItem;
     private ComboBoxItem securityDomainsItem;
+    private CheckBoxItem strictPostBinding;
 
     public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
-        super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain");
+        super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain", "strict-post-binding");
     }
 
     @Override
@@ -79,9 +80,15 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
             securityDomainsItem.setValueMap(securityDomains);
         }
         
+        strictPostBinding = new CheckBoxItem("strictPostBinding", "Strict Post Binding");
+        strictPostBinding.setEnabled(true);
+        
+        TextBoxItem errorPageItem = new TextBoxItem("errorPage", "Error Page");
+        errorPageItem.setEnabled(true);
+        
         FormItem<?>[] formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
                 new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true),
-                new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), };
+                new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), strictPostBinding, errorPageItem};
 
         return formItems;
     }

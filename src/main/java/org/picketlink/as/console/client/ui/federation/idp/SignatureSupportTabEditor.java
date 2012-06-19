@@ -28,7 +28,7 @@ import org.jboss.as.console.client.widgets.forms.FormToolStrip;
 import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 import org.picketlink.as.console.client.ui.federation.AsyncHelpText;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
@@ -40,14 +40,13 @@ import com.google.gwt.user.client.ui.Widget;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 31, 2012
  */
-public class SignatureSupportTabEditor {
+public abstract class SignatureSupportTabEditor<P extends GenericFederationEntity> {
 
-    private Form<IdentityProvider> identityProviderForm;
+    private Form<P> identityProviderForm;
     private FederationPresenter presenter;
     
-    private CheckBoxItem signOutgoingMessages;
-    private CheckBoxItem ignoreIncomingSignature;
-    private IdentityProvider identityProvider;
+    private CheckBoxItem supportsSignatures;
+    private P identityProvider;
     private HTML errorMessage;
 
     public SignatureSupportTabEditor(FederationPresenter presenter) {
@@ -59,7 +58,7 @@ public class SignatureSupportTabEditor {
 
         layout.setStyleName("fill-layout-width");
         
-        new AsyncHelpText("identity-provider", new String[] {"signOutgoingMessages", "ignoreIncomingSignatures"}, this.presenter, layout, false);
+        new AsyncHelpText("identity-provider", new String[] {"supportsSignatures"}, this.presenter, layout, false);
         
         addIdentityProviderForm(layout);
 
@@ -70,7 +69,7 @@ public class SignatureSupportTabEditor {
      * @param identityProviderHeader
      */
     private void addIdentityProviderForm(VerticalPanel identityProviderHeader) {
-        this.identityProviderForm = new Form<IdentityProvider>(IdentityProvider.class);
+        this.identityProviderForm = new Form<P>(getEntityClass());
         
         errorMessage = new HTML();
         
@@ -78,19 +77,18 @@ public class SignatureSupportTabEditor {
         
         identityProviderHeader.add(errorMessage);
         
-        FormToolStrip<IdentityProvider> toolStrip = new FormToolStrip<IdentityProvider>(this.identityProviderForm, new FormToolStrip.FormCallback<IdentityProvider>() {
+        FormToolStrip<P> toolStrip = new FormToolStrip<P>(this.identityProviderForm, new FormToolStrip.FormCallback<P>() {
             @Override
             public void onSave(Map<String, Object> changeset) {
-                IdentityProvider updatedIdentityProvider = identityProviderForm.getUpdatedEntity();
+                P updatedIdentityProvider = identityProviderForm.getUpdatedEntity();
                 
-                identityProvider.setSignOutgoingMessages(updatedIdentityProvider.isSignOutgoingMessages());
-                identityProvider.setIgnoreIncomingSignatures(updatedIdentityProvider.isIgnoreIncomingSignatures());
+                identityProvider.setSupportsSignatures(updatedIdentityProvider.isSupportsSignatures());
                 
-                getPresenter().getFederationManager().onUpdateIdentityProvider(identityProvider, changeset);
+                doUpdateEntity(changeset);
             }
 
             @Override
-            public void onDelete(IdentityProvider entity) {
+            public void onDelete(P entity) {
             }
         });
 
@@ -100,16 +98,17 @@ public class SignatureSupportTabEditor {
 
         this.identityProviderForm.setEnabled(false);
 
-        signOutgoingMessages = new CheckBoxItem("signOutgoingMessages",
-                PicketLinkConsoleFramework.CONSTANTS.common_label_signOutgoingMessages());
+        this.supportsSignatures = new CheckBoxItem("supportsSignatures",
+                PicketLinkConsoleFramework.CONSTANTS.common_label_supportsSignatures());
 
-        ignoreIncomingSignature = new CheckBoxItem("ignoreIncomingSignatures",
-                PicketLinkConsoleFramework.CONSTANTS.common_label_ignoreIncomingSignatures());
-
-        this.identityProviderForm.setFields(signOutgoingMessages, ignoreIncomingSignature);
+        this.identityProviderForm.setFields(supportsSignatures);
         
         identityProviderHeader.add(this.identityProviderForm.asWidget());
     }
+
+    protected abstract Class<P> getEntityClass();
+
+    protected abstract void doUpdateEntity(Map<String, Object> changeset);
 
     private void enableDisableSignatureSupportFields() {
         if (getPresenter().getCurrentFederation() != null) {
@@ -120,11 +119,9 @@ public class SignatureSupportTabEditor {
             }
             
             if (getPresenter().getCurrentFederation().getKeyStores().isEmpty()) {
-                signOutgoingMessages.setEnabled(false);
-                ignoreIncomingSignature.setEnabled(false);
+                this.supportsSignatures.setEnabled(false);
             } else {
-                signOutgoingMessages.setEnabled(true);
-                ignoreIncomingSignature.setEnabled(true);
+                this.supportsSignatures.setEnabled(true);
             }
         }
     }
@@ -132,14 +129,17 @@ public class SignatureSupportTabEditor {
     /**
      * @param identityProvider
      */
-    public void setIdentityProvider(IdentityProvider identityProvider) {
+    public void setIdentityProvider(P identityProvider) {
         this.identityProvider = identityProvider;
         this.identityProviderForm.edit(identityProvider);
         enableDisableSignatureSupportFields();
     }
     
-    private FederationPresenter getPresenter() {
+    protected FederationPresenter getPresenter() {
         return presenter;
     }
-
+    
+    protected P getIdentityProvider() {
+        return identityProvider;
+    }
 }

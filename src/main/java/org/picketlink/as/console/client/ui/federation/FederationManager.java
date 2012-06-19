@@ -13,9 +13,14 @@ import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
+import org.picketlink.as.console.client.shared.subsys.model.SAMLConfiguration;
 import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandler;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerParameter;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 import org.picketlink.as.console.client.ui.federation.idp.AddIdentityProviderEvent;
 import org.picketlink.as.console.client.ui.federation.idp.RemoveIdentityProviderEvent;
@@ -114,7 +119,6 @@ public class FederationManager {
                                     .common_label_key_store()));
                     }
                 });
-        this.federationStore.reloadKeyProvider(this.presenter.getCurrentFederation(), keyStore);
     }
 
     public void onUpdateKeyStore(KeyStore updatedEntity, final Map<String, Object> changedValues) {
@@ -430,6 +434,158 @@ public class FederationManager {
                                     .common_label_securityTokenService() + " ")
                                     + securityTokenService.getName());
                         }
+                    }
+                });
+    }
+
+    public void onCreateIdentityProviderHandler(IdentityProvider identityProvider, final IdentityProviderHandler newHandler) {
+        this.federationStore.createIdentityProviderHandler(this.presenter.getCurrentFederation(), identityProvider, newHandler,
+                new SimpleCallback<ResponseWrapper<Boolean>>() {
+
+                    @Override
+                    public void onSuccess(ResponseWrapper<Boolean> result) {
+                        if (result.getUnderlying()) {
+                            Console.info(Console.MESSAGES.added("Handler" + newHandler.getClassName()));
+                        } else
+                            Console.error(
+                                    Console.MESSAGES.addingFailed("Handler" + newHandler.getClassName()), result.getResponse().toString());
+                    }
+                });
+    }
+
+    /**
+     * @param identityProvider
+     * @param removedTrustedDomain
+     */
+    public void onRemoveIdentityProviderHandler(IdentityProvider identityProvider, final IdentityProviderHandler removedTrustedDomain) {
+        this.federationStore.deleteIdentityProviderHandler(presenter.getCurrentFederation(), identityProvider, removedTrustedDomain,
+                new SimpleCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean success) {
+                        if (success) {
+                            Console.info(Console.MESSAGES.deleted("Handler" + removedTrustedDomain.getClassName()));
+                        } else {
+                            Console.error(Console.MESSAGES.deletionFailed("Handler" + removedTrustedDomain.getClassName()));
+                        }
+                    }
+                });
+    }
+
+    public void onCreateIdentityProviderHandlerParameter(IdentityProvider identityProvider,IdentityProviderHandler handler,
+            final IdentityProviderHandlerParameter newHandlerParameter) {
+        this.federationStore.createIdentityProviderHandlerParameter(this.presenter.getCurrentFederation(), identityProvider, handler, newHandlerParameter,
+                new SimpleCallback<ResponseWrapper<Boolean>>() {
+
+                    @Override
+                    public void onSuccess(ResponseWrapper<Boolean> result) {
+                        if (result.getUnderlying()) {
+                            Console.info(Console.MESSAGES.added("Handler Parameter" + newHandlerParameter.getName()));
+                        } else
+                            Console.error(
+                                    Console.MESSAGES.addingFailed("Handler Parameter" + newHandlerParameter.getName()), result.getResponse().toString());
+                    }
+                });
+    }
+
+    public void onRemoveIdentityProviderHandlerParameter(IdentityProvider identityProvider,IdentityProviderHandler handler,
+            final IdentityProviderHandlerParameter removedHandlerParameter) {
+        this.federationStore.deleteIdentityProviderHandlerParameter(presenter.getCurrentFederation(), identityProvider, handler, removedHandlerParameter,
+                new SimpleCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean success) {
+                        if (success) {
+                            Console.info(Console.MESSAGES.deleted("Handler Parameter" + removedHandlerParameter.getName()));
+                        } else {
+                            Console.error(Console.MESSAGES.deletionFailed("Handler Parameter" + removedHandlerParameter.getName()));
+                        }
+                    }
+                });        
+    }
+
+    public void onCreateServiceProviderHandler(ServiceProvider serviceProvider, final ServiceProviderHandler newTrustedDomain) {
+        this.federationStore.createServiceProviderHandler(this.presenter.getCurrentFederation(), serviceProvider, newTrustedDomain,
+                new SimpleCallback<ResponseWrapper<Boolean>>() {
+
+                    @Override
+                    public void onSuccess(ResponseWrapper<Boolean> result) {
+                        if (result.getUnderlying()) {
+                            Console.info(Console.MESSAGES.added("Handler" + newTrustedDomain.getClassName()));
+                        } else
+                            Console.error(
+                                    Console.MESSAGES.addingFailed("Handler" + newTrustedDomain.getClassName()), result.getResponse().toString());
+                    }
+                });
+    }
+
+    public void onRemoveServiceProviderHandler(ServiceProvider serviceProvider, final ServiceProviderHandler removedTrustedDomain) {
+        this.federationStore.deleteServiceProviderHandler(presenter.getCurrentFederation(), serviceProvider, removedTrustedDomain,
+                new SimpleCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean success) {
+                        if (success) {
+                            Console.info(Console.MESSAGES.deleted("Handler" + removedTrustedDomain.getClassName()));
+                        } else {
+                            Console.error(Console.MESSAGES.deletionFailed("Handler" + removedTrustedDomain.getClassName()));
+                        }
+                    }
+                });
+    }
+
+    public void onCreateServiceProviderHandlerParameter(ServiceProvider serviceProvider,
+            ServiceProviderHandler selectedHandler, final ServiceProviderHandlerParameter newHandlerParameter) {
+        this.federationStore.createServiceProviderHandlerParameter(this.presenter.getCurrentFederation(), serviceProvider, selectedHandler, newHandlerParameter,
+                new SimpleCallback<ResponseWrapper<Boolean>>() {
+
+                    @Override
+                    public void onSuccess(ResponseWrapper<Boolean> result) {
+                        if (result.getUnderlying()) {
+                            Console.info(Console.MESSAGES.added("Handler Parameter" + newHandlerParameter.getName()));
+                        } else
+                            Console.error(
+                                    Console.MESSAGES.addingFailed("Handler Parameter" + newHandlerParameter.getName()), result.getResponse().toString());
+                    }
+                });
+    }
+
+    public void onRemoveServiceProviderHandlerParameter(ServiceProvider serviceProvider,
+            ServiceProviderHandler selectedHandler, final ServiceProviderHandlerParameter removedHandlerParameter) {
+        this.federationStore.deleteServiceProviderHandlerParameter(presenter.getCurrentFederation(), serviceProvider, selectedHandler, removedHandlerParameter,
+                new SimpleCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean success) {
+                        if (success) {
+                            Console.info(Console.MESSAGES.deleted("Handler Parameter" + removedHandlerParameter.getName()));
+                        } else {
+                            Console.error(Console.MESSAGES.deletionFailed("Handler Parameter" + removedHandlerParameter.getName()));
+                        }
+                    }
+                });        
+    }
+
+    public void onCreateSAMLConfiguration(SAMLConfiguration updatedEntity) {
+        this.federationStore.createSAMLConfiguration(presenter.getCurrentFederation(), updatedEntity,
+                new SimpleCallback<ResponseWrapper<Boolean>>() {
+
+                    @Override
+                    public void onSuccess(ResponseWrapper<Boolean> result) {
+                        if (result.getUnderlying()) {
+                            Console.info(Console.MESSAGES.added("SAML Configuration"));
+                        } else
+                            Console.error(Console.MESSAGES.addingFailed("SAML Configuration"));
+                    }
+                });
+    }
+
+    public void onRemoveKeyStore(SAMLConfiguration samlConfig) {
+        this.federationStore.deleteSAMLConfiguration(presenter.getCurrentFederation(), samlConfig,
+                new SimpleCallback<ResponseWrapper<Boolean>>() {
+
+                    @Override
+                    public void onSuccess(ResponseWrapper<Boolean> result) {
+                        if (result.getUnderlying()) {
+                            Console.info(Console.MESSAGES.deleted("SAML Configuration"));
+                        } else
+                            Console.error(Console.MESSAGES.deletionFailed("SAML Configuration"));
                     }
                 });
     }

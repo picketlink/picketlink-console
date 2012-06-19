@@ -3,16 +3,22 @@ package org.picketlink.as.console.client.shared.subsys.model;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
+
 public class FederationWrapper implements Federation {
 
     private Federation federation;
 
     private List<IdentityProviderWrapper> identityProviders;
-    private List<ServiceProvider> serviceProviders;
+    private List<ServiceProviderWrapper> serviceProviders;
 
     private List<KeyStore> keyStores;
 
     public List<SecurityTokenService> securityTokenServices;
+
+    private ArrayList<SAMLConfiguration> samlConfigurations;
+
+    private SAMLConfiguration samlConfiguration;
 
     public FederationWrapper(Federation federation) {
         this.federation = federation;
@@ -36,9 +42,9 @@ public class FederationWrapper implements Federation {
         return this.identityProviders;
     }
 
-    public List<ServiceProvider> getServiceProviders() {
+    public List<ServiceProviderWrapper> getServiceProviders() {
         if (this.serviceProviders == null) {
-            this.serviceProviders = new ArrayList<ServiceProvider>();
+            this.serviceProviders = new ArrayList<ServiceProviderWrapper>();
         }
 
         return this.serviceProviders;
@@ -56,7 +62,7 @@ public class FederationWrapper implements Federation {
         this.getIdentityProviders().add(identityProvider);
     }
     
-    public void addServiceProvider(ServiceProvider serviceProvider) {
+    public void addServiceProvider(ServiceProviderWrapper serviceProvider) {
         this.getServiceProviders().add(serviceProvider);
     }
 
@@ -78,6 +84,14 @@ public class FederationWrapper implements Federation {
 
     public void setName(String alias) {
         federation.setName(alias);
+    }
+
+    public SAMLConfiguration getSAMLConfiguration() {
+        return this.samlConfiguration;
+    }
+    
+    public void setSAMLConfiguration(SAMLConfiguration samlConfiguration) {
+        this.samlConfiguration = samlConfiguration;
     }
     
     

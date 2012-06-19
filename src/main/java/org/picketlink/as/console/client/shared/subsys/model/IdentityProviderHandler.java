@@ -22,40 +22,20 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
-import org.jboss.as.console.client.shared.viewframework.NamedEntity;
 import org.jboss.as.console.client.widgets.forms.Address;
 import org.jboss.as.console.client.widgets.forms.Binding;
-import org.jboss.as.console.client.widgets.forms.FormItem;
 
 /**
  * <p>Federation bean definition.</p>
  * <p>This interface also defines the address to be used when using the AS7 management API.</p>
  * 
- * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
+ * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink/federation={0}/service-provider={0}")
-public interface ServiceProvider extends DeploymentRecord, NamedEntity, GenericFederationEntity {
+@Address("/subsystem=picketlink/federation={0}/identity-provider={1}/handler={2}")
+public interface IdentityProviderHandler {
 
-    @Override
-    @FormItem(localLabel="common_label_name",
-            required=true,
-            formItemTypeForEdit="TEXT",
-            formItemTypeForAdd="TEXT_BOX",
-            tabName="common_label_attributes")
-    @Binding(detypedName="alias", key = true)
-    String getName();
-    
-    @Override
-    void setName(String alias);
-
-    @Binding (detypedName="post-binding")
-    boolean isPostBinding();
-    void setPostBinding(boolean postBinding);
-
-    @Binding (detypedName="error-page")
-    String getErrorPage();
-    void setErrorPage(String errorPage);
-
+    @Binding(key = true, detypedName="class")
+    String getClassName();
+    void setClassName(String name);
 }

@@ -49,11 +49,12 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     private ComboBoxItem deploymentsItem;
     private TextBoxItem url;
     private CheckBoxItem externalIDP;
+    private CheckBoxItem strictPostBinding;
     private ComboBoxItem securityDomainsItem;
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
             String type) {
-        super(editor, cls, presenter, type, "alias", "security-domain", "url");
+        super(editor, cls, presenter, type, "alias", "security-domain", "url","strict-post-binding");
     }
 
     @Override
@@ -80,6 +81,9 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
         
         updateSecurityDomains();
 
+        strictPostBinding = new CheckBoxItem("strictPostBinding", "Strict Post Binding");
+        strictPostBinding.setEnabled(true);
+        
         if (isDialogue()) {
             externalIDP = new CheckBoxItem("external", "Is external?") {
                 @Override
@@ -89,21 +93,25 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
                         getAliasItem().setRequired(false);
                         securityDomainsItem.setEnabled(false);
                         securityDomainsItem.setRequired(false);
+                        strictPostBinding.setEnabled(false);
+                        strictPostBinding.setRequired(false);
                     } else {
                         getAliasItem().setEnabled(true);
                         getAliasItem().setRequired(true);
                         securityDomainsItem.setEnabled(true);
                         securityDomainsItem.setRequired(true);
+                        strictPostBinding.setEnabled(true);
+                        strictPostBinding.setRequired(true);
                     }
                 }
             };
 
-            formItems = new FormItem<?>[] { externalIDP, aliasItem, securityDomainsItem, url};
+            formItems = new FormItem<?>[] { externalIDP, aliasItem, securityDomainsItem, url, strictPostBinding};
         } else {
             editAliasesItem = new TextItem("name", "Alias");
             editAliasesItem.setEnabled(true);
             
-            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, url};
+            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, url, strictPostBinding};
         }
 
         return formItems;

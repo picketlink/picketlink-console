@@ -99,7 +99,7 @@ public class TrustedDomainTabEditor {
                             && !newTrustedDomain.getName().trim().isEmpty()) {
                         presenter.getFederationManager().onCreateTrustDomain(identityProvider, newTrustedDomain);
                         getTrustDomainTable().getDataProvider().getList().add(newTrustedDomain);
-                        showRestartDialog();
+//                        showRestartDialog();
                     } else {
                         Window.alert(PicketLinkConsoleFramework.MESSAGES.invalidTrustedDomain());
                     }
@@ -128,7 +128,7 @@ public class TrustedDomainTabEditor {
                                 if (isConfirmed) {
                                     presenter.getFederationManager().onRemoveTrustDomain(identityProvider, removedTrustedDomain);
                                     getTrustDomainTable().getDataProvider().getList().remove(removedTrustedDomain);
-                                    showRestartDialog();
+//                                    showRestartDialog();
                                 }
                             }
                         });
