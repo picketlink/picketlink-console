@@ -50,24 +50,8 @@ public interface IdentityProvider extends DeploymentRecord, NamedEntity, Generic
     @Override
     void setName(String alias);
     
-    @Binding (detypedName="url")
-    String getUrl();
-    void setUrl(String url);
-
-    @Binding (detypedName="signOutgoingMessages")
-    boolean isSignOutgoingMessages();
-    void setSignOutgoingMessages(boolean url);
-
-    @Binding (detypedName="ignoreIncomingSignatures")
-    boolean isIgnoreIncomingSignatures();
-    void setIgnoreIncomingSignatures(boolean url);
-
-    @Binding (detypedName="security-domain")
-    String getSecurityDomain();
-    void setSecurityDomain(String securityDomain);
-    
     @Binding (detypedName="external")
     boolean isExternal();
     void setExternal(boolean external);
-    
+
 }

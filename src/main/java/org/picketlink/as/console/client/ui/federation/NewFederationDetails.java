@@ -49,6 +49,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     private final Form<Federation> form;
     private final FederationPresenter presenter;
     private DigitalCertificateDetails digitalCertificateDetails;
+    private SAMLConfigurationDetails samlConfigurationDetails;
 
     /**
      * @param table
@@ -85,7 +86,11 @@ public class NewFederationDetails implements FormAdapter<Federation> {
         this.digitalCertificateDetails = new DigitalCertificateDetails(this.presenter);
         
         tabPanel.add(this.digitalCertificateDetails.asWidget(), "Digital Certificates");
+
+        this.samlConfigurationDetails = new SAMLConfigurationDetails(this.presenter);
         
+        tabPanel.add(this.samlConfigurationDetails.asWidget(), "SAML Configurations");
+
         tabPanel.selectTab(0);
 
         return tabPanel;
@@ -230,6 +235,8 @@ public class NewFederationDetails implements FormAdapter<Federation> {
         } else {
             this.digitalCertificateDetails.setKeyStore(null);
         }
+        
+        this.samlConfigurationDetails.setSAMLConfiguration(federation.getSAMLConfiguration());
     }
 
 }

@@ -70,7 +70,13 @@ public class AsyncHelpText implements SecurityDomainsPresenter.DescriptionCallBa
             @Override
             public void onSuccess(DMRResponse result) {
                 ModelNode response = result.get();
-                List<ModelNode> resList = response.get(ModelDescriptionConstants.RESULT).asList();
+                ModelNode responseResult = response.get(ModelDescriptionConstants.RESULT);
+                
+                if (!responseResult.isDefined()) {
+                    return;
+                }
+                
+                List<ModelNode> resList = responseResult.asList();
                 if (resList.size() == 0)
                     return;
 

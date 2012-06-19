@@ -36,7 +36,7 @@ import org.picketlink.as.console.client.NameTokens;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.shared.EventBus;
@@ -237,9 +237,9 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
             }
             
             for (DeploymentRecord deploymentRecord : new ArrayList<DeploymentRecord>(this.availableDeployments)) {
-                for (ServiceProvider serviceProvider : federation.getServiceProviders()) {
-                    if (deploymentRecord.getName().equals(serviceProvider.getName())) {
-                        serviceProvider.setEnabled(deploymentRecord.isEnabled());
+                for (ServiceProviderWrapper serviceProvider : federation.getServiceProviders()) {
+                    if (deploymentRecord.getName().equals(serviceProvider.getServiceProvider().getName())) {
+                        serviceProvider.getServiceProvider().setEnabled(deploymentRecord.isEnabled());
                         this.availableDeployments.remove(deploymentRecord);
                     }
                 }

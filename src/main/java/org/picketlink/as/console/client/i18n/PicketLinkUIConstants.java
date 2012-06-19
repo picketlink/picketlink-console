@@ -37,8 +37,7 @@ public interface PicketLinkUIConstants extends Constants {
     String common_label_trustDomain();
     String common_label_alias();
     String common_label_URL();
-    String common_label_ignoreIncomingSignatures();
-    String common_label_signOutgoingMessages();
+    String common_label_supportsSignatures();
     String common_label_postBinding();
     String common_label_trustedDomains();
     String common_label_domainName();

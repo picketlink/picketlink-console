@@ -198,4 +198,36 @@ public interface FederationStore {
     void deleteSecurityTokenService(FederationWrapper currentFederation, SecurityTokenService securityTokenService,
             SimpleCallback<Boolean> simpleCallback);
 
+    void createIdentityProviderHandler(FederationWrapper currentFederation, IdentityProvider identityProvider,
+            IdentityProviderHandler newHandler, SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    void deleteIdentityProviderHandler(FederationWrapper currentFederation, IdentityProvider identityProvider,
+            IdentityProviderHandler removedTrustedDomain, SimpleCallback<Boolean> simpleCallback);
+
+    void createIdentityProviderHandlerParameter(FederationWrapper currentFederation, IdentityProvider identityProvider,IdentityProviderHandler handler,
+            IdentityProviderHandlerParameter newHandlerParameter, SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    void deleteIdentityProviderHandlerParameter(FederationWrapper currentFederation, IdentityProvider identityProvider,IdentityProviderHandler handler,
+            IdentityProviderHandlerParameter removedHandlerParameter, SimpleCallback<Boolean> simpleCallback);
+
+    void createServiceProviderHandler(FederationWrapper currentFederation, ServiceProvider serviceProvider,
+            ServiceProviderHandler newTrustedDomain, SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    void deleteServiceProviderHandler(FederationWrapper currentFederation, ServiceProvider serviceProvider,
+            ServiceProviderHandler removedTrustedDomain, SimpleCallback<Boolean> simpleCallback);
+
+    void createServiceProviderHandlerParameter(FederationWrapper currentFederation, ServiceProvider serviceProvider,
+            ServiceProviderHandler selectedHandler, ServiceProviderHandlerParameter newHandlerParameter,
+            SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    void deleteServiceProviderHandlerParameter(FederationWrapper currentFederation, ServiceProvider serviceProvider,
+            ServiceProviderHandler selectedHandler, ServiceProviderHandlerParameter removedHandlerParameter,
+            SimpleCallback<Boolean> simpleCallback);
+
+    void createSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration updatedEntity,
+            SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    void deleteSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration samlConfig,
+            SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
 }

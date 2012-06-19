@@ -76,6 +76,10 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
         TextColumn<IdentityProvider> aliasColumn = new TextColumn<IdentityProvider>() {
             @Override
             public String getValue(IdentityProvider record) {
+                if (record.isExternal()) {
+                    return "Remote Identity Provider (" + record.getUrl() + ")";
+                }
+                
                 return record.getName();
             }
         };
@@ -90,7 +94,7 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
                     public void execute(IdentityProvider identityProvider) {
                         if (!identityProvider.isExternal()) {
                             presenter.getDeploymentManager().restartIdentityProvider(identityProvider);
-                            presenter.loadDeployments();
+//                            presenter.loadDeployments();
                         }
                     }
                 })) {
