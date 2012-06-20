@@ -1139,7 +1139,7 @@ public class FederationStoreImpl implements FederationStore {
     public void createSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration updatedEntity,
             final SimpleCallback<ResponseWrapper<Boolean>> callback) {
         AddressBinding address = samlConfigurationMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), currentFederation.getName() + "-saml");
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), "saml");
 
         ModelNode operation = samlConfigurationAdapter.fromEntity(updatedEntity);
         operation.get(OP).set(ADD);
@@ -1166,7 +1166,7 @@ public class FederationStoreImpl implements FederationStore {
     public void deleteSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration samlConfig,
             final SimpleCallback<ResponseWrapper<Boolean>> callback) {
         AddressBinding address = this.samlConfigurationMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), currentFederation.getName() + "-saml");
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), "saml");
 
         ModelNode operation = samlConfigurationAdapter.fromEntity(samlConfig);
         operation.get(OP).set(REMOVE);

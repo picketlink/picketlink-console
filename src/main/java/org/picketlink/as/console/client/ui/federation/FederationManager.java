@@ -316,7 +316,9 @@ public class FederationManager {
                             Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
-                            deploymentManager.restartIdentityProvider(identityProvider);
+                            if (!identityProvider.isExternal()) {
+                                deploymentManager.restartIdentityProvider(identityProvider);
+                            }
                         } else {
                             Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")

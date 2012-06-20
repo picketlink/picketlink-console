@@ -103,6 +103,10 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
 
     @Override
     protected boolean doInsert(ServiceProvider serviceProvider) {
+        if (serviceProvider.getErrorPage().trim().isEmpty()) {
+            serviceProvider.setErrorPage(null);
+        }
+        
         getPresenter().getFederationManager().onCreateServiceProvider(serviceProvider);
         return true;
     }

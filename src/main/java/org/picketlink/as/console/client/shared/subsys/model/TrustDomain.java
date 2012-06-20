@@ -38,5 +38,9 @@ public interface TrustDomain {
     @Binding(key = true)
     String getName();
     void setName(String name);
-    
+
+    @Binding(detypedName="cert-alias")
+    String getCertAlias();
+    void setCertAlias(String certAlias);
+
 }
