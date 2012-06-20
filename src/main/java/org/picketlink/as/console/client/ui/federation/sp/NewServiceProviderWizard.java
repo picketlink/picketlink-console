@@ -82,9 +82,11 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
         
         strictPostBinding = new CheckBoxItem("strictPostBinding", "Strict Post Binding");
         strictPostBinding.setEnabled(true);
+        strictPostBinding.setRequired(false);
         
         TextBoxItem errorPageItem = new TextBoxItem("errorPage", "Error Page");
         errorPageItem.setEnabled(true);
+        errorPageItem.setRequired(false);
         
         FormItem<?>[] formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
                 new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true),

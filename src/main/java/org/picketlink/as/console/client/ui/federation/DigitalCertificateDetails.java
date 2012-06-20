@@ -94,6 +94,8 @@ public class DigitalCertificateDetails {
                 if (!hasKeyStore) {
                     presenter.getFederationManager().onCreateKeyStore(form.getUpdatedEntity());
                     hasKeyStore = true;
+                } else {
+                    presenter.getFederationManager().onUpdateKeyStore(form.getUpdatedEntity(), changeset);
                 }
                 
                 form.edit(form.getUpdatedEntity());

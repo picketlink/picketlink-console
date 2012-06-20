@@ -36,6 +36,7 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.user.client.Window;
 
 /**
  * <p>
@@ -95,6 +96,8 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
                         if (!identityProvider.isExternal()) {
                             presenter.getDeploymentManager().restartIdentityProvider(identityProvider);
 //                            presenter.loadDeployments();
+                        } else {
+                            Window.alert("You can restart only hosted Identity providers.");
                         }
                     }
                 })) {

@@ -93,7 +93,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         pages.addPage(Console.CONSTANTS.common_label_back(), domainList);
         pages.addPage(getIdentityProviderEditor().doGetEntityName(), getIdentityProviderEditor().asWidget());
         pages.addPage(getServiceProviderEditor().doGetEntityName(), getServiceProviderEditor().asWidget());
-        pages.addPage(getSecurityTokenServiceEditor().doGetEntityName(), getSecurityTokenServiceEditor().asWidget());
+//        pages.addPage(getSecurityTokenServiceEditor().doGetEntityName(), getSecurityTokenServiceEditor().asWidget());
 
         // default page
         pages.showPage(0);
@@ -130,7 +130,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         this.federationDetails.updateKeyStore(federation);
         getIdentityProviderEditor().updateIdentityProviders(federation);
         getServiceProviderEditor().updateServiceProviders(federation);
-        getSecurityTokenServiceEditor().updateSecurityTokenServices(federation);
+//        getSecurityTokenServiceEditor().updateSecurityTokenServices(federation);
     }
 
     private Widget createDomainList(String description) {
