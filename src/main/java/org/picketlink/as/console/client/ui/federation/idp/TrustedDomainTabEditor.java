@@ -95,11 +95,14 @@ public class TrustedDomainTabEditor {
                 } else {
                     TrustDomain newTrustedDomain = trustDomainForm.getUpdatedEntity();
                     
+                    if (newTrustedDomain.getCertAlias().trim().isEmpty()) {
+                        newTrustedDomain.setCertAlias(null);
+                    }
+                    
                     if (newTrustedDomain != null
                             && !newTrustedDomain.getName().trim().isEmpty()) {
                         presenter.getFederationManager().onCreateTrustDomain(identityProvider, newTrustedDomain);
                         getTrustDomainTable().getDataProvider().getList().add(newTrustedDomain);
-//                        showRestartDialog();
                     } else {
                         Window.alert(PicketLinkConsoleFramework.MESSAGES.invalidTrustedDomain());
                     }
@@ -128,7 +131,6 @@ public class TrustedDomainTabEditor {
                                 if (isConfirmed) {
                                     presenter.getFederationManager().onRemoveTrustDomain(identityProvider, removedTrustedDomain);
                                     getTrustDomainTable().getDataProvider().getList().remove(removedTrustedDomain);
-//                                    showRestartDialog();
                                 }
                             }
                         });
@@ -153,10 +155,12 @@ public class TrustedDomainTabEditor {
         this.trustDomainForm = new Form<TrustDomain>(TrustDomain.class);
 
         TextBoxItem domainName = new TextBoxItem("name", PicketLinkConsoleFramework.CONSTANTS.common_label_domainName());
-
         domainName.setRequired(true);
 
-        this.trustDomainForm.setFields(domainName);
+        TextBoxItem certAliasName = new TextBoxItem("certAlias", "Certificate Alias");
+        certAliasName.setRequired(false);
+
+        this.trustDomainForm.setFields(domainName, certAliasName);
 
         trustDomainsHeader.add(this.trustDomainForm.asWidget());
     }

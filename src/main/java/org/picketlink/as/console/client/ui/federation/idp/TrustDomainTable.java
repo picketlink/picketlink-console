@@ -65,6 +65,7 @@ public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
     @Override
     protected void doAddConlumns(CellTable table) {
         createNameColumn(table);
+        createCertAliasColumn(table);
 
         this.getCellTable().setSelectionModel(createSelectionModel());
     }
@@ -96,6 +97,17 @@ public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
         };
 
         table.addColumn(nameColumn, Console.CONSTANTS.common_label_name());
+    }
+    
+    private void createCertAliasColumn(CellTable table) {
+        TextColumn<TrustDomain> nameColumn = new TextColumn<TrustDomain>() {
+            @Override
+            public String getValue(TrustDomain record) {
+                return record.getCertAlias();
+            }
+        };
+
+        table.addColumn(nameColumn, "Certificate Alias");
     }
     
     /**

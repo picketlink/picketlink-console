@@ -49,7 +49,7 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
     private CheckBoxItem strictPostBinding;
 
     public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
-        super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain", "strict-post-binding");
+        super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain", "strict-post-binding", "error-page");
     }
 
     @Override
@@ -82,13 +82,23 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
         
         strictPostBinding = new CheckBoxItem("strictPostBinding", "Strict Post Binding");
         strictPostBinding.setEnabled(true);
+        strictPostBinding.setRequired(false);
         
         TextBoxItem errorPageItem = new TextBoxItem("errorPage", "Error Page");
         errorPageItem.setEnabled(true);
+        errorPageItem.setRequired(false);
+
+        FormItem<?>[] formItems = null;
+
         
-        FormItem<?>[] formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
-                new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true),
-                new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), strictPostBinding, errorPageItem};
+        if (!isDialogue()) {
+            formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
+                    new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true),
+                    new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), strictPostBinding, errorPageItem};           
+        } else {
+            formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
+                    new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), false)}; 
+        }
 
         return formItems;
     }

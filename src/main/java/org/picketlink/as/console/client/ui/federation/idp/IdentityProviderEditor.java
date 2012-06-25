@@ -29,9 +29,9 @@ import java.util.Map;
 import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
@@ -83,6 +83,10 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
         if (identityProvider.isExternal()) {
             identityProvider.setName(getFederation().getName() + "-" + "external-idp");
             identityProvider.setSecurityDomain("no-defined");
+        }
+        
+        if (identityProvider.getUrl() == null || "".equals(identityProvider.getUrl().trim())) {
+            identityProvider.setUrl("http://localhost:8080/" + identityProvider.getName().replaceAll(".war", ""));
         }
         
         getPresenter().getFederationManager().onCreateIdentityProvider(identityProvider);

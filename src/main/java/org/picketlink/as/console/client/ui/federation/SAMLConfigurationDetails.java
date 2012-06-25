@@ -86,6 +86,8 @@ public class SAMLConfigurationDetails {
                 if (!hasSAMLConfiguration) {
                     presenter.getFederationManager().onCreateSAMLConfiguration(form.getUpdatedEntity());
                     hasSAMLConfiguration = true;
+                } else {
+                    presenter.getFederationManager().onUpdateSAMLConfiguration(form.getUpdatedEntity(), changeset);
                 }
                 
                 form.edit(form.getUpdatedEntity());

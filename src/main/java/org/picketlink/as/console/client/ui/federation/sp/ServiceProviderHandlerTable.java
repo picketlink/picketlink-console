@@ -51,6 +51,7 @@ public class ServiceProviderHandlerTable extends AbstractModelElementTable<Servi
     private ServiceProviderHandler selectedHandler;
     private ServiceProviderHandlerParameterTable parametersTable;
     private FederationPresenter presenter;
+    private ServiceProviderHandlersTabEditor handlersTabEditor;
     
     /*
      * (non-Javadoc)
@@ -93,6 +94,8 @@ public class ServiceProviderHandlerTable extends AbstractModelElementTable<Servi
                         parametersTable.getDataProvider().setList(handlerWrapper.getParameters());
                     }
                 }
+                
+                handlersTabEditor.doUpdateSelection(selectedHandler);
             }
 
         };
@@ -125,5 +128,13 @@ public class ServiceProviderHandlerTable extends AbstractModelElementTable<Servi
     
     public void setPresenter(FederationPresenter presenter) {
         this.presenter = presenter;
+    }
+    
+    public void setSelectedServiceProvider(ServiceProviderWrapper selectedServiceProvider) {
+        this.selectedServiceProvider = selectedServiceProvider;
+    }
+    
+    public void setHandlersTabEditor(ServiceProviderHandlersTabEditor handlersTabEditor) {
+        this.handlersTabEditor = handlersTabEditor;
     }
 }

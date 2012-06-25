@@ -127,75 +127,6 @@ public class FederationStoreImpl implements FederationStore {
         this.serviceProviderHandlerParameterMetaData = metaData.getBeanMetaData(ServiceProviderHandlerParameter.class);
     }
 
-    @Override
-    public void reloadIdentityProvider(Federation federation, IdentityProvider identityProvider) {
-        AddressBinding address = identityProviderMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), identityProvider.getName());
-
-        ModelNode operation = identityProviderAdapter.fromEntity(identityProvider);
-        operation.get(OP).set("reload");
-        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
-
-        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-                System.out.println(caught);
-            }
-
-            @Override
-            public void onSuccess(DMRResponse result) {
-                System.out.println(result);
-            }
-        });
-    }
-
-    @Override
-    public void reloadServiceProvider(Federation federation, ServiceProvider serviceProvider) {
-        AddressBinding address = serviceProviderMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), serviceProvider.getName());
-
-        ModelNode operation = serviceProviderAdapter.fromEntity(serviceProvider);
-        operation.get(OP).set("reload");
-        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
-
-        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-                System.out.println(caught);
-            }
-
-            @Override
-            public void onSuccess(DMRResponse result) {
-                System.out.println(result);
-            }
-        });
-    }
-
-    @Override
-    public void reloadKeyProvider(Federation federation, KeyStore keyProvider) {
-        AddressBinding address = keyProviderMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), keyProvider.getName());
-
-        ModelNode operation = keyProviderAdapter.fromEntity(keyProvider);
-        operation.get(OP).set("reload");
-        operation.get(ADDRESS).set(addressModel.get(ADDRESS));
-
-        dispatcher.execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
-
-            @Override
-            public void onFailure(Throwable caught) {
-                System.out.println(caught);
-            }
-
-            @Override
-            public void onSuccess(DMRResponse result) {
-                System.out.println(result);
-            }
-        });
-    }
-
     public void loadSecurityDomains(final SimpleCallback<List<SecurityDomain>> callback) {
         AddressBinding address = securityDomainMetaData.getAddress();
         ModelNode operation = address.asSubresource(baseadress.getAdress());
@@ -1208,7 +1139,7 @@ public class FederationStoreImpl implements FederationStore {
     public void createSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration updatedEntity,
             final SimpleCallback<ResponseWrapper<Boolean>> callback) {
         AddressBinding address = samlConfigurationMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), currentFederation.getName() + "-saml");
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), "saml");
 
         ModelNode operation = samlConfigurationAdapter.fromEntity(updatedEntity);
         operation.get(OP).set(ADD);
@@ -1235,7 +1166,7 @@ public class FederationStoreImpl implements FederationStore {
     public void deleteSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration samlConfig,
             final SimpleCallback<ResponseWrapper<Boolean>> callback) {
         AddressBinding address = this.samlConfigurationMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), currentFederation.getName() + "-saml");
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), "saml");
 
         ModelNode operation = samlConfigurationAdapter.fromEntity(samlConfig);
         operation.get(OP).set(REMOVE);
@@ -1256,4 +1187,26 @@ public class FederationStoreImpl implements FederationStore {
             }
         });
     }
+
+    @Override
+    public void updateSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration updatedEntity,
+            Map<String, Object> changedValues, final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+        AddressBinding address = this.samlConfigurationMetaData.getAddress();
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), "saml");
+        ModelNode operation = this.samlConfigurationAdapter.fromChangeset(changedValues, addressModel);
+
+        dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
+
+            @Override
+            public void onFailure(Throwable caught) {
+                callback.onFailure(caught);
+            }
+
+            @Override
+            public void onSuccess(DMRResponse result) {
+                callback.onSuccess(ModelAdapter.wrapBooleanResponse(result));
+            }
+        });
+    }
+
 }

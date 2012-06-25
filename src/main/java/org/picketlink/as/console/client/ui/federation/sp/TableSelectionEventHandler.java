@@ -20,27 +20,16 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.shared.subsys.model;
+package org.picketlink.as.console.client.ui.federation.sp;
 
-import org.jboss.as.console.client.widgets.forms.Address;
-import org.jboss.as.console.client.widgets.forms.Binding;
+import com.google.gwt.event.shared.EventHandler;
 
 /**
- * <p>TrustDomain bean definition.</p>
- * <p>This interface also defines the address to be used when using the AS7 management API.</p>
- * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
- * @since Mar 14, 2012
+ *
  */
-@Address("/subsystem=picketlink/federation={0}/identity-provider={0}/trust-domain={0}")
-public interface TrustDomain {
-
-    @Binding(key = true)
-    String getName();
-    void setName(String name);
-
-    @Binding(detypedName="cert-alias")
-    String getCertAlias();
-    void setCertAlias(String certAlias);
-
+public interface TableSelectionEventHandler extends EventHandler {
+    
+    void onSelect(TableSelectionEvent event);
+    
 }
