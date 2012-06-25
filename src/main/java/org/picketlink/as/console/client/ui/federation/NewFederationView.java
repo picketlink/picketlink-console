@@ -127,9 +127,9 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     @Override
     public void updateSelectedFederation(FederationWrapper federation) {
-        this.federationDetails.updateKeyStore(federation);
-        getIdentityProviderEditor().updateIdentityProviders(federation);
-        getServiceProviderEditor().updateServiceProviders(federation);
+        this.federationDetails.updateKeyStore(federation);    
+        getIdentityProviderEditor().updateIdentityProviders(federation);    
+        getServiceProviderEditor().updateServiceProviders(federation);    
 //        getSecurityTokenServiceEditor().updateSecurityTokenServices(federation);
     }
 

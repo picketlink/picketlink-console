@@ -25,6 +25,7 @@ package org.picketlink.as.console.client.ui.federation;
 import java.util.Map;
 
 import org.jboss.as.console.client.widgets.forms.FormToolStrip;
+import org.jboss.ballroom.client.widgets.forms.EditListener;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.FormValidation;
@@ -126,6 +127,7 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
             layout.add(toolStrip.asWidget());
 
             form.setEnabled(false);
+            form.setNumColumns(2);
         }
 
         // ----
@@ -148,7 +150,7 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
                 editor.closeWizard();
             }
         });
-
+        
         return isDialogue ? new WindowContentBuilder(layout, options).build() : layout;
     }
 

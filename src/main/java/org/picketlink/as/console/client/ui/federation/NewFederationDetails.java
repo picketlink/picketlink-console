@@ -89,7 +89,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
 
         this.samlConfigurationDetails = new SAMLConfigurationDetails(this.presenter);
         
-        tabPanel.add(this.samlConfigurationDetails.asWidget(), "SAML Configurations");
+        tabPanel.add(this.samlConfigurationDetails.asWidget(), "SAML Configuration");
 
         tabPanel.selectTab(0);
 
@@ -227,16 +227,22 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     @Override
     public void clearValues() {
         form.clearValues();
+        this.digitalCertificateDetails.setKeyStore(null);
+        this.samlConfigurationDetails.setSAMLConfiguration(null);
     }
 
     public void updateKeyStore(FederationWrapper federation) {
-        if (!federation.getKeyStores().isEmpty()) {
+        if (federation != null && !federation.getKeyStores().isEmpty()) {
             this.digitalCertificateDetails.setKeyStore(federation.getKeyStores().get(0));            
         } else {
             this.digitalCertificateDetails.setKeyStore(null);
         }
         
-        this.samlConfigurationDetails.setSAMLConfiguration(federation.getSAMLConfiguration());
+        if (federation != null) {
+            this.samlConfigurationDetails.setSAMLConfiguration(federation.getSAMLConfiguration());
+        } else {
+            this.samlConfigurationDetails.setSAMLConfiguration(null);
+        }
     }
 
 }

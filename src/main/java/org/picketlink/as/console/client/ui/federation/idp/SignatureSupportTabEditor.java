@@ -113,7 +113,7 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
     private void enableDisableSignatureSupportFields() {
         if (getPresenter().getCurrentFederation() != null) {
             if (getPresenter().getCurrentFederation().getKeyStores().isEmpty()) {
-                errorMessage.setHTML("These configurations are disabled because the current federation does not support signatures.");
+                errorMessage.setHTML("This configuration is disabled because the current federation does not support signatures.");
             } else {
                 errorMessage.setHTML("");
             }

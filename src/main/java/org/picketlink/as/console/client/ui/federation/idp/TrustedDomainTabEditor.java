@@ -95,6 +95,10 @@ public class TrustedDomainTabEditor {
                 } else {
                     TrustDomain newTrustedDomain = trustDomainForm.getUpdatedEntity();
                     
+                    if (newTrustedDomain.getCertAlias().trim().isEmpty()) {
+                        newTrustedDomain.setCertAlias(null);
+                    }
+                    
                     if (newTrustedDomain != null
                             && !newTrustedDomain.getName().trim().isEmpty()) {
                         presenter.getFederationManager().onCreateTrustDomain(identityProvider, newTrustedDomain);
@@ -127,7 +131,6 @@ public class TrustedDomainTabEditor {
                                 if (isConfirmed) {
                                     presenter.getFederationManager().onRemoveTrustDomain(identityProvider, removedTrustedDomain);
                                     getTrustDomainTable().getDataProvider().getList().remove(removedTrustedDomain);
-//                                    showRestartDialog();
                                 }
                             }
                         });

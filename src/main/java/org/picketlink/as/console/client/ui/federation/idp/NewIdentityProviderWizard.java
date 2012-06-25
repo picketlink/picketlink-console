@@ -106,7 +106,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
                 }
             };
 
-            formItems = new FormItem<?>[] { externalIDP, aliasItem, securityDomainsItem, url, strictPostBinding};
+            formItems = new FormItem<?>[] { externalIDP, aliasItem, securityDomainsItem, url};
         } else {
             editAliasesItem = new TextItem("name", "Alias");
             editAliasesItem.setEnabled(false);
