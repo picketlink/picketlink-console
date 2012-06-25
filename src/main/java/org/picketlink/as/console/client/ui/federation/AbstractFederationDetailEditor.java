@@ -303,7 +303,7 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
      * 
      * @param policy
      */
-    protected void doUpdateSelection(T policy) {
+    protected void doUpdateSelection(T selection) {
 
     }
 

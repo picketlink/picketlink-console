@@ -30,6 +30,9 @@ import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandler;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerParameter;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
@@ -47,6 +50,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
 
     private SignatureSupportTabEditor signatureSupportTabEditor;
     private ServiceProviderHandlersTabEditor handlersTabEditor;
+    private ServiceProviderWrapper selectedServiceProvider;
 
     public ServiceProviderEditor(FederationPresenter presenter) {
         super(presenter, new ServiceProviderTable(presenter), ServiceProvider.class);
@@ -103,6 +107,14 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
 
     @Override
     protected boolean doInsert(ServiceProvider serviceProvider) {
+        if (serviceProvider.getErrorPage() != null && serviceProvider.getErrorPage().trim().isEmpty()) {
+            serviceProvider.setErrorPage(null);
+        }
+        
+        if (serviceProvider.getUrl() == null || "".equals(serviceProvider.getUrl().trim())) {
+            serviceProvider.setUrl("http://localhost:8080/" + serviceProvider.getName().replaceAll(".war", ""));
+        }
+        
         getPresenter().getFederationManager().onCreateServiceProvider(serviceProvider);
         return true;
     }
@@ -168,8 +180,43 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
         setData(federation, serviceProviders);
         
         if (!federation.getServiceProviders().isEmpty()) {
+            updateSelectedServiceProvider(getCurrentSelection());
             getSignatureSupportTabEditor().setIdentityProvider(getCurrentSelection());
-            getHandlerTabEditor().setServiceProvider(getCurrentSelection());
+            getHandlerTabEditor().setServiceProvider(this.selectedServiceProvider);
+            
+            ArrayList<ServiceProviderHandler> handlersList = new ArrayList<ServiceProviderHandler>();
+            
+            for (ServiceProviderHandlerWrapper handler : this.selectedServiceProvider.getHandlers()) {
+                handlersList.add(handler.getHandler());
+            }
+            
+            getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
+        }
+    }
+    
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor#doUpdateSelection(org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity)
+     */
+    @Override
+    protected void doUpdateSelection(ServiceProvider serviceProvider) {
+        updateSelectedServiceProvider(serviceProvider);
+        getHandlerTabEditor().setServiceProvider(this.selectedServiceProvider);
+        ArrayList<ServiceProviderHandler> handlersList = new ArrayList<ServiceProviderHandler>();
+        
+        for (ServiceProviderHandlerWrapper handler : this.selectedServiceProvider.getHandlers()) {
+            handlersList.add(handler.getHandler());
+        }
+        
+        getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
+        getHandlerTabEditor().getHandlerParameterTable().getDataProvider().setList(new ArrayList<ServiceProviderHandlerParameter>());
+    }
+
+    private void updateSelectedServiceProvider(ServiceProvider serviceProvider) {
+        for (ServiceProviderWrapper serviceProviderWrapper : getPresenter().getCurrentFederation().getServiceProviders()) {
+            if (serviceProviderWrapper.getServiceProvider().getName().equals(serviceProvider.getName())) {
+                this.selectedServiceProvider = serviceProviderWrapper;
+                break;
+            }
         }
     }
 }

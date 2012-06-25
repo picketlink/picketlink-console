@@ -186,12 +186,6 @@ public interface FederationStore {
 
     void loadConfiguration(SimpleCallback<Map<String, FederationWrapper>> callback);
 
-    void reloadIdentityProvider(Federation federation, IdentityProvider identityProvider);
-    
-    void reloadServiceProvider(Federation federation, ServiceProvider serviceProvider);
-    
-    void reloadKeyProvider(Federation federation, KeyStore keyStore);
-
     void createSecurityTokenService(FederationWrapper currentFederation, SecurityTokenService securitytokenService,
             SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
 
@@ -229,5 +223,8 @@ public interface FederationStore {
 
     void deleteSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration samlConfig,
             SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
+
+    void updateSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration updatedEntity,
+            Map<String, Object> changedValues, SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
 
 }

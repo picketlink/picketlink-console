@@ -136,7 +136,6 @@ public class FederationManager {
                         }
 
                     });
-            this.federationStore.reloadKeyProvider(this.presenter.getCurrentFederation(), updatedEntity);
         }
     }
 
@@ -159,7 +158,6 @@ public class FederationManager {
                 }
             }
         });
-        this.federationStore.reloadKeyProvider(presenter.getCurrentFederation(), keyStore);
     }
 
     /**
@@ -173,6 +171,7 @@ public class FederationManager {
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
+                            loadAllFederations();
                             Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
                                     .common_label_trustDomain() + " ")
                                     + trustDomain.getName());
@@ -192,6 +191,7 @@ public class FederationManager {
                 new SimpleCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
+                        loadAllFederations();
                         if (success) {
                             Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
                                     .common_label_trustDomain() + " ")
@@ -228,7 +228,6 @@ public class FederationManager {
                         }
 
                     });
-            this.federationStore.reloadServiceProvider(this.presenter.getCurrentFederation(), serviceProvider);
         }
     }
 
@@ -251,7 +250,6 @@ public class FederationManager {
                                     .toString());
                     }
                 });
-        this.federationStore.reloadServiceProvider(this.presenter.getCurrentFederation(), serviceProvider);
         this.eventBus.fireEvent(new AddServiceProviderEvent(serviceProvider));
     }
 
@@ -298,14 +296,12 @@ public class FederationManager {
                             Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
-                            federationStore.reloadIdentityProvider(presenter.getCurrentFederation(), identityProvider);
                         } else
                             Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " " + identityProvider.getName()), result.getResponse()
                                     .toString());
                     }
                 });
-        this.federationStore.reloadIdentityProvider(this.presenter.getCurrentFederation(), identityProvider);
         this.eventBus.fireEvent(new AddIdentityProviderEvent(identityProvider));
     }
 
@@ -322,7 +318,9 @@ public class FederationManager {
                             Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
-                            deploymentManager.restartIdentityProvider(identityProvider);
+                            if (!identityProvider.isExternal()) {
+                                deploymentManager.restartIdentityProvider(identityProvider);
+                            }
                         } else {
                             Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
                                     .common_label_identityProvider() + " ")
@@ -350,7 +348,6 @@ public class FederationManager {
                                 loadAllFederations();
                                 Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
                                         .common_label_identityProvider() + " " + identityProvider.getName()));
-                                federationStore.reloadIdentityProvider(presenter.getCurrentFederation(), identityProvider);
                             } else {
                                 Console.error(
                                         Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
@@ -508,6 +505,7 @@ public class FederationManager {
 
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
+                        loadAllFederations();
                         if (result.getUnderlying()) {
                             Console.info(Console.MESSAGES.added("Handler" + newTrustedDomain.getClassName()));
                         } else
@@ -522,6 +520,7 @@ public class FederationManager {
                 new SimpleCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
+                        loadAllFederations();
                         if (success) {
                             Console.info(Console.MESSAGES.deleted("Handler" + removedTrustedDomain.getClassName()));
                         } else {
@@ -538,6 +537,7 @@ public class FederationManager {
 
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
+                        loadAllFederations();
                         if (result.getUnderlying()) {
                             Console.info(Console.MESSAGES.added("Handler Parameter" + newHandlerParameter.getName()));
                         } else
@@ -553,6 +553,7 @@ public class FederationManager {
                 new SimpleCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
+                        loadAllFederations();
                         if (success) {
                             Console.info(Console.MESSAGES.deleted("Handler Parameter" + removedHandlerParameter.getName()));
                         } else {
@@ -588,5 +589,23 @@ public class FederationManager {
                             Console.error(Console.MESSAGES.deletionFailed("SAML Configuration"));
                     }
                 });
+    }
+
+    public void onUpdateSAMLConfiguration(SAMLConfiguration updatedEntity, final Map<String, Object> changedValues) {
+        if (changedValues.size() > 0) {
+            this.federationStore.updateSAMLConfiguration(presenter.getCurrentFederation(), updatedEntity, changedValues,
+                    new SimpleCallback<ResponseWrapper<Boolean>>() {
+                        @Override
+                        public void onSuccess(ResponseWrapper<Boolean> response) {
+                            if (response.getUnderlying())
+                                Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
+                                        .common_label_key_store()));
+                            else
+                                Console.error(Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
+                                        .common_label_key_store()));
+                        }
+
+                    });
+        }
     }
 }
