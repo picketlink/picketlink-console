@@ -505,6 +505,7 @@ public class FederationManager {
 
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
+                        loadAllFederations();
                         if (result.getUnderlying()) {
                             Console.info(Console.MESSAGES.added("Handler" + newTrustedDomain.getClassName()));
                         } else
@@ -519,6 +520,7 @@ public class FederationManager {
                 new SimpleCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
+                        loadAllFederations();
                         if (success) {
                             Console.info(Console.MESSAGES.deleted("Handler" + removedTrustedDomain.getClassName()));
                         } else {
@@ -535,6 +537,7 @@ public class FederationManager {
 
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
+                        loadAllFederations();
                         if (result.getUnderlying()) {
                             Console.info(Console.MESSAGES.added("Handler Parameter" + newHandlerParameter.getName()));
                         } else
@@ -550,6 +553,7 @@ public class FederationManager {
                 new SimpleCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
+                        loadAllFederations();
                         if (success) {
                             Console.info(Console.MESSAGES.deleted("Handler Parameter" + removedHandlerParameter.getName()));
                         } else {

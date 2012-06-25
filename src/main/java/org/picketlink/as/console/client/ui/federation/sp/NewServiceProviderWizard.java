@@ -97,7 +97,7 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
                     new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), strictPostBinding, errorPageItem};           
         } else {
             formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
-                    new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true)}; 
+                    new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), false)}; 
         }
 
         return formItems;

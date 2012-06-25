@@ -84,7 +84,7 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
         form = new Form<T>(entityClass);
 
         form.setFields(doGetCustomFields());
-
+        
         final Command saveCmd = new Command() {
             @Override
             public void execute() {

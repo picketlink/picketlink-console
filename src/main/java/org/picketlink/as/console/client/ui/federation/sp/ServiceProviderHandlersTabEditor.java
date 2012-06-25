@@ -22,6 +22,9 @@
 
 package org.picketlink.as.console.client.ui.federation.sp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.widgets.ContentDescription;
 import org.jboss.ballroom.client.widgets.ContentHeaderLabel;
@@ -34,6 +37,8 @@ import org.picketlink.as.console.client.PicketLinkConsoleFramework;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerParameter;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerWrapper;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -53,7 +58,7 @@ public class ServiceProviderHandlersTabEditor {
     private Form<ServiceProviderHandlerParameter> handlerParameterForm;
     private ServiceProviderHandlerParameterTable handlerParameterTable;
     private FederationPresenter presenter;
-    private ServiceProvider serviceProvider;
+    private ServiceProviderWrapper serviceProvider;
     private ToolButton removeHandlerBtn;
     private ToolButton addHandlerBtn;
     private ToolButton removeHandlerParameterBtn;
@@ -109,7 +114,7 @@ public class ServiceProviderHandlersTabEditor {
                     
                     if (newTrustedDomain != null
                             && !newTrustedDomain.getClassName().trim().isEmpty()) {
-                        presenter.getFederationManager().onCreateServiceProviderHandler(serviceProvider, newTrustedDomain);
+                        presenter.getFederationManager().onCreateServiceProviderHandler(serviceProvider.getServiceProvider(), newTrustedDomain);
                         getHandlerTable().getDataProvider().getList().add(newTrustedDomain);
                     } else {
                         Window.alert(PicketLinkConsoleFramework.MESSAGES.invalidTrustedDomain());
@@ -137,7 +142,7 @@ public class ServiceProviderHandlersTabEditor {
                             @Override
                             public void onConfirmation(boolean isConfirmed) {
                                 if (isConfirmed) {
-                                    presenter.getFederationManager().onRemoveServiceProviderHandler(serviceProvider, removedTrustedDomain);
+                                    presenter.getFederationManager().onRemoveServiceProviderHandler(serviceProvider.getServiceProvider(), removedTrustedDomain);
                                     getHandlerTable().getDataProvider().getList().remove(removedTrustedDomain);
                                     getHandlerParameterTable().getDataProvider().getList().clear();
 //                                    showRestartDialog();
@@ -178,7 +183,7 @@ public class ServiceProviderHandlersTabEditor {
                     
                     if (newHandlerParameter != null
                             && !newHandlerParameter.getName().trim().isEmpty()) {
-                        presenter.getFederationManager().onCreateServiceProviderHandlerParameter(serviceProvider, getHandlerTable().getSelectedHandler(), newHandlerParameter);
+                        presenter.getFederationManager().onCreateServiceProviderHandlerParameter(serviceProvider.getServiceProvider(), getHandlerTable().getSelectedHandler(), newHandlerParameter);
                         getHandlerParameterTable().getDataProvider().getList().add(newHandlerParameter);
                     } else {
                         Window.alert("Invalid Handler Parameter");
@@ -206,7 +211,7 @@ public class ServiceProviderHandlersTabEditor {
                             @Override
                             public void onConfirmation(boolean isConfirmed) {
                                 if (isConfirmed) {
-                                    presenter.getFederationManager().onRemoveServiceProviderHandlerParameter(serviceProvider, getHandlerTable().getSelectedHandler(), removedHandlerParameter);
+                                    presenter.getFederationManager().onRemoveServiceProviderHandlerParameter(serviceProvider.getServiceProvider(), getHandlerTable().getSelectedHandler(), removedHandlerParameter);
                                     getHandlerParameterTable().getDataProvider().getList().remove(removedHandlerParameter);
                                 }
                             }
@@ -262,6 +267,7 @@ public class ServiceProviderHandlersTabEditor {
             this.handlerTable = new ServiceProviderHandlerTable();
             this.handlerTable.setParametersTable(this.getHandlerParameterTable());
             this.handlerTable.setPresenter(this.presenter);
+            this.handlerTable.setHandlersTabEditor(this);
         }
 
         return this.handlerTable;
@@ -277,15 +283,15 @@ public class ServiceProviderHandlersTabEditor {
 
     private void showRestartDialog() {
         if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
-            presenter.getDeploymentManager().restartServiceProvider(serviceProvider);
+            presenter.getDeploymentManager().restartServiceProvider(serviceProvider.getServiceProvider());
         }        
     }
     
     /**
-     * @param identityProvider
+     * @param selectedServiceProvider
      */
-    public void setServiceProvider(ServiceProvider identityProvider) {
-        if (identityProvider == null) {
+    public void setServiceProvider(ServiceProviderWrapper selectedServiceProvider) {
+        if (selectedServiceProvider == null) {
             this.handlerForm.setEnabled(false);
             this.addHandlerBtn.setEnabled(false);
             this.removeHandlerBtn.setEnabled(false);
@@ -295,7 +301,23 @@ public class ServiceProviderHandlersTabEditor {
             this.removeHandlerBtn.setEnabled(true);
         }
         
-        this.serviceProvider = identityProvider;
+        this.serviceProvider = selectedServiceProvider;
+        getHandlerTable().setSelectedServiceProvider(this.serviceProvider);
+    }
+
+    public void doUpdateSelection(ServiceProviderHandler selectedHandler) {
+        List<ServiceProviderHandlerWrapper> handlers = this.serviceProvider.getHandlers();
+        ArrayList<ServiceProviderHandlerParameter> parameters = new ArrayList<ServiceProviderHandlerParameter>();
+        
+        for (ServiceProviderHandlerWrapper handlerWrapper : handlers) {
+            if (handlerWrapper.getHandler().getClassName().equals(selectedHandler.getClassName())) {
+                for (ServiceProviderHandlerParameter serviceProviderHandlerParameter : handlerWrapper.getParameters()) {
+                    parameters.add(serviceProviderHandlerParameter);
+                }
+            }
+        }
+        
+        getHandlerParameterTable().getDataProvider().setList(parameters);
     }
 
 }

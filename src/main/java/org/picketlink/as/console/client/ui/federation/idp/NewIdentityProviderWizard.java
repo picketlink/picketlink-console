@@ -47,7 +47,6 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     private ComboBoxItem aliasesItem;
     private TextItem editAliasesItem;
     private ComboBoxItem deploymentsItem;
-    private TextBoxItem url;
     private CheckBoxItem externalIDP;
     private CheckBoxItem strictPostBinding;
     private ComboBoxItem securityDomainsItem;
@@ -75,8 +74,6 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
         FormItem<?>[] formItems = null;
 
-        url = new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_identityURL(), true);
-        
         securityDomainsItem =  new ComboBoxItem("securityDomain", "Security Domain");
         
         updateSecurityDomains();
@@ -106,12 +103,12 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
                 }
             };
 
-            formItems = new FormItem<?>[] { externalIDP, aliasItem, securityDomainsItem, url};
+            formItems = new FormItem<?>[] { externalIDP, aliasItem, securityDomainsItem, new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), false)};
         } else {
             editAliasesItem = new TextItem("name", "Alias");
             editAliasesItem.setEnabled(false);
             
-            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, url, strictPostBinding};
+            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true), strictPostBinding};
         }
 
         return formItems;
