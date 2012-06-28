@@ -99,6 +99,7 @@ public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvi
                     public void execute(ServiceProvider serviceProvider) {
                         presenter.getDeploymentManager().restartServiceProvider(serviceProvider);
                         presenter.loadDeployments();
+                        presenter.getFederationManager().loadAllFederations();
                     }
                 })) {
             @Override

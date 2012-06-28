@@ -56,7 +56,8 @@ public class DeploymentFederationStoreImpl implements DeploymentFederationStore 
 
     @Override
     public void redeploy(DeploymentRecord deploymentRecord, AsyncCallback<DMRResponse> callback) {
-        doDeploymentCommand(makeOperation("redeploy", deploymentRecord.getServerGroup(), deploymentRecord), callback);
+        doDeploymentCommand(deploymentRecord, makeOperation("undeploy", deploymentRecord.getServerGroup(), deploymentRecord), callback);
+        doDeploymentCommand(deploymentRecord, makeOperation("deploy", deploymentRecord.getServerGroup(), deploymentRecord), callback);
     }
     
     private ModelNode makeOperation(String command, String serverGroup, DeploymentRecord deployment) {
@@ -70,7 +71,7 @@ public class DeploymentFederationStoreImpl implements DeploymentFederationStore 
         return operation;
     }
 
-    private void doDeploymentCommand(ModelNode operation,
+    private void doDeploymentCommand(final DeploymentRecord deploymentRecord, ModelNode operation,
                                      final AsyncCallback<DMRResponse> callback) {
         dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
 
@@ -80,8 +81,16 @@ public class DeploymentFederationStoreImpl implements DeploymentFederationStore 
             }
 
             @Override
-            public void onSuccess(DMRResponse result) {
-                callback.onSuccess(result);
+            public void onSuccess(DMRResponse response) {
+                ModelNode result = response.get();
+                
+                if (result.isFailure()) {
+                    deploymentRecord.setEnabled(false);
+                } else {
+                    deploymentRecord.setEnabled(true);
+                }
+                
+                callback.onSuccess(response);
             }
         });
     }

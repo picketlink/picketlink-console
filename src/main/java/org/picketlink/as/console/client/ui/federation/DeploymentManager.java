@@ -109,8 +109,6 @@ public class DeploymentManager {
                 }
             }
         });
-
-        record.setEnabled(true);
     }
 
     public void restartSecurityTokenService(SecurityTokenService serviceProvider) {

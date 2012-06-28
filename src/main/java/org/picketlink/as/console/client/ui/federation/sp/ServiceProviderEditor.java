@@ -112,7 +112,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
         }
         
         if (serviceProvider.getUrl() == null || "".equals(serviceProvider.getUrl().trim())) {
-            serviceProvider.setUrl("http://localhost:8080/" + serviceProvider.getName().replaceAll(".war", ""));
+            serviceProvider.setUrl("http://localhost:8080/" + serviceProvider.getName().replaceAll(".war", "") + "/");
         }
         
         getPresenter().getFederationManager().onCreateServiceProvider(serviceProvider);
