@@ -86,7 +86,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
         }
         
         if (identityProvider.getUrl() == null || "".equals(identityProvider.getUrl().trim())) {
-            identityProvider.setUrl("http://localhost:8080/" + identityProvider.getName().replaceAll(".war", ""));
+            identityProvider.setUrl("http://localhost:8080/" + identityProvider.getName().replaceAll(".war", "") + "/");
         }
         
         getPresenter().getFederationManager().onCreateIdentityProvider(identityProvider);

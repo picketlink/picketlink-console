@@ -95,7 +95,8 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
                     public void execute(IdentityProvider identityProvider) {
                         if (!identityProvider.isExternal()) {
                             presenter.getDeploymentManager().restartIdentityProvider(identityProvider);
-//                            presenter.loadDeployments();
+                            presenter.loadDeployments();
+                            presenter.getFederationManager().loadAllFederations();
                         } else {
                             Window.alert("You can restart only hosted Identity providers.");
                         }
