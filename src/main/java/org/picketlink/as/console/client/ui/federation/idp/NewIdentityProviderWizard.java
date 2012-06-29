@@ -54,7 +54,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
             String type) {
-        super(editor, cls, presenter, type, "alias", "security-domain", "url","strict-post-binding");
+        super(editor, cls, presenter, type, "alias", "security-domain", "url","strict-post-binding", "attribute-manager");
     }
 
     @Override
