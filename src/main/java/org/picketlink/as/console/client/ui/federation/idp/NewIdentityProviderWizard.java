@@ -50,6 +50,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     private CheckBoxItem externalIDP;
     private CheckBoxItem strictPostBinding;
     private ComboBoxItem securityDomainsItem;
+    private TextBoxItem attributeManagerItem;
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
             String type) {
@@ -108,7 +109,11 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
             editAliasesItem = new TextItem("name", "Alias");
             editAliasesItem.setEnabled(false);
             
-            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true), strictPostBinding};
+            this.attributeManagerItem = new TextBoxItem("attributeManager", "Attribute Manager");
+            this.attributeManagerItem.setRequired(false);
+            this.attributeManagerItem.setEnabled(true);
+            
+            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true), strictPostBinding, attributeManagerItem};
         }
 
         return formItems;
