@@ -51,10 +51,11 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     private CheckBoxItem strictPostBinding;
     private ComboBoxItem securityDomainsItem;
     private TextBoxItem attributeManagerItem;
+    private TextBoxItem roleGeneratorItem;
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
             String type) {
-        super(editor, cls, presenter, type, "alias", "security-domain", "url","strict-post-binding", "attribute-manager");
+        super(editor, cls, presenter, type, "alias", "security-domain", "url","strict-post-binding", "attribute-manager", "role-generator");
     }
 
     @Override
@@ -112,8 +113,12 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
             this.attributeManagerItem = new TextBoxItem("attributeManager", "Attribute Manager");
             this.attributeManagerItem.setRequired(false);
             this.attributeManagerItem.setEnabled(true);
-            
-            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true), strictPostBinding, attributeManagerItem};
+
+            this.roleGeneratorItem = new TextBoxItem("roleGenerator", "Role Generator");
+            this.roleGeneratorItem.setRequired(false);
+            this.roleGeneratorItem.setEnabled(true);
+
+            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true), strictPostBinding, attributeManagerItem, roleGeneratorItem};
         }
 
         return formItems;
