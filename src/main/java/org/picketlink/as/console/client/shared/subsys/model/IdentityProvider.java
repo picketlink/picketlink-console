@@ -58,4 +58,8 @@ public interface IdentityProvider extends DeploymentRecord, NamedEntity, Generic
     String getAttributeManager();
     void setAttributeManager(String attributeManager);
 
+    @Binding (detypedName="role-generator")
+    String getRoleGenerator();
+    void setRoleGenerator(String roleGenerator);
+
 }
