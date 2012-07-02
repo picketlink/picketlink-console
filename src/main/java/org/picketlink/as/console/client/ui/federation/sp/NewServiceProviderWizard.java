@@ -49,7 +49,7 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
     private CheckBoxItem strictPostBinding;
 
     public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
-        super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain", "strict-post-binding", "error-page");
+        super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain", "strict-post-binding", "error-page", "logout-page");
     }
 
     @Override
