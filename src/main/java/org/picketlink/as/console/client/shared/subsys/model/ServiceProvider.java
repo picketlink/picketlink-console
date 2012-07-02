@@ -58,4 +58,8 @@ public interface ServiceProvider extends DeploymentRecord, NamedEntity, GenericF
     String getErrorPage();
     void setErrorPage(String errorPage);
 
+    @Binding (detypedName="logout-page")
+    String getLogoutPage();
+    void setLogoutPage(String logoutPage);
+
 }
