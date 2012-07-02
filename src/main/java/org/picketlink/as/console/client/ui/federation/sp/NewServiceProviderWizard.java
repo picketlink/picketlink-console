@@ -49,7 +49,7 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
     private CheckBoxItem strictPostBinding;
 
     public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
-        super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain", "strict-post-binding", "error-page");
+        super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain", "strict-post-binding", "error-page", "logout-page");
     }
 
     @Override
@@ -88,13 +88,17 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
         errorPageItem.setEnabled(true);
         errorPageItem.setRequired(false);
 
+        TextBoxItem logoutPageItem = new TextBoxItem("logoutPage", "LogOut Page");
+        logoutPageItem.setEnabled(true);
+        logoutPageItem.setRequired(false);
+
         FormItem<?>[] formItems = null;
 
         
         if (!isDialogue()) {
             formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
                     new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true),
-                    new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), strictPostBinding, errorPageItem};           
+                    new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), strictPostBinding, errorPageItem, logoutPageItem};           
         } else {
             formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
                     new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), false)}; 
