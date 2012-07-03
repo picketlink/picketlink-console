@@ -209,6 +209,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
         
         getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
         getHandlerTabEditor().getHandlerParameterTable().getDataProvider().setList(new ArrayList<ServiceProviderHandlerParameter>());
+        getSignatureSupportTabEditor().setIdentityProvider(this.selectedServiceProvider.getServiceProvider());
     }
 
     private void updateSelectedServiceProvider(ServiceProvider serviceProvider) {
