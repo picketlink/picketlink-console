@@ -132,6 +132,7 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
     public void setIdentityProvider(P identityProvider) {
         this.identityProvider = identityProvider;
         this.identityProviderForm.edit(identityProvider);
+        supportsSignatures.setValue(identityProvider.isSupportsSignatures());
         enableDisableSignatureSupportFields();
     }
     
