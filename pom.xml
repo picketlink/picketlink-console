@@ -29,9 +29,9 @@
     </url>
 	
 	<scm>
-		<connection>scm:git:${jboss.as.scm.connection}</connection>
-		<developerConnection>scm:git:${jboss.as.scm.connection}</developerConnection>
-		<url>${jboss.as.scm.url}</url>
+		<connection>scm:git:${picketlink.console.scm.connection}</connection>
+		<developerConnection>scm:git:${picketlink.console.scm.connection}</developerConnection>
+		<url>${picketlink.console.scm.url}</url>
 	</scm>
 	
 	<organization>
@@ -57,8 +57,8 @@
 	</licenses>
 
 	<properties>
-		<jboss.as.scm.url>https://github.com/picketlink/picketlink-console</jboss.as.scm.url>
-		<jboss.as.scm.connection>git@github.com:picketlink/picketlink-console.git</jboss.as.scm.connection>
+		<picketlink.console.scm.url>https://github.com/picketlink/picketlink-console</picketlink.console.scm.url>
+		<picketlink.console.scm.connection>git@github.com:picketlink/picketlink-console.git</picketlink.console.scm.connection>
 		
 		<gwt.maven>2.3.0</gwt.maven>
 		<gwt.bindAddress>127.0.0.1</gwt.bindAddress>
