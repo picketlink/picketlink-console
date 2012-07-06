@@ -85,7 +85,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
      */
     @Override
     protected void addDetailsSectionTabs(TabPanel bottomTabs) {
-        bottomTabs.add(getSignatureSupportTabEditor().asWidget(), "Signature Support");
+        bottomTabs.add(getSignatureSupportTabEditor().asWidget(), "Signature Policy");
         bottomTabs.add(getHandlerTabEditor().asWidget(), "SAML Handlers");
     }
 
@@ -181,7 +181,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
         
         if (!federation.getServiceProviders().isEmpty()) {
             updateSelectedServiceProvider(getCurrentSelection());
-            getSignatureSupportTabEditor().setIdentityProvider(getCurrentSelection());
+            getSignatureSupportTabEditor().setEntity(getCurrentSelection());
             getHandlerTabEditor().setServiceProvider(this.selectedServiceProvider);
             
             ArrayList<ServiceProviderHandler> handlersList = new ArrayList<ServiceProviderHandler>();
@@ -209,7 +209,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
         
         getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
         getHandlerTabEditor().getHandlerParameterTable().getDataProvider().setList(new ArrayList<ServiceProviderHandlerParameter>());
-        getSignatureSupportTabEditor().setIdentityProvider(this.selectedServiceProvider.getServiceProvider());
+        getSignatureSupportTabEditor().setEntity(this.selectedServiceProvider.getServiceProvider());
     }
 
     private void updateSelectedServiceProvider(ServiceProvider serviceProvider) {

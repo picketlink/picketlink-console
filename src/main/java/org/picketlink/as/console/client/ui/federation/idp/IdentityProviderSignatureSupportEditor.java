@@ -13,7 +13,7 @@ public class IdentityProviderSignatureSupportEditor extends SignatureSupportTabE
 
     @Override
     protected void doUpdateEntity(Map changeset) {
-        getPresenter().getFederationManager().onUpdateIdentityProvider(getIdentityProvider(), changeset);        
+        getPresenter().getFederationManager().onUpdateIdentityProvider(getEntity(), changeset);        
     }
 
     /* (non-Javadoc)

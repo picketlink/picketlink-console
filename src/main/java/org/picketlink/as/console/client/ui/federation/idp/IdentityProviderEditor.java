@@ -48,6 +48,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
     private TrustedDomainTabEditor trustedDomainTabEditor;
     private SignatureSupportTabEditor signatureSupportTabEditor;
+    private EncryptionSupportTabEditor encryptionSupportTabEditor;
     private IdentityProviderHandlersTabEditor handlersTabEditor;
 
     public IdentityProviderEditor(FederationPresenter presenter) {
@@ -99,7 +100,8 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      */
     @Override
     protected void addDetailsSectionTabs(TabPanel bottomTabs) {
-        bottomTabs.add(getSignatureSupportTabEditor().asWidget(), "Signature Support");
+        bottomTabs.add(getSignatureSupportTabEditor().asWidget(), "Signature Policy");
+        bottomTabs.add(getEncryptionSupportTabEditor().asWidget(), "Encryption Policy");
         bottomTabs.add(getTrustedDomainTabEditor().asWidget(), "Trusted Domains");
         bottomTabs.add(getHandlerTabEditor().asWidget(), "SAML Handlers");
     }
@@ -126,6 +128,14 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
         }
 
         return this.signatureSupportTabEditor;
+    }
+
+    private EncryptionSupportTabEditor getEncryptionSupportTabEditor() {
+        if (this.encryptionSupportTabEditor == null) {
+            this.encryptionSupportTabEditor = new EncryptionSupportTabEditor(getPresenter());
+        }
+
+        return this.encryptionSupportTabEditor;
     }
 
     /* (non-Javadoc)
@@ -185,7 +195,8 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
         }
         
         if (!identityProviders.isEmpty()) {
-            getSignatureSupportTabEditor().setIdentityProvider(identityProviders.get(0));
+            getSignatureSupportTabEditor().setEntity(identityProviders.get(0));
+            getEncryptionSupportTabEditor().setEntity(identityProviders.get(0));
         }
         
         updateTrustedDomains(federation);

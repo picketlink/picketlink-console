@@ -14,7 +14,7 @@ public class ServiceProviderSignatureSupportEditor extends SignatureSupportTabEd
 
     @Override
     protected void doUpdateEntity(Map changeset) {
-        getPresenter().getFederationManager().onUpdateServiceProvider(getIdentityProvider(), changeset);        
+        getPresenter().getFederationManager().onUpdateServiceProvider(getEntity(), changeset);        
     }
     
     /* (non-Javadoc)

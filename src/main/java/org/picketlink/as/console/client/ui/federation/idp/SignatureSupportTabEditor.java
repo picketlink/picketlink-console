@@ -37,16 +37,18 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
+ * <p>Abstract class for creating a tab with signature support configurations.</p>
+ * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 31, 2012
  */
 public abstract class SignatureSupportTabEditor<P extends GenericFederationEntity> {
 
-    private Form<P> identityProviderForm;
+    private Form<P> form;
     private FederationPresenter presenter;
     
     private CheckBoxItem supportsSignatures;
-    private P identityProvider;
+    private P entity;
     private HTML errorMessage;
 
     public SignatureSupportTabEditor(FederationPresenter presenter) {
@@ -54,35 +56,35 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
     }
     
     public Widget asWidget() {
-        VerticalPanel layout = new VerticalPanel();
+        VerticalPanel panel = new VerticalPanel();
 
-        layout.setStyleName("fill-layout-width");
+        panel.setStyleName("fill-layout-width");
         
-        new AsyncHelpText("identity-provider", new String[] {"supportsSignatures"}, this.presenter, layout, false);
+        new AsyncHelpText("identity-provider", new String[] {"supportsSignatures"}, this.presenter, panel, false);
         
-        addIdentityProviderForm(layout);
+        addForm(panel);
 
-        return layout;
+        return panel;
     }
 
     /**
-     * @param identityProviderHeader
+     * @param panel
      */
-    private void addIdentityProviderForm(VerticalPanel identityProviderHeader) {
-        this.identityProviderForm = new Form<P>(getEntityClass());
+    private void addForm(VerticalPanel panel) {
+        this.form = new Form<P>(getEntityClass());
         
         errorMessage = new HTML();
         
         errorMessage.setStyleName("error-panel");
         
-        identityProviderHeader.add(errorMessage);
+        panel.add(errorMessage);
         
-        FormToolStrip<P> toolStrip = new FormToolStrip<P>(this.identityProviderForm, new FormToolStrip.FormCallback<P>() {
+        FormToolStrip<P> toolStrip = new FormToolStrip<P>(this.form, new FormToolStrip.FormCallback<P>() {
             @Override
             public void onSave(Map<String, Object> changeset) {
-                P updatedIdentityProvider = identityProviderForm.getUpdatedEntity();
+                P updatedIdentityProvider = form.getUpdatedEntity();
                 
-                identityProvider.setSupportsSignatures(updatedIdentityProvider.isSupportsSignatures());
+                entity.setSupportsSignatures(updatedIdentityProvider.isSupportsSignatures());
                 
                 doUpdateEntity(changeset);
             }
@@ -94,16 +96,16 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
 
         toolStrip.providesDeleteOp(false);
         
-        identityProviderHeader.add(toolStrip.asWidget());
+        panel.add(toolStrip.asWidget());
 
-        this.identityProviderForm.setEnabled(false);
+        this.form.setEnabled(false);
 
         this.supportsSignatures = new CheckBoxItem("supportsSignatures",
                 PicketLinkConsoleFramework.CONSTANTS.common_label_supportsSignatures());
 
-        this.identityProviderForm.setFields(supportsSignatures);
+        this.form.setFields(supportsSignatures);
         
-        identityProviderHeader.add(this.identityProviderForm.asWidget());
+        panel.add(this.form.asWidget());
     }
 
     protected abstract Class<P> getEntityClass();
@@ -126,13 +128,10 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
         }
     }
 
-    /**
-     * @param identityProvider
-     */
-    public void setIdentityProvider(P identityProvider) {
-        this.identityProvider = identityProvider;
-        this.identityProviderForm.edit(identityProvider);
-        supportsSignatures.setValue(identityProvider.isSupportsSignatures());
+    public void setEntity(P entity) {
+        this.entity = entity;
+        this.form.edit(entity);
+        supportsSignatures.setValue(entity.isSupportsSignatures());
         enableDisableSignatureSupportFields();
     }
     
@@ -140,7 +139,7 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
         return presenter;
     }
     
-    protected P getIdentityProvider() {
-        return identityProvider;
+    protected P getEntity() {
+        return entity;
     }
 }

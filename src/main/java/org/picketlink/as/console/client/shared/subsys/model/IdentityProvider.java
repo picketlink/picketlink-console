@@ -53,7 +53,11 @@ public interface IdentityProvider extends DeploymentRecord, NamedEntity, Generic
     @Binding (detypedName="external")
     boolean isExternal();
     void setExternal(boolean external);
-    
+
+    @Binding (detypedName="encrypt")
+    boolean isEncrypt();
+    void setEncrypt(boolean encrypt);
+
     @Binding (detypedName="attribute-manager")
     String getAttributeManager();
     void setAttributeManager(String attributeManager);
