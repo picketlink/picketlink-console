@@ -1,18 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project>
+<!-- ~ JBoss, Home of Professional Open Source. ~ Copyright 2010, Red Hat, 
+	Inc., and individual contributors ~ as indicated by the @author tags. See 
+	the copyright.txt file in the ~ distribution for a full listing of individual 
+	contributors. ~ ~ This is free software; you can redistribute it and/or modify 
+	it ~ under the terms of the GNU Lesser General Public License as ~ published 
+	by the Free Software Foundation; either version 2.1 of ~ the License, or 
+	(at your option) any later version. ~ ~ This software is distributed in the 
+	hope that it will be useful, ~ but WITHOUT ANY WARRANTY; without even the 
+	implied warranty of ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+	See the GNU ~ Lesser General Public License for more details. ~ ~ You should 
+	have received a copy of the GNU Lesser General Public ~ License along with 
+	this software; if not, write to the Free ~ Software Foundation, Inc., 51 
+	Franklin St, Fifth Floor, Boston, MA ~ 02110-1301 USA, or see the FSF site: 
+	http://www.fsf.org. -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.picketlink</groupId>
 	<artifactId>picketlink-console</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.0.0.Final</version>
 	<packaging>war</packaging>
 
-	<name>PicketLink: Management Console</name>
-	<description>PicketLink: Management Console Parent</description>
+	<name>PicketLink: JBoss AS7 Management Console</name>
+	<description>PicketLink: Management Console for the JBoss Application Server v7</description>
 
 	<organization>
 		<name>JBoss, a division of Red Hat</name>
 		<url>http://www.jboss.org</url>
 	</organization>
+
+	<developers>
+		<developer>
+			<name>Pedro Silva</name>
+			<roles>
+				<role>Project Lead</role>
+			</roles>
+		</developer>
+	</developers>
 
 	<licenses>
 		<license>
@@ -471,22 +495,57 @@
 		</profile>
 	</profiles>
 
-	<!-- Repositories -->
+	<distributionManagement>
+		<repository>
+			<id>jboss-releases-repository</id>
+			<name>JBoss Releases Repository</name>
+			<url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</url>
+		</repository>
+		<snapshotRepository>
+			<id>jboss-snapshots-repository</id>
+			<name>JBoss Snapshots Repository</name>
+			<url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
+		</snapshotRepository>
+	</distributionManagement>
+
 	<repositories>
 		<repository>
 			<id>jboss-public-repository-group</id>
 			<name>JBoss Public Maven Repository Group</name>
-			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+			<url>http://repository.jboss.org/nexus/content/groups/public/</url>
 			<layout>default</layout>
 			<releases>
+				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>
 			</releases>
 			<snapshots>
+				<enabled>true</enabled>
 				<updatePolicy>never</updatePolicy>
 			</snapshots>
 		</repository>
+		<repository>
+			<id>repository.jboss.org</id>
+			<name>JBoss Repository</name>
+			<layout>default</layout>
+			<url>http://repository.jboss.org/maven2/</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
+		<repository>
+			<id>snapshots.jboss.org</id>
+			<name>JBoss Snapshots Repository</name>
+			<layout>default</layout>
+			<url>http://snapshots.jboss.org/maven2/</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+		</repository>
 	</repositories>
-
+	
 	<pluginRepositories>
 		<pluginRepository>
 			<id>jboss-public-repository-group</id>
