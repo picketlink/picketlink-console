@@ -24,6 +24,10 @@
 	<name>PicketLink: JBoss AS7 Management Console</name>
 	<description>PicketLink: Management Console for the JBoss Application Server v7</description>
 
+	<url>
+        https://github.com/picketlink/picketlink-console
+    </url>
+	
 	<organization>
 		<name>JBoss, a division of Red Hat</name>
 		<url>http://www.jboss.org</url>
