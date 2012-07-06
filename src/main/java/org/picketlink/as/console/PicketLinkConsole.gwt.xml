@@ -12,8 +12,11 @@
 	to the Free Software ~ Foundation, Inc., 51 Franklin Street, Fifth Floor, 
 	Boston, ~ MA 02110-1301, USA. -->
 
-<module rename-to="PicketLinkConsole">
+<module rename-to="app">
 
 	<inherits name="org.jboss.as.console.App"/>
+	
+	<set-property name="user.agent" value="safari,gecko1_8,ie6" />
+  	<set-property name="locale" value="en" />
 
 </module>

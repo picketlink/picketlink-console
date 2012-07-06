@@ -25,4 +25,11 @@ public class ServiceProviderSignatureSupportEditor extends SignatureSupportTabEd
         return ServiceProvider.class;
     }
 
+    /* (non-Javadoc)
+     * @see org.picketlink.as.console.client.ui.federation.idp.SignatureSupportTabEditor#doGetSupportsSignatureLabel()
+     */
+    @Override
+    protected String doGetSupportsSignatureLabel() {
+        return "Supports Signature or Encryption";
+    }
 }

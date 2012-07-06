@@ -101,11 +101,15 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
         this.form.setEnabled(false);
 
         this.supportsSignatures = new CheckBoxItem("supportsSignatures",
-                PicketLinkConsoleFramework.CONSTANTS.common_label_supportsSignatures());
+                doGetSupportsSignatureLabel());
 
         this.form.setFields(supportsSignatures);
         
         panel.add(this.form.asWidget());
+    }
+
+    protected String doGetSupportsSignatureLabel() {
+        return PicketLinkConsoleFramework.CONSTANTS.common_label_supportsSignatures();
     }
 
     protected abstract Class<P> getEntityClass();

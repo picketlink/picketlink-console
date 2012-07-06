@@ -85,7 +85,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
      */
     @Override
     protected void addDetailsSectionTabs(TabPanel bottomTabs) {
-        bottomTabs.add(getSignatureSupportTabEditor().asWidget(), "Signature Policy");
+        bottomTabs.add(getSignatureSupportTabEditor().asWidget(), "Signature and Encryption Policy");
         bottomTabs.add(getHandlerTabEditor().asWidget(), "SAML Handlers");
     }
 
