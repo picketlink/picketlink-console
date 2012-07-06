@@ -18,7 +18,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.picketlink</groupId>
 	<artifactId>picketlink-console</artifactId>
-	<version>1.0.0.Final</version>
+	<version>1.0.1-SNAPSHOT</version>
 	<packaging>war</packaging>
 
 	<name>PicketLink: JBoss AS7 Management Console</name>
