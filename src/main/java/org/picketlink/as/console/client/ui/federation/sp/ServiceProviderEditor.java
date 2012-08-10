@@ -201,15 +201,19 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
     protected void doUpdateSelection(ServiceProvider serviceProvider) {
         updateSelectedServiceProvider(serviceProvider);
         getHandlerTabEditor().setServiceProvider(this.selectedServiceProvider);
-        ArrayList<ServiceProviderHandler> handlersList = new ArrayList<ServiceProviderHandler>();
         
-        for (ServiceProviderHandlerWrapper handler : this.selectedServiceProvider.getHandlers()) {
-            handlersList.add(handler.getHandler());
+        if (this.selectedServiceProvider != null) {
+            ArrayList<ServiceProviderHandler> handlersList = new ArrayList<ServiceProviderHandler>();
+            
+            for (ServiceProviderHandlerWrapper handler : this.selectedServiceProvider.getHandlers()) {
+                handlersList.add(handler.getHandler());
+            }
+            
+            getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
+            getSignatureSupportTabEditor().setEntity(this.selectedServiceProvider.getServiceProvider());
         }
         
-        getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
         getHandlerTabEditor().getHandlerParameterTable().getDataProvider().setList(new ArrayList<ServiceProviderHandlerParameter>());
-        getSignatureSupportTabEditor().setEntity(this.selectedServiceProvider.getServiceProvider());
     }
 
     private void updateSelectedServiceProvider(ServiceProvider serviceProvider) {
