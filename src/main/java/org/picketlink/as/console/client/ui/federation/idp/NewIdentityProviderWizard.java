@@ -155,6 +155,14 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     }
 
     public void updateAliasItems() {
+        if (getPresenter().getIdentityProvider() != null) {
+            boolean isHosted = !getPresenter().getIdentityProvider().getIdentityProvider().isExternal();
+            
+            this.attributeManagerItem.setEnabled(isHosted);
+            this.roleGeneratorItem.setEnabled(isHosted);
+            this.strictPostBinding.setEnabled(isHosted);
+        }
+        
         if (this.deploymentsItem != null) {
             updateAliasComboBox(this.deploymentsItem, this.getPresenter().getAllDeployments());
         }
