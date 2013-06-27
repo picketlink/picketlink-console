@@ -24,19 +24,20 @@
     <parent>
         <groupId>org.jboss.as</groupId>
         <artifactId>jboss-as-console-build</artifactId>
-        <version>1.5.3.Final</version>
+        <version>1.5.4.Final</version>
+        <relativePath/>
     </parent>
 
     <!-- the GUI extensions -->
     <dependencies>
         <dependency>
-            <groupId>org.jboss.teiid.web-console</groupId>
-            <artifactId>console-extensions</artifactId>
+            <groupId>org.picketlink</groupId>
+            <artifactId>picketlink-console-extensions</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.jboss.teiid.web-console</groupId>
-            <artifactId>console-extensions</artifactId>
+            <groupId>org.picketlink</groupId>
+            <artifactId>picketlink-console-extensions</artifactId>
             <version>${project.version}</version>
             <classifier>sources</classifier>
         </dependency>

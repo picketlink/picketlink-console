@@ -22,10 +22,9 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
-import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
+import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
 
 /**
  * <p>This interface defines the methods that can be used to manipulate the {@link Federation} model.</p>

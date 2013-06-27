@@ -25,22 +25,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.jboss.as.console.client.shared.BeanFactory;
-import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
-import org.jboss.as.console.client.shared.subsys.RevealStrategy;
-import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
-import org.jboss.as.console.spi.Subsystem;
-import org.jboss.ballroom.client.layout.LHSHighlightEvent;
-import org.picketlink.as.console.client.NameTokens;
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
-
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.event.shared.EventBus;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import com.gwtplatform.mvp.client.Presenter;
 import com.gwtplatform.mvp.client.View;
 import com.gwtplatform.mvp.client.annotations.NameToken;
@@ -49,6 +36,19 @@ import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
 import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
+import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
+import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
+import org.jboss.as.console.client.shared.subsys.RevealStrategy;
+import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
+import org.jboss.as.console.spi.SubsystemExtension;
+import org.jboss.ballroom.client.layout.LHSHighlightEvent;
+import org.picketlink.as.console.client.NameTokens;
+import org.picketlink.as.console.client.PicketlinkBeanFactory;
+import org.picketlink.as.console.client.shared.subsys.model.Federation;
+import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
+import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
 
 /**
  * <p>
@@ -75,7 +75,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
 
     @ProxyCodeSplit
     @NameToken(NameTokens.FEDERATION)
-    @Subsystem(name = "Federation", group = "PicketLink", key = "logging")
+    @SubsystemExtension(name = "Federation", group = "PicketLink", key = "logging")
     public interface MyProxy extends Proxy<FederationPresenter>, Place {
     }
 
@@ -83,7 +83,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     private final DeploymentManager deploymentManager;
     private final PlaceManager placeManager;
     private final DispatchAsync dispatcher;
-    private final BeanFactory beanFactory;
+    private final PicketlinkBeanFactory beanFactory;
     private final FederationManager federationManager;
 
     private List<DeploymentRecord> availableDeployments;
@@ -100,7 +100,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         this.deploymentManager = deploymentManager;
         this.placeManager = placeManager;
         this.dispatcher = dispatcher;
-        this.beanFactory = beanFactory;
+        this.beanFactory = (PicketlinkBeanFactory) beanFactory;
         this.federationManager = federationManager;
         this.federationManager.setPresenter(this);
     }
@@ -270,7 +270,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         return this.dispatcher;
     }
 
-    public BeanFactory getBeanFactory() {
+    public PicketlinkBeanFactory getBeanFactory() {
         return this.beanFactory;
     }
     

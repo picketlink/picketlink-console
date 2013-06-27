@@ -24,13 +24,13 @@ package org.picketlink.as.console.client.ui.federation.idp;
 
 import java.util.List;
 
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.ballroom.client.widgets.forms.TextItem;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationWizard;
@@ -52,10 +52,13 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     private ComboBoxItem securityDomainsItem;
     private TextBoxItem attributeManagerItem;
     private TextBoxItem roleGeneratorItem;
+    private PicketLinkUIConstants uiConstants;
+
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
-            String type) {
+            String type, PicketLinkUIConstants uiConstants) {
         super(editor, cls, presenter, type, "alias", "security-domain", "url","strict-post-binding", "attribute-manager", "role-generator");
+        this.uiConstants = uiConstants;
     }
 
     @Override
@@ -105,7 +108,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
                 }
             };
 
-            formItems = new FormItem<?>[] { externalIDP, aliasItem, securityDomainsItem, new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), false)};
+            formItems = new FormItem<?>[] { externalIDP, aliasItem, securityDomainsItem, new TextBoxItem("url", uiConstants.common_label_URL(), false)};
         } else {
             editAliasesItem = new TextItem("name", "Alias");
             editAliasesItem.setEnabled(false);
@@ -118,7 +121,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
             this.roleGeneratorItem.setRequired(false);
             this.roleGeneratorItem.setEnabled(true);
 
-            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true), strictPostBinding, attributeManagerItem, roleGeneratorItem};
+            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, new TextBoxItem("url", uiConstants.common_label_URL(), true), strictPostBinding, attributeManagerItem, roleGeneratorItem};
         }
 
         return formItems;

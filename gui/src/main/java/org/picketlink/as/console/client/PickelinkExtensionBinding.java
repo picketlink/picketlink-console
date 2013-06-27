@@ -17,7 +17,7 @@
  * MA  02110-1301, USA.
  */
 
-package org.picketlink.as.console.client.core.gin;
+package org.picketlink.as.console.client;
 
 import org.jboss.as.console.spi.GinExtensionBinding;
 import org.picketlink.as.console.client.shared.subsys.model.DeploymentFederationStore;
@@ -39,11 +39,8 @@ import com.gwtplatform.mvp.client.gin.AbstractPresenterModule;
  * @author Pedro Silva
  */
 @GinExtensionBinding
-public class PicketLinkClientModule extends AbstractPresenterModule {
+public class PickelinkExtensionBinding extends AbstractPresenterModule {
 
-    /* (non-Javadoc)
-     * @see com.google.gwt.inject.client.AbstractGinModule#configure()
-     */
     protected void configure() {
         bindFederation();
     }
@@ -59,5 +56,4 @@ public class PicketLinkClientModule extends AbstractPresenterModule {
         bind(DeploymentManager.class).in(Singleton.class);
         bind(FederationManager.class);
     }
-
 }

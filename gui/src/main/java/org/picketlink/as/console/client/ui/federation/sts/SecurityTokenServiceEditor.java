@@ -24,7 +24,7 @@ package org.picketlink.as.console.client.ui.federation.sts;
 
 import java.util.Map;
 
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
@@ -37,8 +37,11 @@ import org.picketlink.as.console.client.ui.federation.Wizard;
  */
 public class SecurityTokenServiceEditor extends AbstractFederationDetailEditor<SecurityTokenService> {
 
-    public SecurityTokenServiceEditor(FederationPresenter presenter) {
+    private PicketLinkUIConstants uiConstants;
+
+    public SecurityTokenServiceEditor(FederationPresenter presenter, PicketLinkUIConstants uiConstants) {
         super(presenter, new SecurityTokenServiceTable(presenter), SecurityTokenService.class);
+        this.uiConstants = uiConstants;
     }
 
     /* (non-Javadoc)
@@ -46,7 +49,7 @@ public class SecurityTokenServiceEditor extends AbstractFederationDetailEditor<S
      */
     @Override
     public String doGetEntityName() {
-        return PicketLinkConsoleFramework.CONSTANTS.common_label_securityTokenService();
+        return uiConstants.common_label_securityTokenService();
     }
     
     /* (non-Javadoc)
@@ -54,7 +57,7 @@ public class SecurityTokenServiceEditor extends AbstractFederationDetailEditor<S
      */
     @Override
     protected String doGetDescription() {
-        return PicketLinkConsoleFramework.CONSTANTS.subsys_picketlink_security_token_service_desc();
+        return uiConstants.subsys_picketlink_security_token_service_desc();
     }
     
     /* (non-Javadoc)
@@ -97,7 +100,7 @@ public class SecurityTokenServiceEditor extends AbstractFederationDetailEditor<S
      */
     @Override
     public Wizard<SecurityTokenService> doCreateWizard() {
-        return new NewSecurityTokenServiceWizard(this, getEntityClass(), getPresenter(), "security-token-service");
+        return new NewSecurityTokenServiceWizard(this, getEntityClass(), getPresenter(), "security-token-service", uiConstants);
     }
 
     public void updateSecurityTokenServices(FederationWrapper federation) {

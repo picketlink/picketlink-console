@@ -51,7 +51,7 @@ public class DigitalCertificateDetails {
     private boolean hasKeyStore;
     
     /**
-     * @param table
+     * @param presenter
      */
     public DigitalCertificateDetails(FederationPresenter presenter) {
         form = new Form<KeyStore>(KeyStore.class);

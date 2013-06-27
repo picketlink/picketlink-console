@@ -33,8 +33,8 @@ import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.Feedback;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
+import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerParameter;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerWrapper;
@@ -63,9 +63,14 @@ public class ServiceProviderHandlersTabEditor {
     private ToolButton addHandlerBtn;
     private ToolButton removeHandlerParameterBtn;
     private ToolButton addHandlerParameterBtn;
+    private PicketLinkUIConstants uiConstants;
+    private PicketLinkUIMessages uiMessages;
 
-    public ServiceProviderHandlersTabEditor(FederationPresenter presenter) {
+    public ServiceProviderHandlersTabEditor(FederationPresenter presenter,
+            PicketLinkUIConstants uiConstants, PicketLinkUIMessages uiMessages) {
         this.presenter = presenter;
+        this.uiConstants = uiConstants;
+        this.uiMessages = uiMessages;
     }
     
     public Widget asWidget() {
@@ -87,17 +92,10 @@ public class ServiceProviderHandlersTabEditor {
         return trustDomainsHeader;
     }
 
-    /**
-     * @param detailPanel
-     */
     private void addHandlerTable(VerticalPanel detailPanel) {
         detailPanel.add(getHandlerTable().asWidget());
     }
 
-    /**
-     * @param detailPanel
-     * @param trustDomainsHeader
-     */
     private void addHandlerActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
 
@@ -108,7 +106,7 @@ public class ServiceProviderHandlersTabEditor {
             @Override
             public void onClick(ClickEvent event) {
                 if (serviceProvider == null) {
-                    Window.alert(PicketLinkConsoleFramework.MESSAGES.identityProviderNotConfigured());
+                    Window.alert(uiMessages.identityProviderNotConfigured());
                 } else {
                     ServiceProviderHandler newTrustedDomain = handlerForm.getUpdatedEntity();
                     
@@ -117,7 +115,7 @@ public class ServiceProviderHandlersTabEditor {
                         presenter.getFederationManager().onCreateServiceProviderHandler(serviceProvider.getServiceProvider(), newTrustedDomain);
                         getHandlerTable().getDataProvider().getList().add(newTrustedDomain);
                     } else {
-                        Window.alert(PicketLinkConsoleFramework.MESSAGES.invalidTrustedDomain());
+                        Window.alert(uiMessages.invalidTrustedDomain());
                     }
                     
                     handlerForm.clearValues();
@@ -136,7 +134,7 @@ public class ServiceProviderHandlersTabEditor {
                 final ServiceProviderHandler removedTrustedDomain = getHandlerTable().getSelectedHandler();
                 
                 Feedback.confirm(
-                        Console.MESSAGES.deleteTitle(PicketLinkConsoleFramework.CONSTANTS.common_label_trustDomain()),
+                        Console.MESSAGES.deleteTitle(uiConstants.common_label_trustDomain()),
                         Console.MESSAGES.deleteConfirm(removedTrustedDomain.getClassName()),
                         new Feedback.ConfirmationHandler() {
                             @Override
@@ -163,10 +161,6 @@ public class ServiceProviderHandlersTabEditor {
         trustDomainsHeader.add(new ContentDescription(""));
     }
 
-    /**
-     * @param detailPanel
-     * @param trustDomainsHeader
-     */
     private void addHandlerParameterActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
 

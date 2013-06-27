@@ -26,8 +26,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import com.google.gwt.user.client.ui.TabPanel;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
+import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
@@ -37,8 +39,6 @@ import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
-
-import com.google.gwt.user.client.ui.TabPanel;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -50,9 +50,14 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     private SignatureSupportTabEditor signatureSupportTabEditor;
     private EncryptionSupportTabEditor encryptionSupportTabEditor;
     private IdentityProviderHandlersTabEditor handlersTabEditor;
+    private PicketLinkUIConstants uiConstants;
+    private PicketLinkUIMessages uiMessages;
 
-    public IdentityProviderEditor(FederationPresenter presenter) {
+    public IdentityProviderEditor(FederationPresenter presenter,
+            final PicketLinkUIConstants uiConstants, final PicketLinkUIMessages uiMessages) {
         super(presenter, new IdentityProviderTable(presenter), IdentityProvider.class);
+        this.uiConstants = uiConstants;
+        this.uiMessages = uiMessages;
     }
 
     /* (non-Javadoc)
@@ -60,7 +65,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      */
     @Override
     public String doGetEntityName() {
-        return PicketLinkConsoleFramework.CONSTANTS.common_label_identityProvider();
+        return uiConstants.common_label_identityProvider();
     }
     
     /* (non-Javadoc)
@@ -68,7 +73,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      */
     @Override
     protected String doGetDescription() {
-        return PicketLinkConsoleFramework.CONSTANTS.subsys_picketlink_identity_provider_desc();
+        return uiConstants.subsys_picketlink_identity_provider_desc();
     }
     
     /* (non-Javadoc)
@@ -108,7 +113,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
     private TrustedDomainTabEditor getTrustedDomainTabEditor() {
         if (this.trustedDomainTabEditor == null) {
-            this.trustedDomainTabEditor = new TrustedDomainTabEditor(getPresenter());
+            this.trustedDomainTabEditor = new TrustedDomainTabEditor(getPresenter(), uiConstants, uiMessages);
         }
 
         return this.trustedDomainTabEditor;
@@ -116,7 +121,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
     private IdentityProviderHandlersTabEditor getHandlerTabEditor() {
         if (this.handlersTabEditor == null) {
-            this.handlersTabEditor = new IdentityProviderHandlersTabEditor(getPresenter());
+            this.handlersTabEditor = new IdentityProviderHandlersTabEditor(getPresenter(), uiConstants, uiMessages);
         }
 
         return this.handlersTabEditor;
@@ -124,7 +129,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
     private SignatureSupportTabEditor getSignatureSupportTabEditor() {
         if (this.signatureSupportTabEditor == null) {
-            this.signatureSupportTabEditor = new IdentityProviderSignatureSupportEditor(getPresenter());
+            this.signatureSupportTabEditor = new IdentityProviderSignatureSupportEditor(getPresenter(), uiConstants);
         }
 
         return this.signatureSupportTabEditor;
@@ -168,14 +173,9 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
     @Override
     public Wizard<IdentityProvider> doCreateWizard() {
-        return new NewIdentityProviderWizard(this, getEntityClass(), getPresenter(), "identity-provider");
+        return new NewIdentityProviderWizard(this, getEntityClass(), getPresenter(), "identity-provider", uiConstants);
     }
 
-    /**
-     * @param name
-     * @param identityProviders
-     * @param resourceExists
-     */
     public void updateIdentityProviders(FederationWrapper federation) {
         getBottomTabs().selectTab(0);
         

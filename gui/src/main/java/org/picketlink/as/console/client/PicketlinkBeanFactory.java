@@ -22,6 +22,7 @@
 
 package org.picketlink.as.console.client;
 
+import com.google.web.bindery.autobean.shared.AutoBean;
 import org.jboss.as.console.spi.BeanFactoryExtension;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
@@ -34,8 +35,6 @@ import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerParameter;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
-
-import com.google.gwt.autobean.shared.AutoBean;
 
 /**
  * <p><code>com.google.gwt.autobean.shared.AutoBeanFactory</code> for the PicketLink module.</p>

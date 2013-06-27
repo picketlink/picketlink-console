@@ -30,7 +30,8 @@ import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.Feedback;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
+import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter;
@@ -58,9 +59,14 @@ public class IdentityProviderHandlersTabEditor {
     private ToolButton addHandlerBtn;
     private ToolButton removeHandlerParameterBtn;
     private ToolButton addHandlerParameterBtn;
+    private PicketLinkUIConstants uiConstants;
+    private PicketLinkUIMessages uiMessages;
 
-    public IdentityProviderHandlersTabEditor(FederationPresenter presenter) {
+    public IdentityProviderHandlersTabEditor(FederationPresenter presenter,
+            final PicketLinkUIConstants uiConstants, final PicketLinkUIMessages uiMessages) {
         this.presenter = presenter;
+        this.uiConstants = uiConstants;
+        this.uiMessages = uiMessages;
     }
     
     public Widget asWidget() {
@@ -89,10 +95,6 @@ public class IdentityProviderHandlersTabEditor {
         detailPanel.add(getHandlerTable().asWidget());
     }
 
-    /**
-     * @param detailPanel
-     * @param trustDomainsHeader
-     */
     private void addHandlerActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
 
@@ -103,7 +105,7 @@ public class IdentityProviderHandlersTabEditor {
             @Override
             public void onClick(ClickEvent event) {
                 if (identityProvider == null) {
-                    Window.alert(PicketLinkConsoleFramework.MESSAGES.identityProviderNotConfigured());
+                    Window.alert(uiMessages.identityProviderNotConfigured());
                 } else {
                     IdentityProviderHandler newTrustedDomain = handlerForm.getUpdatedEntity();
                     
@@ -112,7 +114,7 @@ public class IdentityProviderHandlersTabEditor {
                         presenter.getFederationManager().onCreateIdentityProviderHandler(identityProvider, newTrustedDomain);
                         getHandlerTable().getDataProvider().getList().add(newTrustedDomain);
                     } else {
-                        Window.alert(PicketLinkConsoleFramework.MESSAGES.invalidTrustedDomain());
+                        Window.alert(uiMessages.invalidTrustedDomain());
                     }
                     
                     handlerForm.clearValues();
@@ -131,7 +133,7 @@ public class IdentityProviderHandlersTabEditor {
                 final IdentityProviderHandler removedTrustedDomain = getHandlerTable().getSelectedHandler();
                 
                 Feedback.confirm(
-                        Console.MESSAGES.deleteTitle(PicketLinkConsoleFramework.CONSTANTS.common_label_trustDomain()),
+                        Console.MESSAGES.deleteTitle(uiConstants.common_label_trustDomain()),
                         Console.MESSAGES.deleteConfirm(removedTrustedDomain.getClassName()),
                         new Feedback.ConfirmationHandler() {
                             @Override
@@ -157,10 +159,6 @@ public class IdentityProviderHandlersTabEditor {
         trustDomainsHeader.add(new ContentDescription(""));
     }
 
-    /**
-     * @param detailPanel
-     * @param trustDomainsHeader
-     */
     private void addHandlerParameterActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
 
@@ -224,9 +222,6 @@ public class IdentityProviderHandlersTabEditor {
         trustDomainsHeader.add(new ContentDescription(""));
     }
 
-    /**
-     * @param trustDomainsHeader
-     */
     private void addHandlerForm(VerticalPanel trustDomainsHeader) {
         this.handlerForm = new Form<IdentityProviderHandler>(IdentityProviderHandler.class);
 
@@ -239,9 +234,6 @@ public class IdentityProviderHandlersTabEditor {
         trustDomainsHeader.add(this.handlerForm.asWidget());
     }
 
-    /**
-     * @param trustDomainsHeader
-     */
     private void addHandlerParameterForm(VerticalPanel trustDomainsHeader) {
         this.handlerParameterForm = new Form<IdentityProviderHandlerParameter>(IdentityProviderHandlerParameter.class);
 
@@ -280,9 +272,6 @@ public class IdentityProviderHandlersTabEditor {
         }        
     }
     
-    /**
-     * @param identityProvider
-     */
     public void setIdentityProvider(IdentityProvider identityProvider) {
         if (identityProvider == null || identityProvider.isExternal()) {
             this.handlerForm.setEnabled(false);

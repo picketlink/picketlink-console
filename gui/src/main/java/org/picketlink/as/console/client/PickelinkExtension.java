@@ -17,7 +17,7 @@
  * MA  02110-1301, USA.
  */
 
-package org.picketlink.as.console.client.core.gin;
+package org.picketlink.as.console.client;
 
 import org.jboss.as.console.spi.GinExtension;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
@@ -26,18 +26,17 @@ import com.google.gwt.inject.client.AsyncProvider;
 
 
 /**
- * <p>Ginjector interface for the PicketLink module.</p>
- * <p>This interface also provides the configuration for the AS7 extension mechanism. The annotations declared in the type
- * are uses the extension mechanism to add the PicketLink module features in the AS7 Console Profile menu tree.</p>
+ * <p>Console Extension for PicketLink.</p>
+ * <p>This interface provides the configuration for the AS7 extension mechanism. The annotations declared in the type
+ * uses the extension mechanism to add PicketLink features to the AS7 Console.</p>
  * 
- * @see PicketLinkClientModule
+ * @see PickelinkExtensionBinding
  * 
  * @author Pedro Silva
  * @author Rob Cernich
  */
-@GinExtension
-public interface PicketLinkGinjector {
-
+@GinExtension("org.picketlink.as.console/PicketLinkExtension")
+public interface PickelinkExtension
+{
     AsyncProvider<FederationPresenter> getFederationPresenter();
-    
 }

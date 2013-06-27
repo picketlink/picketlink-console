@@ -26,8 +26,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.TabPanel;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
+import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandler;
@@ -39,9 +42,6 @@ import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
 import org.picketlink.as.console.client.ui.federation.idp.SignatureSupportTabEditor;
 
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.TabPanel;
-
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 30, 2012
@@ -51,9 +51,14 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
     private SignatureSupportTabEditor signatureSupportTabEditor;
     private ServiceProviderHandlersTabEditor handlersTabEditor;
     private ServiceProviderWrapper selectedServiceProvider;
+    private PicketLinkUIConstants uiConstants;
+    private PicketLinkUIMessages uiMessages;
 
-    public ServiceProviderEditor(FederationPresenter presenter) {
+    public ServiceProviderEditor(FederationPresenter presenter,
+            PicketLinkUIConstants uiConstants, PicketLinkUIMessages uiMessages) {
         super(presenter, new ServiceProviderTable(presenter), ServiceProvider.class);
+        this.uiConstants = uiConstants;
+        this.uiMessages = uiMessages;
     }
 
     /* (non-Javadoc)
@@ -61,7 +66,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
      */
     @Override
     public String doGetEntityName() {
-        return PicketLinkConsoleFramework.CONSTANTS.common_label_serviceProvider();
+        return uiConstants.common_label_serviceProvider();
     }
     
     /* (non-Javadoc)
@@ -69,7 +74,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
      */
     @Override
     protected String doGetDescription() {
-        return PicketLinkConsoleFramework.CONSTANTS.subsys_picketlink_service_provider_desc();
+        return uiConstants.subsys_picketlink_service_provider_desc();
     }
     
     /* (non-Javadoc)
@@ -91,7 +96,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
 
     private SignatureSupportTabEditor getSignatureSupportTabEditor() {
         if (this.signatureSupportTabEditor == null) {
-            this.signatureSupportTabEditor = new ServiceProviderSignatureSupportEditor(getPresenter());
+            this.signatureSupportTabEditor = new ServiceProviderSignatureSupportEditor(getPresenter(), uiConstants);
         }
 
         return this.signatureSupportTabEditor;
@@ -99,7 +104,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
     
     private ServiceProviderHandlersTabEditor getHandlerTabEditor() {
         if (this.handlersTabEditor == null) {
-            this.handlersTabEditor = new ServiceProviderHandlersTabEditor(getPresenter());
+            this.handlersTabEditor = new ServiceProviderHandlersTabEditor(getPresenter(), uiConstants, uiMessages);
         }
 
         return this.handlersTabEditor;
@@ -153,7 +158,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
      */
     @Override
     public Wizard<ServiceProvider> doCreateWizard() {
-        return new NewServiceProviderWizard(this, getEntityClass(), getPresenter(), "service-provider");
+        return new NewServiceProviderWizard(this, getEntityClass(), getPresenter(), "service-provider", uiConstants);
     }
 
     public void updateDeployments(List<DeploymentRecord> deployments) {

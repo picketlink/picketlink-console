@@ -27,7 +27,7 @@ import java.util.Map;
 import org.jboss.as.console.client.widgets.forms.FormToolStrip;
 import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.Form;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 import org.picketlink.as.console.client.ui.federation.AsyncHelpText;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
@@ -46,13 +46,15 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
 
     private Form<P> form;
     private FederationPresenter presenter;
+    private PicketLinkUIConstants uiConstants;
     
     private CheckBoxItem supportsSignatures;
     private P entity;
     private HTML errorMessage;
 
-    public SignatureSupportTabEditor(FederationPresenter presenter) {
+    public SignatureSupportTabEditor(FederationPresenter presenter, PicketLinkUIConstants uiConstants) {
         this.presenter = presenter;
+        this.uiConstants = uiConstants;
     }
     
     public Widget asWidget() {
@@ -109,7 +111,7 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
     }
 
     protected String doGetSupportsSignatureLabel() {
-        return PicketLinkConsoleFramework.CONSTANTS.common_label_supportsSignatures();
+        return uiConstants.common_label_supportsSignatures();
     }
 
     protected abstract Class<P> getEntityClass();

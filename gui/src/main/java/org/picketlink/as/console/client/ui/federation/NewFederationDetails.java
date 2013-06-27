@@ -31,7 +31,7 @@ import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.FormAdapter;
 import org.jboss.ballroom.client.widgets.forms.FormValidation;
 import org.jboss.ballroom.client.widgets.forms.TextItem;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 
@@ -48,22 +48,16 @@ public class NewFederationDetails implements FormAdapter<Federation> {
 
     private final Form<Federation> form;
     private final FederationPresenter presenter;
+    private final PicketLinkUIConstants uiConstants;
     private DigitalCertificateDetails digitalCertificateDetails;
     private SAMLConfigurationDetails samlConfigurationDetails;
 
-    /**
-     * @param table
-     */
-    public NewFederationDetails(FederationPresenter presenter) {
+    public NewFederationDetails(FederationPresenter presenter, final PicketLinkUIConstants uiConstants) {
         form = new Form<Federation>(Federation.class);
         this.presenter = presenter;
+        this.uiConstants = uiConstants;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.google.gwt.user.client.ui.IsWidget#asWidget()
-     */
     @Override
     public Widget asWidget() {
         TabPanel tabPanel = new TabPanel();
@@ -74,12 +68,12 @@ public class NewFederationDetails implements FormAdapter<Federation> {
 
         layout.setStyleName("fill-layout-width");
 
-        final TextItem aliasItem = new TextItem("name", PicketLinkConsoleFramework.CONSTANTS.common_label_federationAlias());
+        final TextItem aliasItem = new TextItem("name", uiConstants.common_label_federationAlias());
 
         form.setFields(aliasItem);
         form.setEnabled(false);
 
-        layout.add(new FormLayout().setSetTools(null).setHelp(null).setForm(form).build());
+        layout.add(new FormLayout().setTools(null).setHelp(null).setForm(form).build());
 
         tabPanel.add(layout, "Attributes");
         
@@ -96,134 +90,71 @@ public class NewFederationDetails implements FormAdapter<Federation> {
         return tabPanel;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#bind(com.google.gwt.user.cellview.client.CellTable)
-     */
     @Override
     public void bind(CellTable<Federation> instanceTable) {
         form.bind(instanceTable);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#cancel()
-     */
     @Override
     public void cancel() {
         form.cancel();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#edit(java.lang.Object)
-     */
     @Override
     public void edit(Federation bean) {
         this.form.edit(bean);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.jboss.ballroom.client.widgets.forms.FormAdapter#addEditListener(org.jboss.ballroom.client.widgets.forms.EditListener)
-     */
     @Override
     public void addEditListener(EditListener listener) {
         form.addEditListener(listener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * org.jboss.ballroom.client.widgets.forms.FormAdapter#removeEditListener(org.jboss.ballroom.client.widgets.forms.EditListener
-     * )
-     */
     @Override
     public void removeEditListener(EditListener listener) {
         form.removeEditListener(listener);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#getChangedValues()
-     */
     @Override
     public Map<String, Object> getChangedValues() {
         return form.getChangedValues();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#getConversionType()
-     */
     @Override
     public Class<?> getConversionType() {
         return Federation.class;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#getEditedEntity()
-     */
     @Override
     public Federation getEditedEntity() {
         return form.getEditedEntity();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#getUpdatedEntity()
-     */
     @Override
     public Federation getUpdatedEntity() {
         return form.getUpdatedEntity();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#getFormItemNames()
-     */
     @Override
     public List<String> getFormItemNames() {
         return form.getFormItemNames();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#setEnabled(boolean)
-     */
+    @Override
+    public String getFormItemTitle(final String ref) {
+        return form.getFormItemTitle(ref);
+    }
+
     @Override
     public void setEnabled(boolean b) {
         form.setEnabled(b);
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#validate()
-     */
     @Override
     public FormValidation validate() {
         return form.validate();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.jboss.ballroom.client.widgets.forms.FormAdapter#clearValues()
-     */
     @Override
     public void clearValues() {
         form.clearValues();
@@ -244,5 +175,4 @@ public class NewFederationDetails implements FormAdapter<Federation> {
             this.samlConfigurationDetails.setSAMLConfiguration(null);
         }
     }
-
 }

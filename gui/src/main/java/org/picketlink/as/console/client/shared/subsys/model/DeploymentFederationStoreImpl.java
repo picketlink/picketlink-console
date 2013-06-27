@@ -27,15 +27,14 @@ import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
 
 import javax.inject.Inject;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.jboss.as.console.client.core.ApplicationProperties;
 import org.jboss.as.console.client.shared.BeanFactory;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
 import org.jboss.as.console.client.shared.dispatch.impl.DMRAction;
 import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.dmr.client.ModelNode;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * <p>

@@ -24,21 +24,20 @@ package org.picketlink.as.console.client.ui.federation;
 
 import java.util.List;
 
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.PopupPanel;
+import com.google.inject.Inject;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
+import org.jboss.as.console.client.shared.deployment.DeploymentStore;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
-import org.jboss.as.console.client.shared.model.DeploymentStore;
 import org.jboss.ballroom.client.widgets.window.Feedback;
 import org.jboss.dmr.client.ModelNode;
 import org.picketlink.as.console.client.shared.subsys.model.DeploymentFederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
-
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.PopupPanel;
-import com.google.inject.Inject;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -74,7 +73,7 @@ public class DeploymentManager {
      * </p>
      */
     public void loadDeployments(final DeploymentCallback callback) {
-        this.deploymentStore.loadDeploymentContent(new SimpleCallback<List<DeploymentRecord>>() {
+        this.deploymentStore.loadDeployments(new SimpleCallback<List<DeploymentRecord>>() {
 
             @Override
             public void onSuccess(List<DeploymentRecord> result) {

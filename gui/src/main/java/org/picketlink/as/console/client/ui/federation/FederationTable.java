@@ -26,7 +26,7 @@ import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.shared.viewframework.Columns;
 import org.jboss.as.console.client.widgets.tables.TextLinkCell;
 import org.jboss.ballroom.client.widgets.forms.FormAdapter;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 
 import com.google.gwt.cell.client.ActionCell;
@@ -47,12 +47,15 @@ import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 public class FederationTable extends AbstractModelElementTable<Federation> {
 
     private final FederationPresenter presenter;
+    private final PicketLinkUIConstants uiConstants;
     private Federation selectedFederation;
     private FormAdapter<Federation> federationDetails;
 
-    public FederationTable(FederationPresenter presenter, FormAdapter<Federation> federationDetails) {
+    public FederationTable(FederationPresenter presenter, FormAdapter<Federation> federationDetails,
+            final PicketLinkUIConstants uiConstants) {
         this.presenter = presenter;
         this.federationDetails = federationDetails;
+        this.uiConstants = uiConstants;
     }
 
     /*
@@ -90,7 +93,7 @@ public class FederationTable extends AbstractModelElementTable<Federation> {
             }
         };
 
-        table.addColumn(new Columns.NameColumn(), PicketLinkConsoleFramework.CONSTANTS.common_label_alias());
+        table.addColumn(new Columns.NameColumn(), uiConstants.common_label_alias());
         table.addColumn(option, "Option");
     }
 

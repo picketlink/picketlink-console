@@ -25,9 +25,15 @@ package org.picketlink.as.console.client.ui.federation;
 import java.util.EnumSet;
 import java.util.List;
 
+import com.google.gwt.dom.client.Style;
+import com.google.gwt.user.client.ui.LayoutPanel;
+import com.google.gwt.user.client.ui.ScrollPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.viewframework.AbstractEntityView;
 import org.jboss.as.console.client.shared.viewframework.EntityEditor;
 import org.jboss.as.console.client.shared.viewframework.EntityToDmrBridge;
@@ -39,19 +45,13 @@ import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.FormAdapter;
 import org.jboss.ballroom.client.widgets.tables.DefaultCellTable;
 import org.jboss.ballroom.client.widgets.tabs.FakeTabPanel;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
+import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.ui.federation.idp.IdentityProviderEditor;
 import org.picketlink.as.console.client.ui.federation.sp.ServiceProviderEditor;
 import org.picketlink.as.console.client.ui.federation.sts.SecurityTokenServiceEditor;
-
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.user.client.ui.LayoutPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
 /**
  * <p>
@@ -65,6 +65,8 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     private EntityToDmrBridgeImpl<Federation> bridge;
     private FederationPresenter presenter;
+    private PicketLinkUIConstants uiConstants;
+    private PicketLinkUIMessages uiMessages;
     private PagedView pages;
     private IdentityProviderEditor identityProviderEditor;
     private FederationTable federationsTable;
@@ -73,14 +75,13 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     private SecurityTokenServiceEditor securityTokenServiceEditor;
     private FederationWrapper selectedFederation;
 
-    /**
-     * @param beanType
-     * @param propertyMetaData
-     */
     @Inject
-    public NewFederationView(ApplicationMetaData propertyMetaData, DispatchAsync dispatchAsync) {
+    public NewFederationView(ApplicationMetaData propertyMetaData, DispatchAsync dispatchAsync,
+            PicketLinkUIConstants uiConstants, PicketLinkUIMessages uiMessages) {
         super(Federation.class, propertyMetaData, EnumSet.of(FrameworkButton.EDIT_SAVE));
-        bridge = new EntityToDmrBridgeImpl<Federation>(propertyMetaData, Federation.class, this, dispatchAsync);
+        this.bridge = new EntityToDmrBridgeImpl<Federation>(propertyMetaData, Federation.class, this, dispatchAsync);
+        this.uiConstants = uiConstants;
+        this.uiMessages = uiMessages;
     }
 
     @Override
@@ -88,7 +89,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
         pages = new PagedView();
 
-        Widget domainList = createDomainList(PicketLinkConsoleFramework.MESSAGES.federationSectionDescription());
+        Widget domainList = createDomainList(uiMessages.federationSectionDescription());
 
         pages.addPage(Console.CONSTANTS.common_label_back(), domainList);
         pages.addPage(getIdentityProviderEditor().doGetEntityName(), getIdentityProviderEditor().asWidget());
@@ -119,7 +120,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     private SecurityTokenServiceEditor getSecurityTokenServiceEditor() {
         if (this.securityTokenServiceEditor == null) {
-            this.securityTokenServiceEditor = new SecurityTokenServiceEditor(this.presenter);
+            this.securityTokenServiceEditor = new SecurityTokenServiceEditor(this.presenter, uiConstants);
         }
 
         return this.securityTokenServiceEditor;
@@ -149,11 +150,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         return scrollPanel;
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.picketlink.as.console.client.ui.federation.FederationPresenter.MyView#updateDeployments(java.util.List)
-     */
     public void updateDeployments(List<DeploymentRecord> deployments) {
         getIdentityProviderEditor().updateDeployments(deployments);
         getServiceProviderEditor().updateDeployments(deployments);
@@ -164,7 +160,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
      */
     private IdentityProviderEditor getIdentityProviderEditor() {
         if (this.identityProviderEditor == null) {
-            this.identityProviderEditor = new IdentityProviderEditor(this.presenter);
+            this.identityProviderEditor = new IdentityProviderEditor(this.presenter, uiConstants, uiMessages);
         }
 
         return this.identityProviderEditor;
@@ -172,7 +168,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     private ServiceProviderEditor getServiceProviderEditor() {
         if (this.serviceProviderEditor == null) {
-            this.serviceProviderEditor = new ServiceProviderEditor(this.presenter);
+            this.serviceProviderEditor = new ServiceProviderEditor(this.presenter, uiConstants, uiMessages);
         }
 
         return this.serviceProviderEditor;
@@ -212,7 +208,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     protected FormAdapter<Federation> makeEditEntityDetailsForm() {
         if (this.federationDetails == null) {
-            this.federationDetails = new NewFederationDetails(this.presenter);
+            this.federationDetails = new NewFederationDetails(this.presenter, uiConstants);
         }
 
         return this.federationDetails;
@@ -225,7 +221,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
      */
     @Override
     protected DefaultCellTable<Federation> makeEntityTable() {
-        this.federationsTable = new FederationTable(this.presenter, this.federationDetails);
+        this.federationsTable = new FederationTable(this.presenter, this.federationDetails, uiConstants);
         return this.federationsTable.getCellTable();
     }
 
@@ -265,7 +261,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
      */
     @Override
     protected String getEntityDisplayName() {
-        return PicketLinkConsoleFramework.CONSTANTS.common_label_federation();
+        return uiConstants.common_label_federation();
     }
 
 }

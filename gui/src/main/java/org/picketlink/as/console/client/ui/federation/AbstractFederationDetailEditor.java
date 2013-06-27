@@ -301,7 +301,7 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
     /**
      * Subclasses can override this method be notified when a table selection is made.
      * 
-     * @param policy
+     * @param selection
      */
     protected void doUpdateSelection(T selection) {
 

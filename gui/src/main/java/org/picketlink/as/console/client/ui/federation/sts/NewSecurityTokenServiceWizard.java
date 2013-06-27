@@ -25,7 +25,7 @@ package org.picketlink.as.console.client.ui.federation.sts;
 import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationWizard;
@@ -38,8 +38,12 @@ import org.picketlink.as.console.client.ui.federation.Wizard;
  */
 public class NewSecurityTokenServiceWizard<T extends GenericFederationEntity> extends AbstractFederationWizard<T> implements Wizard<T> {
 
-    public NewSecurityTokenServiceWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
+    private PicketLinkUIConstants uiConstants;
+
+    public NewSecurityTokenServiceWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type,
+            PicketLinkUIConstants uiConstants) {
         super(editor, cls, presenter, type, "alias", "endpoint", "security-domain");
+        this.uiConstants = uiConstants;
     }
 
     @Override
@@ -67,7 +71,7 @@ public class NewSecurityTokenServiceWizard<T extends GenericFederationEntity> ex
         }
         
         FormItem<?>[] formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
-                new TextBoxItem("endpoint", PicketLinkConsoleFramework.CONSTANTS.common_label_endpoint(), true)};
+                new TextBoxItem("endpoint", uiConstants.common_label_endpoint(), true)};
 
         return formItems;
     }

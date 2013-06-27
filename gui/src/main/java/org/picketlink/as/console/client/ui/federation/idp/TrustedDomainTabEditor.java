@@ -29,7 +29,8 @@ import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.Feedback;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
+import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
@@ -52,9 +53,15 @@ public class TrustedDomainTabEditor {
     private IdentityProvider identityProvider;
     private ToolButton removeTrustedDomainBtn;
     private ToolButton addTrustedDomainBtn;
+    private PicketLinkUIConstants uiConstants;
+    private PicketLinkUIMessages uiMessages;
 
-    public TrustedDomainTabEditor(FederationPresenter presenter) {
+
+    public TrustedDomainTabEditor(FederationPresenter presenter,
+            PicketLinkUIConstants uiConstants, PicketLinkUIMessages uiMessages) {
         this.presenter = presenter;
+        this.uiConstants = uiConstants;
+        this.uiMessages = uiMessages;
     }
     
     public Widget asWidget() {
@@ -70,17 +77,10 @@ public class TrustedDomainTabEditor {
         return trustDomainsHeader;
     }
 
-    /**
-     * @param detailPanel
-     */
     private void addTrustDomainTable(VerticalPanel detailPanel) {
         detailPanel.add(getTrustDomainTable().asWidget());
     }
 
-    /**
-     * @param detailPanel
-     * @param trustDomainsHeader
-     */
     private void addTrustDomainActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
 
@@ -91,7 +91,7 @@ public class TrustedDomainTabEditor {
             @Override
             public void onClick(ClickEvent event) {
                 if (identityProvider == null) {
-                    Window.alert(PicketLinkConsoleFramework.MESSAGES.identityProviderNotConfigured());
+                    Window.alert(uiMessages.identityProviderNotConfigured());
                 } else {
                     TrustDomain newTrustedDomain = trustDomainForm.getUpdatedEntity();
                     
@@ -104,7 +104,7 @@ public class TrustedDomainTabEditor {
                         presenter.getFederationManager().onCreateTrustDomain(identityProvider, newTrustedDomain);
                         getTrustDomainTable().getDataProvider().getList().add(newTrustedDomain);
                     } else {
-                        Window.alert(PicketLinkConsoleFramework.MESSAGES.invalidTrustedDomain());
+                        Window.alert(uiMessages.invalidTrustedDomain());
                     }
                     
                     trustDomainForm.clearValues();
@@ -123,7 +123,7 @@ public class TrustedDomainTabEditor {
                 final TrustDomain removedTrustedDomain = getTrustDomainTable().getSelectedTrustedDomain();
                 
                 Feedback.confirm(
-                        Console.MESSAGES.deleteTitle(PicketLinkConsoleFramework.CONSTANTS.common_label_trustDomain()),
+                        Console.MESSAGES.deleteTitle(uiConstants.common_label_trustDomain()),
                         Console.MESSAGES.deleteConfirm(removedTrustedDomain.getName()),
                         new Feedback.ConfirmationHandler() {
                             @Override
@@ -154,7 +154,7 @@ public class TrustedDomainTabEditor {
     private void addTrustDomainForm(VerticalPanel trustDomainsHeader) {
         this.trustDomainForm = new Form<TrustDomain>(TrustDomain.class);
 
-        TextBoxItem domainName = new TextBoxItem("name", PicketLinkConsoleFramework.CONSTANTS.common_label_domainName());
+        TextBoxItem domainName = new TextBoxItem("name", uiConstants.common_label_domainName());
         domainName.setRequired(true);
 
         TextBoxItem certAliasName = new TextBoxItem("certAlias", "Certificate Alias");

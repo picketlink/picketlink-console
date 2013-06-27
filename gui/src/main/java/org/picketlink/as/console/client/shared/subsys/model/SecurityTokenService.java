@@ -22,7 +22,7 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.viewframework.NamedEntity;
 import org.jboss.as.console.client.widgets.forms.Address;
 import org.jboss.as.console.client.widgets.forms.Binding;

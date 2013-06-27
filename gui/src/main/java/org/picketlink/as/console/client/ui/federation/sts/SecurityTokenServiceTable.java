@@ -22,20 +22,19 @@
 
 package org.picketlink.as.console.client.ui.federation.sts;
 
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
-import org.jboss.as.console.client.widgets.tables.TextLinkCell;
-import org.jboss.ballroom.client.widgets.icons.Icons;
-import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
-import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
-import org.picketlink.as.console.client.ui.federation.FederationPresenter;
-
 import com.google.gwt.cell.client.ActionCell;
 import com.google.gwt.cell.client.ImageResourceCell;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
+import org.jboss.as.console.client.widgets.tables.TextLinkCell;
+import org.jboss.ballroom.client.widgets.icons.Icons;
+import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
+import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
+import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
 /**
  * <p>

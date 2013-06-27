@@ -4,11 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
 import org.jboss.as.console.client.shared.model.ResponseWrapper;
 import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
@@ -27,24 +29,24 @@ import org.picketlink.as.console.client.ui.federation.idp.RemoveIdentityProvider
 import org.picketlink.as.console.client.ui.federation.sp.AddServiceProviderEvent;
 import org.picketlink.as.console.client.ui.federation.sp.RemoveServiceProviderEvent;
 
-import com.google.gwt.event.shared.EventBus;
-import com.google.inject.Inject;
-
 public class FederationManager {
 
     private final FederationStore federationStore;
     private final DeploymentManager deploymentManager;
     private final EventBus eventBus;
+    private final PicketLinkUIConstants uiConstants;
 
     private FederationPresenter presenter;
 
     private Map<String, FederationWrapper> federations = new HashMap<String, FederationWrapper>();
 
     @Inject
-    public FederationManager(FederationStore federationStore, DeploymentManager deploymentManager, EventBus eventBus) {
+    public FederationManager(FederationStore federationStore, DeploymentManager deploymentManager, EventBus eventBus,
+            PicketLinkUIConstants uiConstants) {
         this.federationStore = federationStore;
         this.deploymentManager = deploymentManager;
         this.eventBus = eventBus;
+        this.uiConstants = uiConstants;
     }
 
     /**
@@ -61,12 +63,12 @@ public class FederationManager {
             public void onSuccess(ResponseWrapper<Boolean> result) {
                 if (result.getUnderlying()) {
                     loadAllFederations();
-                    Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants().common_label_federation()
+                    Console.info(Console.MESSAGES.added(uiConstants.common_label_federation()
                             + " ")
                             + federation.getName());
                 } else
                     Console.error(
-                            Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants().common_label_federation()
+                            Console.MESSAGES.addingFailed(uiConstants.common_label_federation()
                                     + " " + federation.getName()), result.getResponse().toString());
             }
         });
@@ -85,11 +87,11 @@ public class FederationManager {
             public void onSuccess(Boolean success) {
                 if (success) {
                     loadAllFederations();
-                    Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants().common_label_federation()
+                    Console.info(Console.MESSAGES.deleted(uiConstants.common_label_federation()
                             + " ")
                             + federation.getName());
                 } else {
-                    Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                    Console.error(Console.MESSAGES.deletionFailed(uiConstants
                             .common_label_federation() + " ")
                             + federation.getName());
                 }
@@ -112,10 +114,10 @@ public class FederationManager {
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
+                            Console.info(Console.MESSAGES.added(uiConstants
                                     .common_label_key_store()));
                         } else
-                            Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
+                            Console.error(Console.MESSAGES.addingFailed(uiConstants
                                     .common_label_key_store()));
                     }
                 });
@@ -128,10 +130,10 @@ public class FederationManager {
                         @Override
                         public void onSuccess(ResponseWrapper<Boolean> response) {
                             if (response.getUnderlying())
-                                Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
+                                Console.info(Console.MESSAGES.saved(uiConstants
                                         .common_label_key_store()));
                             else
-                                Console.error(Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
+                                Console.error(Console.MESSAGES.saveFailed(uiConstants
                                         .common_label_key_store()));
                         }
 
@@ -151,9 +153,9 @@ public class FederationManager {
             @Override
             public void onSuccess(Boolean success) {
                 if (success) {
-                    Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants().common_label_key_store()));
+                    Console.info(Console.MESSAGES.deleted(uiConstants.common_label_key_store()));
                 } else {
-                    Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                    Console.error(Console.MESSAGES.deletionFailed(uiConstants
                             .common_label_key_store()));
                 }
             }
@@ -172,12 +174,12 @@ public class FederationManager {
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
                             loadAllFederations();
-                            Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
+                            Console.info(Console.MESSAGES.added(uiConstants
                                     .common_label_trustDomain() + " ")
                                     + trustDomain.getName());
                         } else
                             Console.error(
-                                    Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
+                                    Console.MESSAGES.addingFailed(uiConstants
                                             .common_label_trustDomain() + " "), result.getResponse().toString());
                     }
                 });
@@ -193,11 +195,11 @@ public class FederationManager {
                     public void onSuccess(Boolean success) {
                         loadAllFederations();
                         if (success) {
-                            Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
+                            Console.info(Console.MESSAGES.deleted(uiConstants
                                     .common_label_trustDomain() + " ")
                                     + trustDomain.getName());
                         } else {
-                            Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                            Console.error(Console.MESSAGES.deletionFailed(uiConstants
                                     .common_label_trustDomain() + " ")
                                     + trustDomain.getName());
                         }
@@ -217,11 +219,11 @@ public class FederationManager {
                         public void onSuccess(ResponseWrapper<Boolean> response) {
                             if (response.getUnderlying()) {
                                 loadAllFederations();
-                                Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
+                                Console.info(Console.MESSAGES.saved(uiConstants
                                         .common_label_serviceProvider() + " " + serviceProvider.getName()));
                             } else {
                                 Console.error(
-                                        Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
+                                        Console.MESSAGES.saveFailed(uiConstants
                                                 .common_label_serviceProvider() + " ")
                                                 + serviceProvider.getName(), response.getResponse().toString());
                             }
@@ -241,11 +243,11 @@ public class FederationManager {
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
                             loadAllFederations();
-                            Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
+                            Console.info(Console.MESSAGES.added(uiConstants
                                     .common_label_serviceProvider() + " ")
                                     + serviceProvider.getName());
                         } else
-                            Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
+                            Console.error(Console.MESSAGES.addingFailed(uiConstants
                                     .common_label_serviceProvider() + " " + serviceProvider.getName()), result.getResponse()
                                     .toString());
                     }
@@ -263,12 +265,12 @@ public class FederationManager {
                     public void onSuccess(Boolean success) {
                         if (success) {
                             loadAllFederations();
-                            Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
+                            Console.info(Console.MESSAGES.deleted(uiConstants
                                     .common_label_serviceProvider() + " ")
                                     + serviceProvider.getName());
                             deploymentManager.restartServiceProvider(serviceProvider);
                         } else {
-                            Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                            Console.error(Console.MESSAGES.deletionFailed(uiConstants
                                     .common_label_serviceProvider() + " ")
                                     + serviceProvider.getName());
                         }
@@ -293,11 +295,11 @@ public class FederationManager {
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
                             loadAllFederations();
-                            Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
+                            Console.info(Console.MESSAGES.added(uiConstants
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
                         } else
-                            Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
+                            Console.error(Console.MESSAGES.addingFailed(uiConstants
                                     .common_label_identityProvider() + " " + identityProvider.getName()), result.getResponse()
                                     .toString());
                     }
@@ -315,14 +317,14 @@ public class FederationManager {
                     public void onSuccess(Boolean success) {
                         if (success) {
                             loadAllFederations();
-                            Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
+                            Console.info(Console.MESSAGES.deleted(uiConstants
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
                             if (!identityProvider.isExternal()) {
                                 deploymentManager.restartIdentityProvider(identityProvider);
                             }
                         } else {
-                            Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                            Console.error(Console.MESSAGES.deletionFailed(uiConstants
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
                         }
@@ -346,11 +348,11 @@ public class FederationManager {
                         public void onSuccess(ResponseWrapper<Boolean> response) {
                             if (response.getUnderlying()) {
                                 loadAllFederations();
-                                Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
+                                Console.info(Console.MESSAGES.saved(uiConstants
                                         .common_label_identityProvider() + " " + identityProvider.getName()));
                             } else {
                                 Console.error(
-                                        Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
+                                        Console.MESSAGES.saveFailed(uiConstants
                                                 .common_label_identityProvider() + " ")
                                                 + identityProvider.getName(), response.getResponse().toString());
                             }
@@ -401,11 +403,11 @@ public class FederationManager {
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
                             loadAllFederations();
-                            Console.info(Console.MESSAGES.added(PicketLinkConsoleFramework.getConstants()
+                            Console.info(Console.MESSAGES.added(uiConstants
                                     .common_label_securityTokenService() + " ")
                                     + securitytokenService.getName());
                         } else
-                            Console.error(Console.MESSAGES.addingFailed(PicketLinkConsoleFramework.getConstants()
+                            Console.error(Console.MESSAGES.addingFailed(uiConstants
                                     .common_label_securityTokenService() + " " + securitytokenService.getName()), result
                                     .getResponse().toString());
                     }
@@ -423,11 +425,11 @@ public class FederationManager {
                     public void onSuccess(Boolean success) {
                         if (success) {
                             loadAllFederations();
-                            Console.info(Console.MESSAGES.deleted(PicketLinkConsoleFramework.getConstants()
+                            Console.info(Console.MESSAGES.deleted(uiConstants
                                     .common_label_securityTokenService() + " ")
                                     + securityTokenService.getName());
                         } else {
-                            Console.error(Console.MESSAGES.deletionFailed(PicketLinkConsoleFramework.getConstants()
+                            Console.error(Console.MESSAGES.deletionFailed(uiConstants
                                     .common_label_securityTokenService() + " ")
                                     + securityTokenService.getName());
                         }
@@ -598,10 +600,10 @@ public class FederationManager {
                         @Override
                         public void onSuccess(ResponseWrapper<Boolean> response) {
                             if (response.getUnderlying())
-                                Console.info(Console.MESSAGES.saved(PicketLinkConsoleFramework.getConstants()
+                                Console.info(Console.MESSAGES.saved(uiConstants
                                         .common_label_key_store()));
                             else
-                                Console.error(Console.MESSAGES.saveFailed(PicketLinkConsoleFramework.getConstants()
+                                Console.error(Console.MESSAGES.saveFailed(uiConstants
                                         .common_label_key_store()));
                         }
 

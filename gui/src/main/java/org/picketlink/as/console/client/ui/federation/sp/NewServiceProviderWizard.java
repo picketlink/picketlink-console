@@ -24,12 +24,12 @@ package org.picketlink.as.console.client.ui.federation.sp;
 
 import java.util.List;
 
-import org.jboss.as.console.client.shared.model.DeploymentRecord;
+import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
-import org.picketlink.as.console.client.PicketLinkConsoleFramework;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
@@ -47,9 +47,12 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
     private ComboBoxItem deploymentsItem;
     private ComboBoxItem securityDomainsItem;
     private CheckBoxItem strictPostBinding;
+    private PicketLinkUIConstants uiConstants;
 
-    public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type) {
+    public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type,
+            PicketLinkUIConstants uiConstants) {
         super(editor, cls, presenter, type, "alias", "url", "postBinding", "security-domain", "strict-post-binding", "error-page", "logout-page");
+        this.uiConstants = uiConstants;
     }
 
     @Override
@@ -97,11 +100,11 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
         
         if (!isDialogue()) {
             formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
-                    new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), true),
-                    new CheckBoxItem("postBinding", PicketLinkConsoleFramework.CONSTANTS.common_label_postBinding()), strictPostBinding, errorPageItem, logoutPageItem};           
+                    new TextBoxItem("url", uiConstants.common_label_URL(), true),
+                    new CheckBoxItem("postBinding", uiConstants.common_label_postBinding()), strictPostBinding, errorPageItem, logoutPageItem};           
         } else {
             formItems = new FormItem<?>[] { aliasItem, securityDomainsItem,
-                    new TextBoxItem("url", PicketLinkConsoleFramework.CONSTANTS.common_label_URL(), false)}; 
+                    new TextBoxItem("url", uiConstants.common_label_URL(), false)}; 
         }
 
         return formItems;

@@ -15,8 +15,9 @@
 <module rename-to="app">
 
 	<inherits name="org.jboss.as.console.App"/>
-	
-	<set-property name="user.agent" value="safari,gecko1_8,ie6" />
-  	<set-property name="locale" value="en" />
+
+    <extend-property name="locale" values="en"/>
+    <set-property-fallback name="locale" value="en"/>
+    <set-property name="locale" value="en"/>
 
 </module>
