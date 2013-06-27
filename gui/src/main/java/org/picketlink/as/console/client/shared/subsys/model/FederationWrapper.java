@@ -3,8 +3,6 @@ package org.picketlink.as.console.client.shared.subsys.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
-
 public class FederationWrapper implements Federation {
 
     private Federation federation;

@@ -22,13 +22,8 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
-import java.util.List;
-import java.util.Map;
-
-import org.jboss.as.console.client.domain.model.SimpleCallback;
 import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
 import org.jboss.as.console.client.shared.model.DeploymentRecord;
-import org.jboss.as.console.client.shared.model.ResponseWrapper;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 

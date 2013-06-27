@@ -22,15 +22,11 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.jboss.as.console.client.widgets.forms.FormToolStrip;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.NumberBoxItem;
-import org.jboss.ballroom.client.widgets.forms.PasswordBoxItem;
-import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.SAMLConfiguration;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;

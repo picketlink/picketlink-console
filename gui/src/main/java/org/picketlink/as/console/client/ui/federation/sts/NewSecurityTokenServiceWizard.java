@@ -22,7 +22,6 @@
 
 package org.picketlink.as.console.client.ui.federation.sts;
 
-import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;

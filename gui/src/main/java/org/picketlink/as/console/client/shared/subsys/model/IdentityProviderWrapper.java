@@ -1,7 +1,6 @@
 package org.picketlink.as.console.client.shared.subsys.model;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 public class IdentityProviderWrapper {
