@@ -76,11 +76,11 @@ public class DigitalCertificateDetails {
         
         passwdItem.getInputElement().getStyle().setWidth(150, Unit.PX);
         
-        signKeyAliasItem = new TextBoxItem("signKeyAlias", "Singning Key Alias");
+        signKeyAliasItem = new TextBoxItem("signKeyAlias", "Signing Key Alias");
         
         signKeyAliasItem.getInputElement().getStyle().setWidth(150, Unit.PX);
         
-        PasswordBoxItem signKeyPasswdItem = new PasswordBoxItem("signKeyPasswd", "Singning Key Password");
+        PasswordBoxItem signKeyPasswdItem = new PasswordBoxItem("signKeyPasswd", "Signing Key Password");
         
         signKeyPasswdItem.getInputElement().getStyle().setWidth(150, Unit.PX);
         
