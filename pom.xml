@@ -21,6 +21,8 @@
 	<packaging>pom</packaging>
 	<name>PicketLink Console :: Parent</name>
 
+    <description>PicketLink Console :: Parent</description>
+
 	<url>
         https://github.com/picketlink/picketlink-console
     </url>
