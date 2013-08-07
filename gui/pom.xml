@@ -17,7 +17,7 @@
     <groupId>org.picketlink</groupId>
     <artifactId>picketlink-console-extensions</artifactId>
     <packaging>jar</packaging>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3.Final</version>
     <name>PicketLink Console :: GUI Extensions</name>
 
     <parent>

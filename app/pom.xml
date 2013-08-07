@@ -17,7 +17,7 @@
     <groupId>org.picketlink</groupId>
     <artifactId>picketlink-console</artifactId>
     <packaging>war</packaging>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3.Final</version>
     <name>PicketLink Console :: Webapp</name>
 
     <!-- Parent -->
