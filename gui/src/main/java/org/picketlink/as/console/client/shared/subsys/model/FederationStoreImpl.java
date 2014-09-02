@@ -22,26 +22,8 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
-import static org.jboss.dmr.client.ModelDescriptionConstants.ADD;
-import static org.jboss.dmr.client.ModelDescriptionConstants.ADDRESS;
-import static org.jboss.dmr.client.ModelDescriptionConstants.OP;
-import static org.jboss.dmr.client.ModelDescriptionConstants.OUTCOME;
-import static org.jboss.dmr.client.ModelDescriptionConstants.READ_CHILDREN_RESOURCES_OPERATION;
-import static org.jboss.dmr.client.ModelDescriptionConstants.REMOVE;
-import static org.jboss.dmr.client.ModelDescriptionConstants.RESULT;
-import static org.jboss.dmr.client.ModelDescriptionConstants.SUCCESS;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.inject.Inject;
-
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
-import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
-import org.jboss.as.console.client.shared.dispatch.impl.DMRAction;
-import org.jboss.as.console.client.shared.dispatch.impl.DMRResponse;
 import org.jboss.as.console.client.shared.model.ModelAdapter;
 import org.jboss.as.console.client.shared.model.ResponseWrapper;
 import org.jboss.as.console.client.shared.subsys.Baseadress;
@@ -52,8 +34,17 @@ import org.jboss.as.console.client.widgets.forms.BeanMetaData;
 import org.jboss.as.console.client.widgets.forms.EntityAdapter;
 import org.jboss.dmr.client.ModelDescriptionConstants;
 import org.jboss.dmr.client.ModelNode;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
+import org.jboss.dmr.client.dispatch.impl.DMRAction;
+import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import javax.inject.Inject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.jboss.dmr.client.ModelDescriptionConstants.*;
 
 /**
  * <p>
@@ -661,7 +652,7 @@ public class FederationStoreImpl implements FederationStore {
     public void loadIdentityProviders(Federation federation, final AsyncCallback<List<IdentityProvider>> callback) {
         AddressBinding address = this.identityProviderMetaData.getAddress();
 
-        ModelNode operation = address.asSubresource(federation.getName());
+        ModelNode operation = address.asResource(federation.getName());
         operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
 
         dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
@@ -805,7 +796,7 @@ public class FederationStoreImpl implements FederationStore {
     public void loadKeyStore(Federation federation, final SimpleCallback<List<KeyStore>> callback) {
         AddressBinding address = this.keyProviderMetaData.getAddress();
 
-        ModelNode operation = address.asSubresource(federation.getName());
+        ModelNode operation = address.asResource(federation.getName());
         operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
 
         dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
@@ -839,7 +830,7 @@ public class FederationStoreImpl implements FederationStore {
     public void loadServiceProviders(Federation federation, final SimpleCallback<List<ServiceProvider>> callback) {
         AddressBinding address = this.serviceProviderMetaData.getAddress();
 
-        ModelNode operation = address.asSubresource(federation.getName());
+        ModelNode operation = address.asResource(federation.getName());
         operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
 
         dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
@@ -875,7 +866,7 @@ public class FederationStoreImpl implements FederationStore {
             final SimpleCallback<List<TrustDomain>> callback) {
         AddressBinding address = this.trustDomainMetaData.getAddress();
 
-        ModelNode operation = address.asSubresource(federation.getName(), identityProvider.getName());
+        ModelNode operation = address.asResource(federation.getName(), identityProvider.getName());
         operation.get(OP).set(READ_CHILDREN_RESOURCES_OPERATION);
 
         dispatcher.execute(new DMRAction(operation), new AsyncCallback<DMRResponse>() {
