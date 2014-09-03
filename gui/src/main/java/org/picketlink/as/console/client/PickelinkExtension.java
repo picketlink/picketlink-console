@@ -35,7 +35,7 @@ import com.google.gwt.inject.client.AsyncProvider;
  * @author Pedro Silva
  * @author Rob Cernich
  */
-@GinExtension("org.picketlink.as.console/PicketLinkExtension")
+@GinExtension("org.picketlink.as.console.PicketLinkExtension")
 public interface PickelinkExtension
 {
     AsyncProvider<FederationPresenter> getFederationPresenter();

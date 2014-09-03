@@ -35,7 +35,7 @@ import org.jboss.as.console.client.widgets.forms.FormItem;
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink/federation={0}/identity-provider={1}")
+@Address("/subsystem=picketlink-federation/federation={0}/identity-provider={1}")
 public interface IdentityProvider extends DeploymentRecord, NamedEntity, GenericFederationEntity {
 
     @Override

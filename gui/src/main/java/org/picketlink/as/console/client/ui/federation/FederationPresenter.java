@@ -75,7 +75,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
 
     @ProxyCodeSplit
     @NameToken(NameTokens.FEDERATION)
-    @SubsystemExtension(name = "Federation", group = "PicketLink", key = "picketlink")
+    @SubsystemExtension(name = "Federation", group = "PicketLink", key = "picketlink-federation")
     public interface MyProxy extends Proxy<FederationPresenter>, Place {
     }
 
