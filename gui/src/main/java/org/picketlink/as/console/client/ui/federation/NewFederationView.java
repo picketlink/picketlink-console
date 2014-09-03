@@ -44,7 +44,6 @@ import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.ui.federation.idp.IdentityProviderEditor;
 import org.picketlink.as.console.client.ui.federation.sp.ServiceProviderEditor;
-import org.picketlink.as.console.client.ui.federation.sts.SecurityTokenServiceEditor;
 
 import java.util.EnumSet;
 import java.util.List;
@@ -68,7 +67,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     private FederationTable federationsTable;
     private ServiceProviderEditor serviceProviderEditor;
     private NewFederationDetails federationDetails;
-    private SecurityTokenServiceEditor securityTokenServiceEditor;
     private FederationWrapper selectedFederation;
 
     @Inject
@@ -90,7 +88,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         pages.addPage(Console.CONSTANTS.common_label_back(), domainList);
         pages.addPage(getIdentityProviderEditor().doGetEntityName(), getIdentityProviderEditor().asWidget());
         pages.addPage(getServiceProviderEditor().doGetEntityName(), getServiceProviderEditor().asWidget());
-//        pages.addPage(getSecurityTokenServiceEditor().doGetEntityName(), getSecurityTokenServiceEditor().asWidget());
 
         // default page
         pages.showPage(0);
@@ -112,14 +109,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         this.federationsTable.addSelectionChangeHandler();
 
         return layout;
-    }
-
-    private SecurityTokenServiceEditor getSecurityTokenServiceEditor() {
-        if (this.securityTokenServiceEditor == null) {
-            this.securityTokenServiceEditor = new SecurityTokenServiceEditor(this.presenter, uiConstants);
-        }
-
-        return this.securityTokenServiceEditor;
     }
 
     @Override

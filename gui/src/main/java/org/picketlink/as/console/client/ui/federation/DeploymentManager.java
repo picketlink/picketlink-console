@@ -34,7 +34,6 @@ import org.jboss.dmr.client.ModelNode;
 import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 import org.picketlink.as.console.client.shared.subsys.model.DeploymentFederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
-import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 
 import java.util.List;
@@ -109,9 +108,4 @@ public class DeploymentManager {
             }
         });
     }
-
-    public void restartSecurityTokenService(SecurityTokenService serviceProvider) {
-        
-    }
-    
 }

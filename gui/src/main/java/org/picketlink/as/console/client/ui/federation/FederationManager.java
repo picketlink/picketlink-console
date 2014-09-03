@@ -19,7 +19,6 @@ import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHand
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.SAMLConfiguration;
-import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerParameter;
@@ -394,47 +393,6 @@ public class FederationManager {
                 federationPresenter.onLoadSecurityDomains(result);
             }
         });
-    }
-
-    public void onCreateSecurityTokenService(final SecurityTokenService securitytokenService) {
-        this.federationStore.createSecurityTokenService(this.presenter.getCurrentFederation(), securitytokenService,
-                new SimpleCallback<ResponseWrapper<Boolean>>() {
-                    @Override
-                    public void onSuccess(ResponseWrapper<Boolean> result) {
-                        if (result.getUnderlying()) {
-                            loadAllFederations();
-                            Console.info(Console.MESSAGES.added(uiConstants
-                                    .common_label_securityTokenService() + " ")
-                                    + securitytokenService.getName());
-                        } else
-                            Console.error(Console.MESSAGES.addingFailed(uiConstants
-                                    .common_label_securityTokenService() + " " + securitytokenService.getName()), result
-                                    .getResponse().toString());
-                    }
-                });
-    }
-
-    public void onUpdateSecurityTokenService(SecurityTokenService securityTokenService, Map<String, Object> changedValues) {
-
-    }
-
-    public void onRemoveSecurityTokenService(final SecurityTokenService securityTokenService) {
-        this.federationStore.deleteSecurityTokenService(presenter.getCurrentFederation(), securityTokenService,
-                new SimpleCallback<Boolean>() {
-                    @Override
-                    public void onSuccess(Boolean success) {
-                        if (success) {
-                            loadAllFederations();
-                            Console.info(Console.MESSAGES.deleted(uiConstants
-                                    .common_label_securityTokenService() + " ")
-                                    + securityTokenService.getName());
-                        } else {
-                            Console.error(Console.MESSAGES.deletionFailed(uiConstants
-                                    .common_label_securityTokenService() + " ")
-                                    + securityTokenService.getName());
-                        }
-                    }
-                });
     }
 
     public void onCreateIdentityProviderHandler(IdentityProvider identityProvider, final IdentityProviderHandler newHandler) {

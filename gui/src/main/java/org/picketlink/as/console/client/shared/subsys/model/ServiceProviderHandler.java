@@ -35,7 +35,7 @@ import org.jboss.as.console.client.widgets.forms.Binding;
 @Address("/subsystem=picketlink-federation/federation={0}/service-provider={1}/handler={2}")
 public interface ServiceProviderHandler {
 
-    @Binding(key = true, detypedName="class")
+    @Binding(key = true, detypedName="class-name")
     String getClassName();
     void setClassName(String name);
 }

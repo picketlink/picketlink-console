@@ -35,12 +35,12 @@ import org.jboss.as.console.client.widgets.forms.Binding;
 @Address("/subsystem=picketlink-federation/federation={0}/key-store={1}")
 public interface KeyStore extends GenericFederationEntity {
 
-    @Binding(detypedName="url")
+    @Binding(detypedName="file")
     String getUrl();
     
     void setUrl(String url);
 
-    @Binding(detypedName="passwd")
+    @Binding(detypedName="password")
     String getPasswd();
     
     void setPasswd(String passwd);
@@ -50,7 +50,7 @@ public interface KeyStore extends GenericFederationEntity {
     
     void setSignKeyAlias(String signKeyAlias);
 
-    @Binding(detypedName="sign-key-passwd")
+    @Binding(detypedName="sign-key-password")
     String getSignKeyPasswd();
     
     void setSignKeyPasswd(String signKeyPasswd);
