@@ -36,6 +36,7 @@ import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.subsys.RevealStrategy;
 import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
+import org.jboss.as.console.spi.AccessControl;
 import org.jboss.as.console.spi.SubsystemExtension;
 import org.jboss.ballroom.client.layout.LHSHighlightEvent;
 import org.jboss.dmr.client.dispatch.DispatchAsync;
@@ -76,6 +77,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
     @ProxyCodeSplit
     @NameToken(NameTokens.FEDERATION)
     @SubsystemExtension(name = "Federation", group = "PicketLink", key = "picketlink-federation")
+    @AccessControl(resources = "/{selected.profile}/subsystem=picketlink-federation/federation=*")
     public interface MyProxy extends Proxy<FederationPresenter>, Place {
     }
 

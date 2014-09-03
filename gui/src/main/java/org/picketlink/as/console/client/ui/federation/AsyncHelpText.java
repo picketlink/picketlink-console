@@ -88,7 +88,7 @@ public class AsyncHelpText implements SecurityDomainsPresenter.DescriptionCallBa
         ModelNode operation = new ModelNode();
         operation.get(ModelDescriptionConstants.OP).set(operator);
         operation.get(ModelDescriptionConstants.ADDRESS).set(Baseadress.get());
-        operation.get(ModelDescriptionConstants.ADDRESS).add(ModelDescriptionConstants.SUBSYSTEM, "picketlink")
+        operation.get(ModelDescriptionConstants.ADDRESS).add(ModelDescriptionConstants.SUBSYSTEM, "picketlink-federation")
                 .add("federation");
         return operation;
     }
