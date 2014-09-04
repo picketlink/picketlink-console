@@ -32,10 +32,10 @@ import org.jboss.as.console.client.widgets.forms.Binding;
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink/federation={0}/identity-provider={1}/handler={2}")
+@Address("/subsystem=picketlink-federation/federation={0}/identity-provider={1}/handler={2}")
 public interface IdentityProviderHandler {
 
-    @Binding(key = true, detypedName="class")
+    @Binding(key = true, detypedName="class-name")
     String getClassName();
     void setClassName(String name);
 }

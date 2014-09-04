@@ -21,10 +21,6 @@
  */
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map.Entry;
-
 import com.google.gwt.core.client.Scheduler;
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
@@ -34,21 +30,26 @@ import com.gwtplatform.mvp.client.annotations.NameToken;
 import com.gwtplatform.mvp.client.annotations.ProxyCodeSplit;
 import com.gwtplatform.mvp.client.proxy.Place;
 import com.gwtplatform.mvp.client.proxy.PlaceManager;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 import com.gwtplatform.mvp.client.proxy.Proxy;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.jboss.as.console.client.shared.BeanFactory;
 import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
-import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
 import org.jboss.as.console.client.shared.subsys.RevealStrategy;
 import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
+import org.jboss.as.console.spi.AccessControl;
 import org.jboss.as.console.spi.SubsystemExtension;
 import org.jboss.ballroom.client.layout.LHSHighlightEvent;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.picketlink.as.console.client.NameTokens;
 import org.picketlink.as.console.client.PicketlinkBeanFactory;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 
 /**
  * <p>
@@ -75,7 +76,8 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
 
     @ProxyCodeSplit
     @NameToken(NameTokens.FEDERATION)
-    @SubsystemExtension(name = "Federation", group = "PicketLink", key = "picketlink")
+    @SubsystemExtension(name = "Federation", group = "PicketLink", key = "picketlink-federation")
+    @AccessControl(resources = "/{selected.profile}/subsystem=picketlink-federation/federation=*")
     public interface MyProxy extends Proxy<FederationPresenter>, Place {
     }
 

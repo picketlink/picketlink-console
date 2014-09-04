@@ -34,7 +34,7 @@ import org.jboss.as.console.client.widgets.forms.FormItem;
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink/federation={0}")
+@Address("/subsystem=picketlink-federation/federation={0}")
 public interface Federation extends NamedEntity {
 
     @Override

@@ -23,7 +23,7 @@ public class IdentityProviderWrapper {
 
     public List<TrustDomain> getTrustDomains() {
         if (this.trustDomains == null) {
-            this.trustDomains = new ArrayList<TrustDomain>();
+            this.trustDomains = new ArrayList<>();
         }
 
         return this.trustDomains;
@@ -35,7 +35,7 @@ public class IdentityProviderWrapper {
 
     public List<IdentityProviderHandlerWrapper> getHandlers() {
         if (this.handlers == null) {
-            this.handlers = new ArrayList<IdentityProviderHandlerWrapper>();
+            this.handlers = new ArrayList<>();
         }
 
         return this.handlers;

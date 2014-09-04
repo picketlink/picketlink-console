@@ -22,23 +22,18 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.List;
-import java.util.Map;
-
-import org.jboss.as.console.client.shared.viewframework.builder.FormLayout;
-import org.jboss.ballroom.client.widgets.forms.EditListener;
-import org.jboss.ballroom.client.widgets.forms.Form;
-import org.jboss.ballroom.client.widgets.forms.FormAdapter;
-import org.jboss.ballroom.client.widgets.forms.FormValidation;
-import org.jboss.ballroom.client.widgets.forms.TextItem;
-import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
-
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.jboss.as.console.client.layout.FormLayout;
+import org.jboss.ballroom.client.widgets.forms.*;
+import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
+import org.picketlink.as.console.client.shared.subsys.model.Federation;
+import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -53,7 +48,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     private SAMLConfigurationDetails samlConfigurationDetails;
 
     public NewFederationDetails(FederationPresenter presenter, final PicketLinkUIConstants uiConstants) {
-        form = new Form<Federation>(Federation.class);
+        form = new Form<>(Federation.class);
         this.presenter = presenter;
         this.uiConstants = uiConstants;
     }
@@ -106,6 +101,11 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     }
 
     @Override
+    public void editTransient(Federation federation) {
+        form.editTransient(federation);
+    }
+
+    @Override
     public void addEditListener(EditListener listener) {
         form.addEditListener(listener);
     }
@@ -113,6 +113,11 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     @Override
     public void removeEditListener(EditListener listener) {
         form.removeEditListener(listener);
+    }
+
+    @Override
+    public void setToolsCallback(FormCallback formCallback) {
+        form.setToolsCallback(formCallback);
     }
 
     @Override

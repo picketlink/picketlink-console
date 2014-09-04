@@ -17,14 +17,14 @@
     <groupId>org.picketlink</groupId>
     <artifactId>picketlink-console</artifactId>
     <packaging>war</packaging>
-    <version>1.0.3.Final</version>
+    <version>1.0.4-SNAPSHOT</version>
     <name>PicketLink Console :: Webapp</name>
 
     <!-- Parent -->
     <parent>
         <groupId>org.jboss.as</groupId>
         <artifactId>jboss-as-console-build</artifactId>
-        <version>1.5.4.Final</version>
+        <version>2.4.0-SNAPSHOT</version>
         <relativePath/>
     </parent>
 

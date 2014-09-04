@@ -32,7 +32,7 @@ import org.jboss.as.console.client.widgets.forms.Binding;
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink/federation={0}/identity-provider={1}/handler={2}/handler-parameter={3}")
+@Address("/subsystem=picketlink-federation/federation={0}/identity-provider={1}/handler={2}/handler-parameter={3}")
 public interface IdentityProviderHandlerParameter {
 
     @Binding(key = true)

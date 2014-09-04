@@ -32,7 +32,7 @@ import org.jboss.as.console.client.widgets.forms.Binding;
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink/federation={0}/saml={1}")
+@Address("/subsystem=picketlink-federation/federation={0}/saml={1}")
 public interface SAMLConfiguration {
 
     @Binding(detypedName="token-timeout")

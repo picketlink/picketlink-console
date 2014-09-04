@@ -22,16 +22,15 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.List;
-
-import org.jboss.ballroom.client.widgets.tables.DefaultCellTable;
-import org.jboss.ballroom.client.widgets.tables.DefaultPager;
-
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.view.client.ProvidesKey;
+import org.jboss.ballroom.client.widgets.tables.DefaultCellTable;
+import org.jboss.ballroom.client.widgets.tables.DefaultPager;
+
+import java.util.List;
 
 /**
  * <p>
@@ -99,7 +98,7 @@ public abstract class AbstractModelElementTable<T> {
      * Callback method to add columns to the table.
      * </p>
      * 
-     * @param federationTable2
+     * @param federationTable
      */
     protected abstract void doAddConlumns(CellTable federationTable);
 
@@ -118,7 +117,7 @@ public abstract class AbstractModelElementTable<T> {
     }
     
     /**
-     * @param datasources
+     * @param items
      */
     public void setList(List<T> items) {
         this.getDataProvider().setList(items);
