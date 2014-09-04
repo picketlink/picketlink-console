@@ -32,6 +32,7 @@ import org.jboss.as.console.client.widgets.forms.Binding;
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
+// TODO This address does not contain the generic attributes defined in GenericFederationEntity!
 @Address("/subsystem=picketlink-federation/federation={0}/key-store={1}")
 public interface KeyStore extends GenericFederationEntity {
 
