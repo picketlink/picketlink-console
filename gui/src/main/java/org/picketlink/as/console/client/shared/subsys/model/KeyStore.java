@@ -32,25 +32,31 @@ import org.jboss.as.console.client.widgets.forms.Binding;
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink/federation={0}/key-store={1}")
-public interface KeyStore extends GenericFederationEntity {
+// TODO This address does not contain the generic attributes defined in GenericFederationEntity!
+@Address("/subsystem=picketlink-federation/federation={0}/key-store=key-store")
+public interface KeyStore {
 
-    @Binding(detypedName="url")
+    @Binding(detypedName="file")
     String getUrl();
     
     void setUrl(String url);
 
-    @Binding(detypedName="passwd")
+    @Binding(detypedName="relative-to")
+    String getRelativeTo();
+
+    void setRelativeTo(String relativeTo);
+
+    @Binding(detypedName="password")
     String getPasswd();
     
     void setPasswd(String passwd);
 
-    @Binding(detypedName="sign-key-alias", key=true)
+    @Binding(detypedName="sign-key-alias")
     String getSignKeyAlias();
     
     void setSignKeyAlias(String signKeyAlias);
 
-    @Binding(detypedName="sign-key-passwd")
+    @Binding(detypedName="sign-key-password")
     String getSignKeyPasswd();
     
     void setSignKeyPasswd(String signKeyPasswd);

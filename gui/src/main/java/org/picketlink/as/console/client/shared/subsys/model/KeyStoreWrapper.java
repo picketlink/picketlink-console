@@ -22,11 +22,8 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
-import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
-import org.jboss.as.console.client.shared.viewframework.NamedEntity;
-import org.jboss.as.console.client.widgets.forms.Address;
-import org.jboss.as.console.client.widgets.forms.Binding;
-import org.jboss.as.console.client.widgets.forms.FormItem;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * <p>Federation bean definition.</p>
@@ -35,26 +32,24 @@ import org.jboss.as.console.client.widgets.forms.FormItem;
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink-federation/federation={0}/identity-provider={1}")
-public interface IdentityProvider extends DeploymentRecord, NamedEntity, GenericFederationEntity {
+public class KeyStoreWrapper {
 
-    @Override
-    @FormItem(localLabel="common_label_name",
-            required=true,
-            formItemTypeForEdit="TEXT",
-            formItemTypeForAdd="TEXT_BOX",
-            tabName="common_label_attributes")
-    @Binding(detypedName="alias", key = true)
-    String getName();
-    
-    @Override
-    void setName(String alias);
-    
-    @Binding (detypedName="external")
-    boolean isExternal();
-    void setExternal(boolean external);
+    private final KeyStore keyStore;
+    private final List<Key> keys = new ArrayList<Key>();
 
-    @Binding (detypedName="encrypt")
-    boolean isEncrypt();
-    void setEncrypt(boolean encrypt);
+    public KeyStoreWrapper(KeyStore keyStore) {
+        this.keyStore = keyStore;
+    }
+
+    public KeyStore getKeyStore() {
+        return this.keyStore;
+    }
+
+    public void addKey(Key key) {
+        this.keys.add(key);
+    }
+
+    public List<Key> getKeys() {
+        return this.keys;
+    }
 }

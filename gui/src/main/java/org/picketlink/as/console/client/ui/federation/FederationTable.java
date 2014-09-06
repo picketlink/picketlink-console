@@ -22,19 +22,18 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
+import com.google.gwt.cell.client.ActionCell;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SingleSelectionModel;
+import com.gwtplatform.mvp.shared.proxy.PlaceRequest;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.shared.viewframework.Columns;
 import org.jboss.as.console.client.widgets.tables.TextLinkCell;
 import org.jboss.ballroom.client.widgets.forms.FormAdapter;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
-
-import com.google.gwt.cell.client.ActionCell;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SingleSelectionModel;
-import com.gwtplatform.mvp.client.proxy.PlaceRequest;
 
 /**
  * <p>
@@ -83,8 +82,8 @@ public class FederationTable extends AbstractModelElementTable<Federation> {
                     @Override
                     public void execute(Federation selection) {
                         presenter.getPlaceManager().revealPlace(
-                                new PlaceRequest(org.picketlink.as.console.client.NameTokens.FEDERATION).with("name",
-                                        selection.getName()));
+                                new PlaceRequest.Builder().nameToken(org.picketlink.as.console.client.NameTokens.FEDERATION).with("name",
+                                        selection.getName()).build());
                     }
                 })) {
             @Override
@@ -93,7 +92,7 @@ public class FederationTable extends AbstractModelElementTable<Federation> {
             }
         };
 
-        table.addColumn(new Columns.NameColumn(), uiConstants.common_label_alias());
+        table.addColumn(new Columns.NameColumn(), uiConstants.common_label_name());
         table.addColumn(option, "Option");
     }
 

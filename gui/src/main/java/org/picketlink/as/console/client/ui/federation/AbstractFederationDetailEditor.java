@@ -210,7 +210,8 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
 
         // adds the tabs for the details section
         bottomTabs = new TabPanel();
-        bottomTabs.setStyleName("default-tabpanel");
+
+        bottomTabs.setStyleName("rhs-content-panel");
 
         wizard = doCreateWizard();
 

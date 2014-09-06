@@ -24,13 +24,15 @@ package org.picketlink.as.console.client;
 
 import com.google.web.bindery.autobean.shared.AutoBean;
 import org.jboss.as.console.spi.BeanFactoryExtension;
+import org.picketlink.as.console.client.shared.subsys.model.AttributeManager;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter;
+import org.picketlink.as.console.client.shared.subsys.model.Key;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
+import org.picketlink.as.console.client.shared.subsys.model.RoleGenerator;
 import org.picketlink.as.console.client.shared.subsys.model.SAMLConfiguration;
-import org.picketlink.as.console.client.shared.subsys.model.SecurityTokenService;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerParameter;
@@ -51,11 +53,13 @@ public interface PicketlinkBeanFactory {
     
     AutoBean<IdentityProvider> identityProvider();
     
-    AutoBean<SecurityTokenService> securityTokenService();
-    
     AutoBean<ServiceProvider> serviceProvider();
     
     AutoBean<TrustDomain> trustDomain();
+
+    AutoBean<AttributeManager> attributeManager();
+
+    AutoBean<RoleGenerator> roleGenerator();
     
     AutoBean<IdentityProviderHandler> identityProviderHandler();
     
@@ -66,6 +70,8 @@ public interface PicketlinkBeanFactory {
     AutoBean<ServiceProviderHandlerParameter> serviceProviderHandlerParameter();
 
     AutoBean<KeyStore> keyStore();
+
+    AutoBean<Key> key();
     
     AutoBean<SAMLConfiguration> samlConfiguration();
 }

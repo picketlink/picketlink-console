@@ -18,7 +18,7 @@ public class IdentityProviderHandlerWrapper {
 
     public List<IdentityProviderHandlerParameter> getParameters() {
         if (this.parameters == null) {
-            this.parameters = new ArrayList<IdentityProviderHandlerParameter>();
+            this.parameters = new ArrayList<>();
         }
 
         return this.parameters;

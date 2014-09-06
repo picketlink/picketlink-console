@@ -22,40 +22,22 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
-import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.viewframework.NamedEntity;
 import org.jboss.as.console.client.widgets.forms.Address;
 import org.jboss.as.console.client.widgets.forms.Binding;
-import org.jboss.as.console.client.widgets.forms.FormItem;
 
 /**
- * <p>Federation bean definition.</p>
+ * <p>Role generator bean definition.</p>
  * <p>This interface also defines the address to be used when using the AS7 management API.</p>
  * 
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink/federation={0}/security-token-service={1}")
-public interface SecurityTokenService extends DeploymentRecord, NamedEntity, GenericFederationEntity {
+@Address("/subsystem=picketlink-federation/federation={0}/identity-provider={1}/role-generator={2}")
+public interface RoleGenerator extends NamedEntity {
 
-    @Override
-    @FormItem(localLabel="common_label_name",
-            required=true,
-            formItemTypeForEdit="TEXT",
-            formItemTypeForAdd="TEXT_BOX",
-            tabName="common_label_attributes")
-    @Binding(detypedName="alias", key = true)
-    String getName();
+    @Binding(detypedName="class-name")
+    String getClassName();
     
-    @Override
-    void setName(String alias);
-    
-    @Binding (detypedName="endpoint")
-    String getEndpoint();
-    void setEndpoint(String url);
-
-    @Binding (detypedName="security-domain")
-    String getSecurityDomain();
-    void setSecurityDomain(String securityDomain);
-    
+    void setClassName(String className);
 }

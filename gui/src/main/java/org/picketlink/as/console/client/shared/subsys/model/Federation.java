@@ -34,7 +34,7 @@ import org.jboss.as.console.client.widgets.forms.FormItem;
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink/federation={0}")
+@Address("/subsystem=picketlink-federation/federation={0}")
 public interface Federation extends NamedEntity {
 
     @Override
@@ -43,7 +43,7 @@ public interface Federation extends NamedEntity {
             formItemTypeForEdit="TEXT",
             formItemTypeForAdd="TEXT_BOX",
             tabName="common_label_attributes")
-    @Binding(detypedName="alias", key = true)
+    @Binding(detypedName="name", key = true)
     String getName();
     
     @Override

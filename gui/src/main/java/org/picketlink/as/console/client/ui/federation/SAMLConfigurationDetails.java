@@ -22,19 +22,16 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.Map;
-
-import org.jboss.as.console.client.widgets.forms.FormToolStrip;
-import org.jboss.ballroom.client.widgets.forms.Form;
-import org.jboss.ballroom.client.widgets.forms.NumberBoxItem;
-import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
-import org.picketlink.as.console.client.shared.subsys.model.SAMLConfiguration;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
-
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
+import org.jboss.as.console.client.widgets.forms.FormToolStrip;
+import org.jboss.ballroom.client.widgets.forms.Form;
+import org.jboss.ballroom.client.widgets.forms.NumberBoxItem;
+import org.picketlink.as.console.client.shared.subsys.model.SAMLConfiguration;
+
+import java.util.Map;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -46,11 +43,8 @@ public class SAMLConfigurationDetails {
     private final FederationPresenter presenter;
     private boolean hasSAMLConfiguration;
     
-    /**
-     * @param table
-     */
     public SAMLConfigurationDetails(FederationPresenter presenter) {
-        form = new Form<SAMLConfiguration>(SAMLConfiguration.class);
+        form = new Form<>(SAMLConfiguration.class);
         this.presenter = presenter;
     }
 
@@ -76,7 +70,7 @@ public class SAMLConfigurationDetails {
         
         form.setEnabled(false);
         
-        FormToolStrip<SAMLConfiguration> toolStrip = new FormToolStrip<SAMLConfiguration>(form, new FormToolStrip.FormCallback<SAMLConfiguration>() {
+        FormToolStrip<SAMLConfiguration> toolStrip = new FormToolStrip<>(form, new FormToolStrip.FormCallback<SAMLConfiguration>() {
             @Override
             public void onSave(Map<String, Object> changeset) {
                 if (!hasSAMLConfiguration) {
@@ -102,7 +96,6 @@ public class SAMLConfigurationDetails {
             }
         });
         
-        toolStrip.providesDeleteOp(true);
         form.edit(this.presenter.getBeanFactory().samlConfiguration().as());
 
         layout.add(toolStrip.asWidget());

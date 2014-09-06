@@ -22,10 +22,6 @@
 
 package org.picketlink.as.console.client.ui.federation.sp;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.TabPanel;
 import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
@@ -41,6 +37,10 @@ import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEd
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
 import org.picketlink.as.console.client.ui.federation.idp.SignatureSupportTabEditor;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -168,34 +168,36 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
     }
 
     public void updateServiceProviders(FederationWrapper federation) {
-        getBottomTabs().selectTab(0);
-        
-        if (federation.getIdentityProvider() == null && !federation.getServiceProviders().isEmpty()) {
-            addErrorMessage("You have Service Providers configured but there is no IDP for them.");
-        } else {
-            removeErrorMessage();
-        }
-        
-        List<ServiceProvider> serviceProviders = new ArrayList<ServiceProvider>();
-        
-        for (ServiceProviderWrapper serviceProviderWrapper : federation.getServiceProviders()) {
-            serviceProviders.add(serviceProviderWrapper.getServiceProvider());
-        }
-        
-        setData(federation, serviceProviders);
-        
-        if (!federation.getServiceProviders().isEmpty()) {
-            updateSelectedServiceProvider(getCurrentSelection());
-            getSignatureSupportTabEditor().setEntity(getCurrentSelection());
-            getHandlerTabEditor().setServiceProvider(this.selectedServiceProvider);
-            
-            ArrayList<ServiceProviderHandler> handlersList = new ArrayList<ServiceProviderHandler>();
-            
-            for (ServiceProviderHandlerWrapper handler : this.selectedServiceProvider.getHandlers()) {
-                handlersList.add(handler.getHandler());
+        if (federation != null) {
+            getBottomTabs().selectTab(0);
+
+            if (federation.getIdentityProvider() == null && !federation.getServiceProviders().isEmpty()) {
+                addErrorMessage("You have Service Providers configured but there is no IDP for them.");
+            } else {
+                removeErrorMessage();
             }
-            
-            getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
+
+            List<ServiceProvider> serviceProviders = new ArrayList<ServiceProvider>();
+
+            for (ServiceProviderWrapper serviceProviderWrapper : federation.getServiceProviders()) {
+                serviceProviders.add(serviceProviderWrapper.getServiceProvider());
+            }
+
+            setData(federation, serviceProviders);
+
+            if (!federation.getServiceProviders().isEmpty()) {
+                updateSelectedServiceProvider(getCurrentSelection());
+                getSignatureSupportTabEditor().setEntity(getCurrentSelection());
+                getHandlerTabEditor().setServiceProvider(this.selectedServiceProvider);
+
+                ArrayList<ServiceProviderHandler> handlersList = new ArrayList<ServiceProviderHandler>();
+
+                for (ServiceProviderHandlerWrapper handler : this.selectedServiceProvider.getHandlers()) {
+                    handlersList.add(handler.getHandler());
+                }
+
+                getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
+            }
         }
     }
     

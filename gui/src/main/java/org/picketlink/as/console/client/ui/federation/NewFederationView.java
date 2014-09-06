@@ -22,9 +22,6 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.EnumSet;
-import java.util.List;
-
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.user.client.ui.LayoutPanel;
 import com.google.gwt.user.client.ui.ScrollPanel;
@@ -33,7 +30,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
-import org.jboss.as.console.client.shared.dispatch.DispatchAsync;
 import org.jboss.as.console.client.shared.viewframework.AbstractEntityView;
 import org.jboss.as.console.client.shared.viewframework.EntityEditor;
 import org.jboss.as.console.client.shared.viewframework.EntityToDmrBridge;
@@ -45,13 +41,16 @@ import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.FormAdapter;
 import org.jboss.ballroom.client.widgets.tables.DefaultCellTable;
 import org.jboss.ballroom.client.widgets.tabs.FakeTabPanel;
+import org.jboss.dmr.client.dispatch.DispatchAsync;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.ui.federation.idp.IdentityProviderEditor;
 import org.picketlink.as.console.client.ui.federation.sp.ServiceProviderEditor;
-import org.picketlink.as.console.client.ui.federation.sts.SecurityTokenServiceEditor;
+
+import java.util.EnumSet;
+import java.util.List;
 
 /**
  * <p>
@@ -72,14 +71,18 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     private FederationTable federationsTable;
     private ServiceProviderEditor serviceProviderEditor;
     private NewFederationDetails federationDetails;
-    private SecurityTokenServiceEditor securityTokenServiceEditor;
-    private FederationWrapper selectedFederation;
 
     @Inject
     public NewFederationView(ApplicationMetaData propertyMetaData, DispatchAsync dispatchAsync,
             PicketLinkUIConstants uiConstants, PicketLinkUIMessages uiMessages) {
         super(Federation.class, propertyMetaData, EnumSet.of(FrameworkButton.EDIT_SAVE));
-        this.bridge = new EntityToDmrBridgeImpl<Federation>(propertyMetaData, Federation.class, this, dispatchAsync);
+        this.bridge = new EntityToDmrBridgeImpl<Federation>(propertyMetaData, Federation.class, this, dispatchAsync) {
+            @Override
+            public void onRemove(Federation entity) {
+                super.onRemove(entity);
+                presenter.updateFederationSelection(null);
+            }
+        };
         this.uiConstants = uiConstants;
         this.uiMessages = uiMessages;
     }
@@ -94,7 +97,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         pages.addPage(Console.CONSTANTS.common_label_back(), domainList);
         pages.addPage(getIdentityProviderEditor().doGetEntityName(), getIdentityProviderEditor().asWidget());
         pages.addPage(getServiceProviderEditor().doGetEntityName(), getServiceProviderEditor().asWidget());
-//        pages.addPage(getSecurityTokenServiceEditor().doGetEntityName(), getSecurityTokenServiceEditor().asWidget());
 
         // default page
         pages.showPage(0);
@@ -118,20 +120,11 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         return layout;
     }
 
-    private SecurityTokenServiceEditor getSecurityTokenServiceEditor() {
-        if (this.securityTokenServiceEditor == null) {
-            this.securityTokenServiceEditor = new SecurityTokenServiceEditor(this.presenter, uiConstants);
-        }
-
-        return this.securityTokenServiceEditor;
-    }
-
     @Override
     public void updateSelectedFederation(FederationWrapper federation) {
-        this.federationDetails.updateKeyStore(federation);    
+        this.federationDetails.updateTabs(federation);
         getIdentityProviderEditor().updateIdentityProviders(federation);    
         getServiceProviderEditor().updateServiceProviders(federation);    
-//        getSecurityTokenServiceEditor().updateSecurityTokenServices(federation);
     }
 
     private Widget createDomainList(String description) {
@@ -233,12 +226,13 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     public void selectFederation(FederationWrapper federation) {
         if (federation != null) {
-            this.selectedFederation = federation;
             pages.showPage(1);
             bridge.loadEntities(federation.getName());
         } else {
             pages.showPage(0);
         }
+
+        updateSelectedFederation(federation);
     }
 
     /*

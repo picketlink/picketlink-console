@@ -22,23 +22,23 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.List;
-import java.util.Map;
-
-import org.jboss.as.console.client.shared.viewframework.builder.FormLayout;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.client.ui.TabPanel;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
+import org.jboss.as.console.client.layout.FormLayout;
 import org.jboss.ballroom.client.widgets.forms.EditListener;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.FormAdapter;
+import org.jboss.ballroom.client.widgets.forms.FormCallback;
 import org.jboss.ballroom.client.widgets.forms.FormValidation;
 import org.jboss.ballroom.client.widgets.forms.TextItem;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.client.ui.TabPanel;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -51,33 +51,34 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     private final PicketLinkUIConstants uiConstants;
     private DigitalCertificateDetails digitalCertificateDetails;
     private SAMLConfigurationDetails samlConfigurationDetails;
+    private TabPanel tabPanel;
 
     public NewFederationDetails(FederationPresenter presenter, final PicketLinkUIConstants uiConstants) {
-        form = new Form<Federation>(Federation.class);
+        form = new Form<>(Federation.class);
         this.presenter = presenter;
         this.uiConstants = uiConstants;
     }
 
     @Override
     public Widget asWidget() {
-        TabPanel tabPanel = new TabPanel();
+        this.tabPanel = new TabPanel();
 
-        tabPanel.setStyleName("default-tabpanel");
+        tabPanel.setStyleName("rhs-content-panel");
 
         VerticalPanel layout = new VerticalPanel();
 
-        layout.setStyleName("fill-layout-width");
+        tabPanel.setStyleName("rhs-content-panel");
 
-        final TextItem aliasItem = new TextItem("name", uiConstants.common_label_federationAlias());
+        final TextItem aliasItem = new TextItem("name", uiConstants.common_label_federationName());
 
         form.setFields(aliasItem);
         form.setEnabled(false);
 
-        layout.add(new FormLayout().setTools(null).setHelp(null).setForm(form).build());
+        layout.add(new FormLayout().setTools(null).setForm(form).build());
 
         tabPanel.add(layout, "Attributes");
         
-        this.digitalCertificateDetails = new DigitalCertificateDetails(this.presenter);
+        this.digitalCertificateDetails = new DigitalCertificateDetails(this.presenter, this.uiConstants);
         
         tabPanel.add(this.digitalCertificateDetails.asWidget(), "Digital Certificates");
 
@@ -106,6 +107,11 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     }
 
     @Override
+    public void editTransient(Federation federation) {
+        form.editTransient(federation);
+    }
+
+    @Override
     public void addEditListener(EditListener listener) {
         form.addEditListener(listener);
     }
@@ -113,6 +119,11 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     @Override
     public void removeEditListener(EditListener listener) {
         form.removeEditListener(listener);
+    }
+
+    @Override
+    public void setToolsCallback(FormCallback formCallback) {
+        form.setToolsCallback(formCallback);
     }
 
     @Override
@@ -162,7 +173,9 @@ public class NewFederationDetails implements FormAdapter<Federation> {
         this.samlConfigurationDetails.setSAMLConfiguration(null);
     }
 
-    public void updateKeyStore(FederationWrapper federation) {
+    public void updateTabs(FederationWrapper federation) {
+        this.tabPanel.setVisible(federation != null);
+
         if (federation != null && !federation.getKeyStores().isEmpty()) {
             this.digitalCertificateDetails.setKeyStore(federation.getKeyStores().get(0));            
         } else {

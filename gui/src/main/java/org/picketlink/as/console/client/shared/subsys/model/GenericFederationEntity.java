@@ -37,8 +37,8 @@ public interface GenericFederationEntity {
     @Binding (detypedName="url")
     String getUrl();
     void setUrl(String url);
-    
-    @Binding (detypedName="supportsSignatures")
+
+    @Binding (detypedName="support-signatures")
     boolean isSupportsSignatures();
     void setSupportsSignatures(boolean url);
 

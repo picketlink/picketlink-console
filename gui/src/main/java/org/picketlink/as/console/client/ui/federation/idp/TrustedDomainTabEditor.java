@@ -22,6 +22,11 @@
 
 package org.picketlink.as.console.client.ui.federation.idp;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.widgets.ContentDescription;
 import org.jboss.ballroom.client.widgets.forms.Form;
@@ -34,12 +39,6 @@ import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
-
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -94,10 +93,6 @@ public class TrustedDomainTabEditor {
                     Window.alert(uiMessages.identityProviderNotConfigured());
                 } else {
                     TrustDomain newTrustedDomain = trustDomainForm.getUpdatedEntity();
-                    
-                    if (newTrustedDomain.getCertAlias().trim().isEmpty()) {
-                        newTrustedDomain.setCertAlias(null);
-                    }
                     
                     if (newTrustedDomain != null
                             && !newTrustedDomain.getName().trim().isEmpty()) {
@@ -173,12 +168,6 @@ public class TrustedDomainTabEditor {
         return this.trustDomainTable;
     }
 
-    private void showRestartDialog() {
-        if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
-            presenter.getDeploymentManager().restartIdentityProvider(identityProvider);
-        }        
-    }
-    
     /**
      * @param identityProvider
      */

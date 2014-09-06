@@ -18,7 +18,7 @@ public class ServiceProviderHandlerWrapper {
 
     public List<ServiceProviderHandlerParameter> getParameters() {
         if (this.parameters == null) {
-            this.parameters = new ArrayList<ServiceProviderHandlerParameter>();
+            this.parameters = new ArrayList<>();
         }
 
         return this.parameters;

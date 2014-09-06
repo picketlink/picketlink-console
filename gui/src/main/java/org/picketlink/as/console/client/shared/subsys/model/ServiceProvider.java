@@ -35,7 +35,7 @@ import org.jboss.as.console.client.widgets.forms.FormItem;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink/federation={0}/service-provider={0}")
+@Address("/subsystem=picketlink-federation/federation={0}/service-provider={0}")
 public interface ServiceProvider extends DeploymentRecord, NamedEntity, GenericFederationEntity {
 
     @Override

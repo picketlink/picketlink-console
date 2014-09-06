@@ -35,13 +35,13 @@ public interface PicketLinkUIConstants extends Constants {
     String common_label_identityProvider();
     String common_label_serviceProvider();
     String common_label_trustDomain();
-    String common_label_alias();
+    String common_label_name();
     String common_label_URL();
     String common_label_supportsSignatures();
     String common_label_postBinding();
     String common_label_trustedDomains();
     String common_label_domainName();
-    String common_label_federationAlias();
+    String common_label_federationName();
     String common_label_identityURL();
     String common_label_key_store();
     String common_label_endpoint();
@@ -49,5 +49,7 @@ public interface PicketLinkUIConstants extends Constants {
     String subsys_picketlink_identity_provider_desc();
     String subsys_picketlink_service_provider_desc();
     String subsys_picketlink_security_token_service_desc();
-    
+    String common_label_key();
+    String common_label_key_host();
+    String common_label_key_alias();
 }
