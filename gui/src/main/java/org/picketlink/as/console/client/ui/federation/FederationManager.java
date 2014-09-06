@@ -1,9 +1,5 @@
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.inject.Inject;
 import com.google.web.bindery.event.shared.EventBus;
 import org.jboss.as.console.client.Console;
@@ -11,12 +7,12 @@ import org.jboss.as.console.client.domain.model.SimpleCallback;
 import org.jboss.as.console.client.shared.model.ResponseWrapper;
 import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationStore;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter;
+import org.picketlink.as.console.client.shared.subsys.model.Key;
 import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.shared.subsys.model.SAMLConfiguration;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
@@ -27,6 +23,10 @@ import org.picketlink.as.console.client.ui.federation.idp.AddIdentityProviderEve
 import org.picketlink.as.console.client.ui.federation.idp.RemoveIdentityProviderEvent;
 import org.picketlink.as.console.client.ui.federation.sp.AddServiceProviderEvent;
 import org.picketlink.as.console.client.ui.federation.sp.RemoveServiceProviderEvent;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class FederationManager {
 
@@ -48,76 +48,20 @@ public class FederationManager {
         this.uiConstants = uiConstants;
     }
 
-    /**
-     * <p>
-     * Creates the given federation instance in the subsystem.
-     * </p>
-     * 
-     * @param federation
-     */
-    public void onCreateFederation(final Federation federation) {
-        this.federationStore.createFederation(federation, new SimpleCallback<ResponseWrapper<Boolean>>() {
-
-            @Override
-            public void onSuccess(ResponseWrapper<Boolean> result) {
-                if (result.getUnderlying()) {
-                    loadAllFederations();
-                    Console.info(Console.MESSAGES.added(uiConstants.common_label_federation()
-                            + " ")
-                            + federation.getName());
-                } else
-                    Console.error(
-                            Console.MESSAGES.addingFailed(uiConstants.common_label_federation()
-                                    + " " + federation.getName()), result.getResponse().toString());
-            }
-        });
-    }
-
-    /**
-     * <p>
-     * Removes the selected federation instance from the subsystem.
-     * </p>
-     * 
-     * @param federation
-     */
-    public void onRemoveFederation(final Federation federation) {
-        this.federationStore.deleteFederation(federation, new SimpleCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean success) {
-                if (success) {
-                    loadAllFederations();
-                    Console.info(Console.MESSAGES.deleted(uiConstants.common_label_federation()
-                            + " ")
-                            + federation.getName());
-                } else {
-                    Console.error(Console.MESSAGES.deletionFailed(uiConstants
-                            .common_label_federation() + " ")
-                            + federation.getName());
-                }
-            }
-        });
-        this.presenter.loadDeployments();
-    }
-
-    /**
-     * <p>
-     * Creates a keystore configuration.
-     * </p>
-     * 
-     * @param federation
-     */
-    public void onCreateKeyStore(KeyStore keyStore) {
+    public void onCreateKeyStore(KeyStore keyStore, final SimpleCallback<Boolean> simpleCallback) {
         this.federationStore.createKeyStore(presenter.getCurrentFederation(), keyStore,
                 new SimpleCallback<ResponseWrapper<Boolean>>() {
 
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added(uiConstants
-                                    .common_label_key_store()));
-                        } else
-                            Console.error(Console.MESSAGES.addingFailed(uiConstants
-                                    .common_label_key_store()));
+                            loadAllFederations();
+                            Console.info(Console.MESSAGES.added(uiConstants.common_label_key_store()));
+                            simpleCallback.onSuccess(true);
+                        } else {
+                            Console.error(Console.MESSAGES.addingFailed(uiConstants.common_label_key_store()));
+                            simpleCallback.onSuccess(false);
+                        }
                     }
                 });
     }
@@ -128,12 +72,14 @@ public class FederationManager {
                     new SimpleCallback<ResponseWrapper<Boolean>>() {
                         @Override
                         public void onSuccess(ResponseWrapper<Boolean> response) {
-                            if (response.getUnderlying())
+                            if (response.getUnderlying()) {
+                                loadAllFederations();
                                 Console.info(Console.MESSAGES.saved(uiConstants
-                                        .common_label_key_store()));
-                            else
+                                    .common_label_key_store()));
+                            } else {
                                 Console.error(Console.MESSAGES.saveFailed(uiConstants
-                                        .common_label_key_store()));
+                                    .common_label_key_store()));
+                            }
                         }
 
                     });
@@ -161,10 +107,6 @@ public class FederationManager {
         });
     }
 
-    /**
-     * @param identityProvider
-     * @param updatedEntity
-     */
     public void onCreateTrustDomain(IdentityProvider identityProvider, final TrustDomain trustDomain) {
         this.federationStore.createTrustDomain(this.presenter.getCurrentFederation(), identityProvider, trustDomain,
                 new SimpleCallback<ResponseWrapper<Boolean>>() {
@@ -184,26 +126,23 @@ public class FederationManager {
                 });
     }
 
-    /**
-     * @param updatedEntity
-     */
     public void onRemoveTrustDomain(IdentityProvider identityProvider, final TrustDomain trustDomain) {
         this.federationStore.deleteTrustDomain(presenter.getCurrentFederation(), identityProvider, trustDomain,
-                new SimpleCallback<Boolean>() {
-                    @Override
-                    public void onSuccess(Boolean success) {
-                        loadAllFederations();
-                        if (success) {
-                            Console.info(Console.MESSAGES.deleted(uiConstants
-                                    .common_label_trustDomain() + " ")
-                                    + trustDomain.getName());
-                        } else {
-                            Console.error(Console.MESSAGES.deletionFailed(uiConstants
-                                    .common_label_trustDomain() + " ")
-                                    + trustDomain.getName());
-                        }
+            new SimpleCallback<Boolean>() {
+                @Override
+                public void onSuccess(Boolean success) {
+                    loadAllFederations();
+                    if (success) {
+                        Console.info(Console.MESSAGES.deleted(uiConstants
+                            .common_label_trustDomain() + " ")
+                            + trustDomain.getName());
+                    } else {
+                        Console.error(Console.MESSAGES.deletionFailed(uiConstants
+                            .common_label_trustDomain() + " ")
+                            + trustDomain.getName());
                     }
-                });
+                }
+            });
     }
 
     /**
@@ -265,9 +204,8 @@ public class FederationManager {
                         if (success) {
                             loadAllFederations();
                             Console.info(Console.MESSAGES.deleted(uiConstants
-                                    .common_label_serviceProvider() + " ")
-                                    + serviceProvider.getName());
-                            deploymentManager.restartServiceProvider(serviceProvider);
+                                .common_label_serviceProvider() + " ")
+                                + serviceProvider.getName());
                         } else {
                             Console.error(Console.MESSAGES.deletionFailed(uiConstants
                                     .common_label_serviceProvider() + " ")
@@ -278,25 +216,33 @@ public class FederationManager {
         this.eventBus.fireEvent(new RemoveServiceProviderEvent(serviceProvider));
     }
 
-    /**
-     * <p>
-     * Creates an identity provider instance fiven a federation.
-     * </p>
-     * 
-     * @param resourceExists
-     * 
-     * @param changeset
-     */
     public void onCreateIdentityProvider(final IdentityProvider identityProvider) {
         this.federationStore.createIdentityProvider(this.presenter.getCurrentFederation(), identityProvider,
                 new SimpleCallback<ResponseWrapper<Boolean>>() {
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         if (result.getUnderlying()) {
+                            String url = identityProvider.getUrl();
+
+                            if (url.indexOf("://") != -1) {
+                                TrustDomain defaultTrustedDomain = presenter.getBeanFactory().trustDomain().as();
+                                String host = url.substring(url.indexOf("://") + 3);
+
+                                if (host.indexOf(":") != -1) {
+                                    host = host.substring(0, host.indexOf(":"));
+                                } else if (host.indexOf("/") != -1) {
+                                    host = host.substring(0, host.indexOf("/"));
+                                }
+
+                                defaultTrustedDomain.setName(host);
+
+                                onCreateTrustDomain(identityProvider, defaultTrustedDomain);
+                            }
+
                             loadAllFederations();
                             Console.info(Console.MESSAGES.added(uiConstants
-                                    .common_label_identityProvider() + " ")
-                                    + identityProvider.getName());
+                                .common_label_identityProvider() + " ")
+                                + identityProvider.getName());
                         } else
                             Console.error(Console.MESSAGES.addingFailed(uiConstants
                                     .common_label_identityProvider() + " " + identityProvider.getName()), result.getResponse()
@@ -319,13 +265,10 @@ public class FederationManager {
                             Console.info(Console.MESSAGES.deleted(uiConstants
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
-                            if (!identityProvider.isExternal()) {
-                                deploymentManager.restartIdentityProvider(identityProvider);
-                            }
                         } else {
                             Console.error(Console.MESSAGES.deletionFailed(uiConstants
-                                    .common_label_identityProvider() + " ")
-                                    + identityProvider.getName());
+                                .common_label_identityProvider() + " ")
+                                + identityProvider.getName());
                         }
                     }
                 });
@@ -554,18 +497,56 @@ public class FederationManager {
     public void onUpdateSAMLConfiguration(SAMLConfiguration updatedEntity, final Map<String, Object> changedValues) {
         if (changedValues.size() > 0) {
             this.federationStore.updateSAMLConfiguration(presenter.getCurrentFederation(), updatedEntity, changedValues,
-                    new SimpleCallback<ResponseWrapper<Boolean>>() {
-                        @Override
-                        public void onSuccess(ResponseWrapper<Boolean> response) {
-                            if (response.getUnderlying())
-                                Console.info(Console.MESSAGES.saved(uiConstants
-                                        .common_label_key_store()));
-                            else
-                                Console.error(Console.MESSAGES.saveFailed(uiConstants
-                                        .common_label_key_store()));
-                        }
+                new SimpleCallback<ResponseWrapper<Boolean>>() {
+                    @Override
+                    public void onSuccess(ResponseWrapper<Boolean> response) {
+                        if (response.getUnderlying())
+                            Console.info(Console.MESSAGES.saved(uiConstants
+                                .common_label_key_store()));
+                        else
+                            Console.error(Console.MESSAGES.saveFailed(uiConstants
+                                .common_label_key_store()));
+                    }
 
-                    });
+                });
         }
+    }
+
+    public void onCreateKey(FederationWrapper federation, final Key newKey) {
+        this.federationStore.createKey(this.presenter.getCurrentFederation(), newKey,
+            new SimpleCallback<ResponseWrapper<Boolean>>() {
+
+                @Override
+                public void onSuccess(ResponseWrapper<Boolean> result) {
+                    if (result.getUnderlying()) {
+                        loadAllFederations();
+                        Console.info(Console.MESSAGES.added(uiConstants
+                            .common_label_key() + " ")
+                            + newKey.getName());
+                    } else
+                        Console.error(
+                            Console.MESSAGES.addingFailed(uiConstants
+                                .common_label_key() + " "), result.getResponse().toString());
+                }
+            });
+    }
+
+    public void onRemoveKey(FederationWrapper federation, final Key removedKey) {
+        this.federationStore.deleteKey(presenter.getCurrentFederation(), removedKey,
+            new SimpleCallback<Boolean>() {
+                @Override
+                public void onSuccess(Boolean success) {
+                    loadAllFederations();
+                    if (success) {
+                        Console.info(Console.MESSAGES.deleted(uiConstants
+                            .common_label_key() + " ")
+                            + removedKey.getName());
+                    } else {
+                        Console.error(Console.MESSAGES.deletionFailed(uiConstants
+                            .common_label_key() + " ")
+                            + removedKey.getName());
+                    }
+                }
+            });
     }
 }

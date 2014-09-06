@@ -30,7 +30,11 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
-import org.jboss.as.console.client.shared.viewframework.*;
+import org.jboss.as.console.client.shared.viewframework.AbstractEntityView;
+import org.jboss.as.console.client.shared.viewframework.EntityEditor;
+import org.jboss.as.console.client.shared.viewframework.EntityToDmrBridge;
+import org.jboss.as.console.client.shared.viewframework.EntityToDmrBridgeImpl;
+import org.jboss.as.console.client.shared.viewframework.FrameworkButton;
 import org.jboss.as.console.client.widgets.forms.ApplicationMetaData;
 import org.jboss.as.console.client.widgets.pages.PagedView;
 import org.jboss.ballroom.client.widgets.forms.Form;
@@ -67,13 +71,18 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     private FederationTable federationsTable;
     private ServiceProviderEditor serviceProviderEditor;
     private NewFederationDetails federationDetails;
-    private FederationWrapper selectedFederation;
 
     @Inject
     public NewFederationView(ApplicationMetaData propertyMetaData, DispatchAsync dispatchAsync,
             PicketLinkUIConstants uiConstants, PicketLinkUIMessages uiMessages) {
         super(Federation.class, propertyMetaData, EnumSet.of(FrameworkButton.EDIT_SAVE));
-        this.bridge = new EntityToDmrBridgeImpl<>(propertyMetaData, Federation.class, this, dispatchAsync);
+        this.bridge = new EntityToDmrBridgeImpl<Federation>(propertyMetaData, Federation.class, this, dispatchAsync) {
+            @Override
+            public void onRemove(Federation entity) {
+                super.onRemove(entity);
+                presenter.updateFederationSelection(null);
+            }
+        };
         this.uiConstants = uiConstants;
         this.uiMessages = uiMessages;
     }
@@ -113,10 +122,9 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     @Override
     public void updateSelectedFederation(FederationWrapper federation) {
-        this.federationDetails.updateKeyStore(federation);    
+        this.federationDetails.updateTabs(federation);
         getIdentityProviderEditor().updateIdentityProviders(federation);    
         getServiceProviderEditor().updateServiceProviders(federation);    
-//        getSecurityTokenServiceEditor().updateSecurityTokenServices(federation);
     }
 
     private Widget createDomainList(String description) {
@@ -218,12 +226,13 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     public void selectFederation(FederationWrapper federation) {
         if (federation != null) {
-            this.selectedFederation = federation;
             pages.showPage(1);
             bridge.loadEntities(federation.getName());
         } else {
             pages.showPage(0);
         }
+
+        updateSelectedFederation(federation);
     }
 
     /*

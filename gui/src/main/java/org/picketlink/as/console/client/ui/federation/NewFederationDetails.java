@@ -27,7 +27,12 @@ import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.as.console.client.layout.FormLayout;
-import org.jboss.ballroom.client.widgets.forms.*;
+import org.jboss.ballroom.client.widgets.forms.EditListener;
+import org.jboss.ballroom.client.widgets.forms.Form;
+import org.jboss.ballroom.client.widgets.forms.FormAdapter;
+import org.jboss.ballroom.client.widgets.forms.FormCallback;
+import org.jboss.ballroom.client.widgets.forms.FormValidation;
+import org.jboss.ballroom.client.widgets.forms.TextItem;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
@@ -46,6 +51,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     private final PicketLinkUIConstants uiConstants;
     private DigitalCertificateDetails digitalCertificateDetails;
     private SAMLConfigurationDetails samlConfigurationDetails;
+    private TabPanel tabPanel;
 
     public NewFederationDetails(FederationPresenter presenter, final PicketLinkUIConstants uiConstants) {
         form = new Form<>(Federation.class);
@@ -55,24 +61,24 @@ public class NewFederationDetails implements FormAdapter<Federation> {
 
     @Override
     public Widget asWidget() {
-        TabPanel tabPanel = new TabPanel();
+        this.tabPanel = new TabPanel();
 
-        tabPanel.setStyleName("default-tabpanel");
+        tabPanel.setStyleName("rhs-content-panel");
 
         VerticalPanel layout = new VerticalPanel();
 
-        layout.setStyleName("fill-layout-width");
+        tabPanel.setStyleName("rhs-content-panel");
 
-        final TextItem aliasItem = new TextItem("name", uiConstants.common_label_federationAlias());
+        final TextItem aliasItem = new TextItem("name", uiConstants.common_label_federationName());
 
         form.setFields(aliasItem);
         form.setEnabled(false);
 
-        layout.add(new FormLayout().setTools(null).setHelp(null).setForm(form).build());
+        layout.add(new FormLayout().setTools(null).setForm(form).build());
 
         tabPanel.add(layout, "Attributes");
         
-        this.digitalCertificateDetails = new DigitalCertificateDetails(this.presenter);
+        this.digitalCertificateDetails = new DigitalCertificateDetails(this.presenter, this.uiConstants);
         
         tabPanel.add(this.digitalCertificateDetails.asWidget(), "Digital Certificates");
 
@@ -167,7 +173,9 @@ public class NewFederationDetails implements FormAdapter<Federation> {
         this.samlConfigurationDetails.setSAMLConfiguration(null);
     }
 
-    public void updateKeyStore(FederationWrapper federation) {
+    public void updateTabs(FederationWrapper federation) {
+        this.tabPanel.setVisible(federation != null);
+
         if (federation != null && !federation.getKeyStores().isEmpty()) {
             this.digitalCertificateDetails.setKeyStore(federation.getKeyStores().get(0));            
         } else {

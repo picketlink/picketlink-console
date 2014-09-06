@@ -43,7 +43,7 @@ public interface Federation extends NamedEntity {
             formItemTypeForEdit="TEXT",
             formItemTypeForAdd="TEXT_BOX",
             tabName="common_label_attributes")
-    @Binding(detypedName="alias", key = true)
+    @Binding(detypedName="name", key = true)
     String getName();
     
     @Override

@@ -183,8 +183,14 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
      * @param currentSelection
      */
     public void updateFederationSelection(final Federation currentSelection) {
-        this.selectedFederation = currentSelection.getName();
+        if (currentSelection != null) {
+            this.selectedFederation = currentSelection.getName();
+        } else {
+            this.selectedFederation = null;
+        }
+
         getFederationManager().loadAllFederations();
+        getView().updateSelectedFederation(getCurrentFederation());
     }
 
     /*

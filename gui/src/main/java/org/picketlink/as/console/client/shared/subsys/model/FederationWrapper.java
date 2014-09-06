@@ -10,7 +10,7 @@ public class FederationWrapper implements Federation {
     private List<IdentityProviderWrapper> identityProviders;
     private List<ServiceProviderWrapper> serviceProviders;
 
-    private List<KeyStore> keyStores;
+    private List<KeyStoreWrapper> keyStores;
 
     private ArrayList<SAMLConfiguration> samlConfigurations;
 
@@ -54,9 +54,9 @@ public class FederationWrapper implements Federation {
         this.getServiceProviders().add(serviceProvider);
     }
 
-    public List<KeyStore> getKeyStores() {
+    public List<KeyStoreWrapper> getKeyStores() {
         if (this.keyStores == null) {
-            this.keyStores = new ArrayList<KeyStore>();
+            this.keyStores = new ArrayList<KeyStoreWrapper>();
         }
 
         return this.keyStores;

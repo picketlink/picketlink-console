@@ -22,10 +22,6 @@
 
 package org.picketlink.as.console.client.ui.federation.idp;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import com.google.gwt.user.client.ui.TabPanel;
 import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
@@ -39,6 +35,10 @@ import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -90,15 +90,18 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
             identityProvider.setName(getFederation().getName() + "-" + "external-idp");
             identityProvider.setSecurityDomain("no-defined");
         }
-        
-        if (identityProvider.getUrl() == null || "".equals(identityProvider.getUrl().trim())) {
-            identityProvider.setUrl("http://localhost:8080/" + identityProvider.getName().replaceAll(".war", "") + "/");
+
+        String url = identityProvider.getUrl();
+
+        if (url == null || "".equals(url.trim())) {
+            url = "http://localhost:8080/" + identityProvider.getName().replaceAll(".war", "") + "/";
+            identityProvider.setUrl(url);
         }
 
         identityProvider.setStrictPostBinding(true);
         
         getPresenter().getFederationManager().onCreateIdentityProvider(identityProvider);
-        
+
         return true;
     }
 
@@ -179,30 +182,36 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     }
 
     public void updateIdentityProviders(FederationWrapper federation) {
-        getBottomTabs().selectTab(0);
-        
-        List<IdentityProvider> identityProviders = new ArrayList<IdentityProvider>();
-        
-        for (IdentityProviderWrapper identityProviderWrapper : federation.getIdentityProviders()) {
-            identityProviders.add(identityProviderWrapper.getIdentityProvider());
+        if (federation != null) {
+            getBottomTabs().selectTab(0);
+
+            List<IdentityProvider> identityProviders = new ArrayList<IdentityProvider>();
+
+            for (IdentityProviderWrapper identityProviderWrapper : federation.getIdentityProviders()) {
+                identityProviders.add(identityProviderWrapper.getIdentityProvider());
+            }
+
+            setData(federation, identityProviders);
+
+            // disables the add button since we already have a idp configuration
+            if (!identityProviders.isEmpty()) {
+                disableAddButton();
+            } else {
+                enableAddButton();
+            }
+
+            if (!identityProviders.isEmpty()) {
+                IdentityProvider identityProvider = identityProviders.get(0);
+
+                getSignatureSupportTabEditor().setEntity(identityProvider);
+                getEncryptionSupportTabEditor().setEntity(identityProvider);
+
+                getBottomTabs().setVisible(!identityProvider.isExternal());
+            }
+
+            updateTrustedDomains(federation);
+            updateHandlers(federation);
         }
-        
-        setData(federation, identityProviders);
-        
-        // disables the add button since we already have a idp configuration
-        if (!identityProviders.isEmpty()) {
-            disableAddButton();
-        } else {
-            enableAddButton();
-        }
-        
-        if (!identityProviders.isEmpty()) {
-            getSignatureSupportTabEditor().setEntity(identityProviders.get(0));
-            getEncryptionSupportTabEditor().setEntity(identityProviders.get(0));
-        }
-        
-        updateTrustedDomains(federation);
-        updateHandlers(federation);
     }
 
     private void updateHandlers(FederationWrapper federation) {
@@ -249,7 +258,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
     public void updateDeployments(List<DeploymentRecord> deployments) {
         if (getWizard() != null) {
-            ((NewIdentityProviderWizard) getWizard()).updateAliasItems();
+            ((NewIdentityProviderWizard) getWizard()).updateNameItems();
         }
     }
 

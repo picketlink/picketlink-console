@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.ui.federation.idp;
+package org.picketlink.as.console.client.ui.federation;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -28,8 +28,7 @@ import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.google.gwt.view.client.SingleSelectionModel;
 import org.jboss.as.console.client.Console;
-import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
-import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
+import org.picketlink.as.console.client.shared.subsys.model.Key;
 
 /**
  * <p>
@@ -39,9 +38,9 @@ import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 19, 2012
  */
-public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
+public class KeyTable extends AbstractModelElementTable<Key> {
 
-    private TrustDomain selectedTrustedDomain;
+    private Key selectedKey;
     
     /*
      * (non-Javadoc)
@@ -49,7 +48,7 @@ public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
      * @see org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doGetKey(java.lang.Object)
      */
     @Override
-    protected Object doGetKey(TrustDomain item) {
+    protected Object doGetKey(Key item) {
         return item.getName();
     }
 
@@ -64,32 +63,34 @@ public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
     @Override
     protected void doAddConlumns(CellTable table) {
         createNameColumn(table);
+        createHostCollumn(table);
 
         this.getCellTable().setSelectionModel(createSelectionModel());
     }
 
-    private SingleSelectionModel<TrustDomain> createSelectionModel() {
-        final SingleSelectionModel<TrustDomain> selectionModel = new SingleSelectionModel<TrustDomain>();
+    private SingleSelectionModel<Key> createSelectionModel() {
+        final SingleSelectionModel<Key> selectionModel = new SingleSelectionModel<Key>();
 
-        Handler selectionHandler = new SelectionChangeEvent.Handler() {
+        Handler selectionHandler = new Handler() {
 
             @Override
-            public void onSelectionChange(com.google.gwt.view.client.SelectionChangeEvent event) {
-                SingleSelectionModel<TrustDomain> selection = (SingleSelectionModel<TrustDomain>) event.getSource();
+            public void onSelectionChange(SelectionChangeEvent event) {
+                SingleSelectionModel<Key> selection = (SingleSelectionModel<Key>) event.getSource();
                 
-                selectedTrustedDomain = selection.getSelectedObject();
+                selectedKey = selection.getSelectedObject();
             }
 
         };
 
         selectionModel.addSelectionChangeHandler(selectionHandler);
+
         return selectionModel;
     }
 
     private void createNameColumn(CellTable table) {
-        TextColumn<TrustDomain> nameColumn = new TextColumn<TrustDomain>() {
+        TextColumn<Key> nameColumn = new TextColumn<Key>() {
             @Override
-            public String getValue(TrustDomain record) {
+            public String getValue(Key record) {
                 return record.getName();
             }
         };
@@ -97,10 +98,21 @@ public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
         table.addColumn(nameColumn, Console.CONSTANTS.common_label_name());
     }
     
+    private void createHostCollumn(CellTable table) {
+        TextColumn<Key> nameColumn = new TextColumn<Key>() {
+            @Override
+            public String getValue(Key record) {
+                return record.getHost();
+            }
+        };
+
+        table.addColumn(nameColumn, "Host");
+    }
+    
     /**
      * @return the selectedTrustedDomain
      */
-    public TrustDomain getSelectedTrustedDomain() {
-        return selectedTrustedDomain;
+    public Key getSelectedTrustedDomain() {
+        return this.selectedKey;
     }
 }

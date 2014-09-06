@@ -22,11 +22,9 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
-import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.viewframework.NamedEntity;
 import org.jboss.as.console.client.widgets.forms.Address;
 import org.jboss.as.console.client.widgets.forms.Binding;
-import org.jboss.as.console.client.widgets.forms.FormItem;
 
 /**
  * <p>Federation bean definition.</p>
@@ -35,26 +33,11 @@ import org.jboss.as.console.client.widgets.forms.FormItem;
  * @author Pedro Silva
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink-federation/federation={0}/identity-provider={1}")
-public interface IdentityProvider extends DeploymentRecord, NamedEntity, GenericFederationEntity {
+@Address("/subsystem=picketlink-federation/federation={0}/key-store=key-store/key={1}")
+public interface Key extends NamedEntity {
 
-    @Override
-    @FormItem(localLabel="common_label_name",
-            required=true,
-            formItemTypeForEdit="TEXT",
-            formItemTypeForAdd="TEXT_BOX",
-            tabName="common_label_attributes")
-    @Binding(detypedName="alias", key = true)
-    String getName();
+    @Binding(detypedName="host")
+    String getHost();
     
-    @Override
-    void setName(String alias);
-    
-    @Binding (detypedName="external")
-    boolean isExternal();
-    void setExternal(boolean external);
-
-    @Binding (detypedName="encrypt")
-    boolean isEncrypt();
-    void setEncrypt(boolean encrypt);
+    void setHost(String host);
 }

@@ -22,14 +22,13 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
-import java.util.List;
-import java.util.Map;
-
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.jboss.as.console.client.domain.model.SimpleCallback;
 import org.jboss.as.console.client.shared.model.ResponseWrapper;
 import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import java.util.List;
+import java.util.Map;
 
 /**
  * <p>This interface defines the methods that can be used to manipulate the {@link Federation} model.</p>
@@ -221,4 +220,7 @@ public interface FederationStore {
     void updateSAMLConfiguration(FederationWrapper currentFederation, SAMLConfiguration updatedEntity,
             Map<String, Object> changedValues, SimpleCallback<ResponseWrapper<Boolean>> simpleCallback);
 
+    void createKey(FederationWrapper federation, Key newKey, SimpleCallback<ResponseWrapper<Boolean>> callback);
+
+    void deleteKey(FederationWrapper federation, Key removedKey, SimpleCallback<Boolean> callback);
 }

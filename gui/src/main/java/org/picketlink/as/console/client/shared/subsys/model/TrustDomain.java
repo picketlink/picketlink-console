@@ -32,15 +32,10 @@ import org.jboss.as.console.client.widgets.forms.Binding;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 14, 2012
  */
-@Address("/subsystem=picketlink-federation/federation={0}/identity-provider={0}/trust-domain={0}")
+@Address("/subsystem=picketlink-federation/federation={0}/identity-provider={1}/trust-domain={2}")
 public interface TrustDomain {
 
     @Binding(key = true)
     String getName();
     void setName(String name);
-
-    @Binding(detypedName="cert-alias")
-    String getCertAlias();
-    void setCertAlias(String certAlias);
-
 }

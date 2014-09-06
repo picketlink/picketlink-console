@@ -92,7 +92,7 @@ public class FederationTable extends AbstractModelElementTable<Federation> {
             }
         };
 
-        table.addColumn(new Columns.NameColumn(), uiConstants.common_label_alias());
+        table.addColumn(new Columns.NameColumn(), uiConstants.common_label_name());
         table.addColumn(option, "Option");
     }
 

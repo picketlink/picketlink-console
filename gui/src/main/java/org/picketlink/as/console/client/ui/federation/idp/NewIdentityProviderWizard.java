@@ -22,8 +22,6 @@
 
 package org.picketlink.as.console.client.ui.federation.idp;
 
-import java.util.List;
-
 import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
@@ -37,6 +35,8 @@ import org.picketlink.as.console.client.ui.federation.AbstractFederationWizard;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
 
+import java.util.List;
+
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 30, 2012
@@ -44,37 +44,35 @@ import org.picketlink.as.console.client.ui.federation.Wizard;
 public class NewIdentityProviderWizard<T extends GenericFederationEntity> extends AbstractFederationWizard<T> implements
         Wizard<T> {
 
-    private ComboBoxItem aliasesItem;
-    private TextItem editAliasesItem;
+    private ComboBoxItem nameItem;
+    private TextItem editNameItem;
     private ComboBoxItem deploymentsItem;
     private CheckBoxItem externalIDP;
     private CheckBoxItem strictPostBinding;
     private ComboBoxItem securityDomainsItem;
-    private TextBoxItem attributeManagerItem;
-    private TextBoxItem roleGeneratorItem;
     private PicketLinkUIConstants uiConstants;
 
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
             String type, PicketLinkUIConstants uiConstants) {
-        super(editor, cls, presenter, type, "alias", "security-domain", "url","strict-post-binding", "attribute-manager", "role-generator");
+        super(editor, cls, presenter, type, "name", "security-domain", "url","strict-post-binding", "attribute-manager", "role-generator");
         this.uiConstants = uiConstants;
     }
 
     @Override
     protected FormItem<?>[] doGetCustomFields() {
-        ComboBoxItem aliasItem = null;
+        ComboBoxItem nameItem = null;
 
         if (!isDialogue()) {
-            this.deploymentsItem = new ComboBoxItem("name", "Alias");
-            aliasItem = this.deploymentsItem;
-            updateAliasComboBox(aliasItem, this.getPresenter().getAllDeployments());
-            aliasItem.setEnabled(false);
-            aliasItem.setRequired(false);
+            this.deploymentsItem = new ComboBoxItem("name", this.uiConstants.common_label_name());
+            nameItem = this.deploymentsItem;
+            updateAliasComboBox(nameItem, this.getPresenter().getAllDeployments());
+            nameItem.setEnabled(false);
+            nameItem.setRequired(false);
         } else {
-            aliasItem = getAliasItem();
-            aliasItem.setRequired(true);
-            updateAliasItems();
+            nameItem = getAliasItem();
+            nameItem.setRequired(true);
+            updateNameItems();
         }
 
         FormItem<?>[] formItems = null;
@@ -108,20 +106,11 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
                 }
             };
 
-            formItems = new FormItem<?>[] { externalIDP, aliasItem, securityDomainsItem, new TextBoxItem("url", uiConstants.common_label_URL(), false)};
+            formItems = new FormItem<?>[] { externalIDP, nameItem, securityDomainsItem, new TextBoxItem("url", uiConstants.common_label_URL(), false)};
         } else {
-            editAliasesItem = new TextItem("name", "Alias");
-            editAliasesItem.setEnabled(false);
-            
-            this.attributeManagerItem = new TextBoxItem("attributeManager", "Attribute Manager");
-            this.attributeManagerItem.setRequired(false);
-            this.attributeManagerItem.setEnabled(true);
-
-            this.roleGeneratorItem = new TextBoxItem("roleGenerator", "Role Generator");
-            this.roleGeneratorItem.setRequired(false);
-            this.roleGeneratorItem.setEnabled(true);
-
-            formItems = new FormItem<?>[] { editAliasesItem, securityDomainsItem, new TextBoxItem("url", uiConstants.common_label_URL(), true), strictPostBinding, attributeManagerItem, roleGeneratorItem};
+            editNameItem = new TextItem("name", "Name");
+            editNameItem.setEnabled(false);
+            formItems = new FormItem<?>[] {editNameItem, securityDomainsItem, new TextBoxItem("url", uiConstants.common_label_URL(), true), strictPostBinding};
         }
 
         return formItems;
@@ -150,19 +139,17 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
      * @return
      */
     private ComboBoxItem getAliasItem() {
-        if (this.aliasesItem == null) {
-            this.aliasesItem = new ComboBoxItem("name", "Alias");
+        if (this.nameItem == null) {
+            this.nameItem = new ComboBoxItem("name", "Name");
         }
 
-        return this.aliasesItem;
+        return this.nameItem;
     }
 
-    public void updateAliasItems() {
+    public void updateNameItems() {
         if (getPresenter().getIdentityProvider() != null) {
             boolean isHosted = !getPresenter().getIdentityProvider().getIdentityProvider().isExternal();
             
-            this.attributeManagerItem.setEnabled(isHosted);
-            this.roleGeneratorItem.setEnabled(isHosted);
             this.strictPostBinding.setEnabled(isHosted);
         }
         
@@ -174,29 +161,29 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
         if (getPresenter().getIdentityProvider() != null && getPresenter().getIdentityProvider().getIdentityProvider() != null
                 && getPresenter().getIdentityProvider().getIdentityProvider().isExternal()) {
-            editAliasesItem.setEnabled(false);
+            editNameItem.setEnabled(false);
             securityDomainsItem.setEnabled(false);
         }
         
         updateSecurityDomains();
     }
 
-    private void updateAliasComboBox(ComboBoxItem aliasItem, List<DeploymentRecord> deployments) {
+    private void updateAliasComboBox(ComboBoxItem nameItem, List<DeploymentRecord> deployments) {
         if (getPresenter().getAllDeployments() == null) {
             return;
         }
 
-        String[] aliases = new String[deployments.size()];
+        String[] names = new String[deployments.size()];
 
         for (int i = 0; i < deployments.size(); i++) {
-            aliases[i] = deployments.get(i).getName();
+            names[i] = deployments.get(i).getName();
         }
 
-        aliasItem.setValueMap(aliases);
+        nameItem.setValueMap(names);
 
         if (!isDialogue()) {
             if (this.getIdentityProviderEditor().getCurrentSelection() != null) {
-                aliasItem.setValue(this.getIdentityProviderEditor().getCurrentSelection().getName());
+                nameItem.setValue(this.getIdentityProviderEditor().getCurrentSelection().getName());
             }
         }
     }
