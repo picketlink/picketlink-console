@@ -30,8 +30,6 @@ import com.google.gwt.user.client.ui.Widget;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.widgets.ContentDescription;
 import org.jboss.ballroom.client.widgets.ContentHeaderLabel;
-import org.jboss.ballroom.client.widgets.forms.Form;
-import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.Feedback;
@@ -52,9 +50,7 @@ import java.util.List;
  */
 public class IdentityProviderHandlersTabEditor {
 
-    private Form<IdentityProviderHandler> handlerForm;
     private IdentityProviderHandlerTable handlerTable;
-    private Form<IdentityProviderHandlerParameter> handlerParameterForm;
     private IdentityProviderHandlerParameterTable handlerParameterTable;
     private FederationPresenter presenter;
     private IdentityProviderWrapper identityProvider;
@@ -78,13 +74,11 @@ public class IdentityProviderHandlersTabEditor {
 
         trustDomainsHeader.setStyleName("fill-layout-width");
 
-        addHandlerForm(trustDomainsHeader);
+        trustDomainsHeader.add(new ContentHeaderLabel("Handler"));
         addHandlerActions(trustDomainsHeader);
         addHandlerTable(trustDomainsHeader);
         
         trustDomainsHeader.add(new ContentHeaderLabel("Handler Parameters"));
-        
-        addHandlerParameterForm(trustDomainsHeader);
         addHandlerParameterActions(trustDomainsHeader);
         trustDomainsHeader.add(getHandlerParameterTable().asWidget());
 
@@ -100,6 +94,7 @@ public class IdentityProviderHandlersTabEditor {
 
     private void addHandlerActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
+        final IdentityProviderHandlersTabEditor editor = this;
 
         addHandlerBtn = new ToolButton(Console.CONSTANTS.common_label_add());
 
@@ -107,19 +102,7 @@ public class IdentityProviderHandlersTabEditor {
 
             @Override
             public void onClick(ClickEvent event) {
-                if (identityProvider != null) {
-                    IdentityProviderHandler newTrustedDomain = handlerForm.getUpdatedEntity();
-                    
-                    if (newTrustedDomain != null
-                            && !newTrustedDomain.getClassName().trim().isEmpty()) {
-                        presenter.getFederationManager().onCreateIdentityProviderHandler(identityProvider.getIdentityProvider(), newTrustedDomain);
-                        getHandlerTable().getDataProvider().getList().add(newTrustedDomain);
-                    } else {
-                        Window.alert(uiMessages.invalidTrustedDomain());
-                    }
-                    
-                    handlerForm.clearValues();
-                }
+            new NewIdentityProviderHandlerWizard(editor, presenter).launchWizard();
             }
         });
 
@@ -146,8 +129,6 @@ public class IdentityProviderHandlersTabEditor {
                                 }
                             }
                         });
-                
-                handlerForm.clearValues();
             }
         });
 
@@ -162,6 +143,7 @@ public class IdentityProviderHandlersTabEditor {
 
     private void addHandlerParameterActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
+        final IdentityProviderHandlersTabEditor editor = this;
 
         addHandlerParameterBtn = new ToolButton(Console.CONSTANTS.common_label_add());
 
@@ -169,21 +151,7 @@ public class IdentityProviderHandlersTabEditor {
 
             @Override
             public void onClick(ClickEvent event) {
-                if (getHandlerTable().getSelectedHandler() == null) {
-                    Window.alert("Please, selecte a handler first.");
-                } else {
-                    IdentityProviderHandlerParameter newHandlerParameter = handlerParameterForm.getUpdatedEntity();
-                    
-                    if (newHandlerParameter != null
-                            && !newHandlerParameter.getName().trim().isEmpty()) {
-                        presenter.getFederationManager().onCreateIdentityProviderHandlerParameter(identityProvider.getIdentityProvider(), getHandlerTable().getSelectedHandler(), newHandlerParameter);
-                        getHandlerParameterTable().getDataProvider().getList().add(newHandlerParameter);
-                    } else {
-                        Window.alert("Invalid Handler Parameter");
-                    }
-                    
-                    handlerParameterForm.clearValues();
-                }
+                new NewIdentityProviderHandlerParameterWizard(editor, presenter).launchWizard();
             }
         });
 
@@ -209,8 +177,6 @@ public class IdentityProviderHandlersTabEditor {
                                 }
                             }
                         });
-                
-                handlerParameterForm.clearValues();
             }
         });
 
@@ -221,32 +187,6 @@ public class IdentityProviderHandlersTabEditor {
         trustDomainsHeader.add(trustDomainTools);
 
         trustDomainsHeader.add(new ContentDescription(""));
-    }
-
-    private void addHandlerForm(VerticalPanel trustDomainsHeader) {
-        this.handlerForm = new Form<IdentityProviderHandler>(IdentityProviderHandler.class);
-
-        TextBoxItem domainName = new TextBoxItem("className", "Class Name");
-
-        domainName.setRequired(true);
-
-        this.handlerForm.setFields(domainName);
-
-        trustDomainsHeader.add(this.handlerForm.asWidget());
-    }
-
-    private void addHandlerParameterForm(VerticalPanel trustDomainsHeader) {
-        this.handlerParameterForm = new Form<IdentityProviderHandlerParameter>(IdentityProviderHandlerParameter.class);
-
-        TextBoxItem handlerName = new TextBoxItem("name", "Name");
-        handlerName.setRequired(true);
-
-        TextBoxItem handlerValue = new TextBoxItem("value", "Value");
-        handlerValue.setRequired(true);
-
-        this.handlerParameterForm.setFields(handlerName, handlerValue);
-
-        trustDomainsHeader.add(this.handlerParameterForm.asWidget());
     }
 
     public IdentityProviderHandlerTable getHandlerTable() {
@@ -276,11 +216,9 @@ public class IdentityProviderHandlersTabEditor {
     
     public void setIdentityProvider(IdentityProviderWrapper identityProvider) {
         if (identityProvider == null || identityProvider.getIdentityProvider().isExternal()) {
-            this.handlerForm.setEnabled(false);
             this.addHandlerBtn.setEnabled(false);
             this.removeHandlerBtn.setEnabled(false);
         } else {
-            this.handlerForm.setEnabled(true);
             this.addHandlerBtn.setEnabled(true);
             this.removeHandlerBtn.setEnabled(true);
         }
@@ -304,4 +242,7 @@ public class IdentityProviderHandlersTabEditor {
         getHandlerParameterTable().getDataProvider().setList(parameters);
     }
 
+    public IdentityProviderWrapper getIdentityProvider() {
+        return identityProvider;
+    }
 }

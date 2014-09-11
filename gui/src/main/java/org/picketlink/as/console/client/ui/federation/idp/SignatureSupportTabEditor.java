@@ -62,7 +62,7 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
 
         panel.setStyleName("fill-layout-width");
         
-        new AsyncHelpText("identity-provider", new String[] {"supportsSignatures"}, this.presenter, panel, false);
+        new AsyncHelpText("identity-provider", new String[] {"support-signatures"}, this.presenter, panel, false);
         
         addForm(panel);
 

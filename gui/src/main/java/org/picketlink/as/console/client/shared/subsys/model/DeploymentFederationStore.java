@@ -35,5 +35,6 @@ import org.jboss.dmr.client.dispatch.impl.DMRResponse;
 public interface DeploymentFederationStore {
 
     void redeploy(DeploymentRecord deploymentRecord, AsyncCallback<DMRResponse> callback);
+    void undeploy(DeploymentRecord deploymentRecord, AsyncCallback<DMRResponse> callback);
 
 }

@@ -55,7 +55,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
             String type, PicketLinkUIConstants uiConstants) {
-        super(editor, cls, presenter, type, "name", "security-domain", "url","strict-post-binding", "attribute-manager", "role-generator");
+        super(editor, cls, presenter, type, "external", "security-domain", "url", "strict-post-binding");
         this.uiConstants = uiConstants;
     }
 

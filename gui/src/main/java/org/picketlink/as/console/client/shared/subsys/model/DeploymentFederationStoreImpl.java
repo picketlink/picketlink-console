@@ -57,6 +57,11 @@ public class DeploymentFederationStoreImpl implements DeploymentFederationStore 
     public void redeploy(DeploymentRecord deploymentRecord, AsyncCallback<DMRResponse> callback) {
         doDeploymentCommand(deploymentRecord, makeOperation("redeploy", deploymentRecord.getServerGroup(), deploymentRecord), callback);
     }
+
+    @Override
+    public void undeploy(DeploymentRecord deploymentRecord, AsyncCallback<DMRResponse> callback) {
+        doDeploymentCommand(deploymentRecord, makeOperation("undeploy", deploymentRecord.getServerGroup(), deploymentRecord), callback);
+    }
     
     private ModelNode makeOperation(String command, String serverGroup, DeploymentRecord deployment) {
         ModelNode operation = new ModelNode();

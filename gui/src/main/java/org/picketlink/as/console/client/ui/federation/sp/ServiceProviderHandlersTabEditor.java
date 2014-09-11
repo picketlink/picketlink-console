@@ -22,14 +22,14 @@
 
 package org.picketlink.as.console.client.ui.federation.sp;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.widgets.ContentDescription;
 import org.jboss.ballroom.client.widgets.ContentHeaderLabel;
-import org.jboss.ballroom.client.widgets.forms.Form;
-import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.Feedback;
@@ -41,11 +41,8 @@ import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandl
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -53,9 +50,7 @@ import com.google.gwt.user.client.ui.Widget;
  */
 public class ServiceProviderHandlersTabEditor {
 
-    private Form<ServiceProviderHandler> handlerForm;
     private ServiceProviderHandlerTable handlerTable;
-    private Form<ServiceProviderHandlerParameter> handlerParameterForm;
     private ServiceProviderHandlerParameterTable handlerParameterTable;
     private FederationPresenter presenter;
     private ServiceProviderWrapper serviceProvider;
@@ -79,13 +74,11 @@ public class ServiceProviderHandlersTabEditor {
 
         trustDomainsHeader.setStyleName("fill-layout-width");
 
-        addHandlerForm(trustDomainsHeader);
+        trustDomainsHeader.add(new ContentHeaderLabel("Handler"));
         addHandlerActions(trustDomainsHeader);
         addHandlerTable(trustDomainsHeader);
         
         trustDomainsHeader.add(new ContentHeaderLabel("Handler Parameters"));
-        
-        addHandlerParameterForm(trustDomainsHeader);
         addHandlerParameterActions(trustDomainsHeader);
         trustDomainsHeader.add(getHandlerParameterTable().asWidget());
 
@@ -98,6 +91,7 @@ public class ServiceProviderHandlersTabEditor {
 
     private void addHandlerActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
+        final ServiceProviderHandlersTabEditor editor = this;
 
         addHandlerBtn = new ToolButton(Console.CONSTANTS.common_label_add());
 
@@ -105,19 +99,7 @@ public class ServiceProviderHandlersTabEditor {
 
             @Override
             public void onClick(ClickEvent event) {
-                if (serviceProvider != null) {
-                    ServiceProviderHandler newTrustedDomain = handlerForm.getUpdatedEntity();
-                    
-                    if (newTrustedDomain != null
-                            && !newTrustedDomain.getClassName().trim().isEmpty()) {
-                        presenter.getFederationManager().onCreateServiceProviderHandler(serviceProvider.getServiceProvider(), newTrustedDomain);
-                        getHandlerTable().getDataProvider().getList().add(newTrustedDomain);
-                    } else {
-                        Window.alert(uiMessages.invalidTrustedDomain());
-                    }
-                    
-                    handlerForm.clearValues();
-                }
+                new NewServiceProviderHandlerWizard(editor, presenter).launchWizard();
             }
         });
 
@@ -144,8 +126,6 @@ public class ServiceProviderHandlersTabEditor {
                                 }
                             }
                         });
-                
-                handlerForm.clearValues();
             }
         });
 
@@ -160,28 +140,14 @@ public class ServiceProviderHandlersTabEditor {
 
     private void addHandlerParameterActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
-
+        final ServiceProviderHandlersTabEditor editor = this;
         addHandlerParameterBtn = new ToolButton(Console.CONSTANTS.common_label_add());
 
         addHandlerParameterBtn.addClickHandler(new ClickHandler() {
 
             @Override
             public void onClick(ClickEvent event) {
-                if (getHandlerTable().getSelectedHandler() == null) {
-                    Window.alert("Please, selecte a handler first.");
-                } else {
-                    ServiceProviderHandlerParameter newHandlerParameter = handlerParameterForm.getUpdatedEntity();
-                    
-                    if (newHandlerParameter != null
-                            && !newHandlerParameter.getName().trim().isEmpty()) {
-                        presenter.getFederationManager().onCreateServiceProviderHandlerParameter(serviceProvider.getServiceProvider(), getHandlerTable().getSelectedHandler(), newHandlerParameter);
-                        getHandlerParameterTable().getDataProvider().getList().add(newHandlerParameter);
-                    } else {
-                        Window.alert("Invalid Handler Parameter");
-                    }
-                    
-                    handlerParameterForm.clearValues();
-                }
+                new NewServiceProviderHandlerParameterWizard(editor, presenter).launchWizard();
             }
         });
 
@@ -207,8 +173,6 @@ public class ServiceProviderHandlersTabEditor {
                                 }
                             }
                         });
-                
-                handlerParameterForm.clearValues();
             }
         });
 
@@ -219,38 +183,6 @@ public class ServiceProviderHandlersTabEditor {
         trustDomainsHeader.add(trustDomainTools);
 
         trustDomainsHeader.add(new ContentDescription(""));
-    }
-
-    /**
-     * @param trustDomainsHeader
-     */
-    private void addHandlerForm(VerticalPanel trustDomainsHeader) {
-        this.handlerForm = new Form<ServiceProviderHandler>(ServiceProviderHandler.class);
-
-        TextBoxItem domainName = new TextBoxItem("className", "Class Name");
-
-        domainName.setRequired(true);
-
-        this.handlerForm.setFields(domainName);
-
-        trustDomainsHeader.add(this.handlerForm.asWidget());
-    }
-
-    /**
-     * @param trustDomainsHeader
-     */
-    private void addHandlerParameterForm(VerticalPanel trustDomainsHeader) {
-        this.handlerParameterForm = new Form<ServiceProviderHandlerParameter>(ServiceProviderHandlerParameter.class);
-
-        TextBoxItem handlerName = new TextBoxItem("name", "Name");
-        handlerName.setRequired(true);
-
-        TextBoxItem handlerValue = new TextBoxItem("value", "Value");
-        handlerValue.setRequired(true);
-
-        this.handlerParameterForm.setFields(handlerName, handlerValue);
-
-        trustDomainsHeader.add(this.handlerParameterForm.asWidget());
     }
 
     public ServiceProviderHandlerTable getHandlerTable() {
@@ -283,11 +215,9 @@ public class ServiceProviderHandlersTabEditor {
      */
     public void setServiceProvider(ServiceProviderWrapper selectedServiceProvider) {
         if (selectedServiceProvider == null) {
-            this.handlerForm.setEnabled(false);
             this.addHandlerBtn.setEnabled(false);
             this.removeHandlerBtn.setEnabled(false);
         } else {
-            this.handlerForm.setEnabled(true);
             this.addHandlerBtn.setEnabled(true);
             this.removeHandlerBtn.setEnabled(true);
         }
@@ -311,4 +241,7 @@ public class ServiceProviderHandlersTabEditor {
         getHandlerParameterTable().getDataProvider().setList(parameters);
     }
 
+    public ServiceProviderWrapper getServiceProvider() {
+        return serviceProvider;
+    }
 }

@@ -51,7 +51,7 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
 
     public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type,
             PicketLinkUIConstants uiConstants) {
-        super(editor, cls, presenter, type, "name", "url", "postBinding", "security-domain", "strict-post-binding", "error-page", "logout-page");
+        super(editor, cls, presenter, type, "security-domain", "url", "post-binding", "strict-post-binding", "error-page", "logout-page");
         this.uiConstants = uiConstants;
     }
 

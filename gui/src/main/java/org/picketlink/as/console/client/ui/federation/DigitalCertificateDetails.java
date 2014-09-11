@@ -25,7 +25,6 @@ package org.picketlink.as.console.client.ui.federation;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.as.console.client.Console;
@@ -106,10 +105,6 @@ public class DigitalCertificateDetails {
         FormToolStrip<KeyStore> toolStrip = new FormToolStrip<KeyStore>(form, new FormToolStrip.FormCallback<KeyStore>() {
             @Override
             public void onSave(Map<String, Object> changeset) {
-                if (presenter.getCurrentFederation() == null) {
-                    Window.alert("You must select a federation first.");
-                }
-
                 KeyStore updatedEntity = form.getUpdatedEntity();
 
                 if (relativeToItem.getValue() != null && relativeToItem.getValue().isEmpty()) {
@@ -165,8 +160,6 @@ public class DigitalCertificateDetails {
 
                         }
                     }
-                } else {
-                    Window.alert("You must save before removing.");
                 }
             }
         });

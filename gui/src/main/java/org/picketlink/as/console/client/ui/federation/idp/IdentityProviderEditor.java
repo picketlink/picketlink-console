@@ -232,12 +232,15 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     private void updateHandlers(IdentityProviderWrapper identityProvider) {
         List<IdentityProviderHandler> handlers = new ArrayList<IdentityProviderHandler>();
 
-        for (IdentityProviderHandlerWrapper wrapper : identityProvider.getHandlers()) {
-            handlers.add(wrapper.getHandler());
-        }
+        if (identityProvider != null) {
+            for (IdentityProviderHandlerWrapper wrapper : identityProvider.getHandlers()) {
+                handlers.add(wrapper.getHandler());
+            }
 
+            this.getHandlerTabEditor().setIdentityProvider(identityProvider);
+        }
         this.getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlers);
-        this.getHandlerTabEditor().setIdentityProvider(identityProvider);
+
     }
 
     /**

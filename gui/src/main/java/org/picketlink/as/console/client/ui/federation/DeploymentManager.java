@@ -22,7 +22,6 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
 import org.jboss.as.console.client.Console;
@@ -99,11 +98,42 @@ public class DeploymentManager {
                 ModelNode result = response.get();
 
                 if (result.isFailure()) {
-                    Window.alert("Could not undeploy the deployment " + record.getName() + ". Make sure it is deployed and check the logs.");
+                    Console.error("Could not undeploy the deployment " + record.getName() + ". Make sure it is deployed and check the logs.");
                     Console.error(Console.MESSAGES.modificationFailed("Deployment " + record.getRuntimeName()),
                             result.getFailureDescription());
                 } else {
                     Console.info(Console.MESSAGES.modified("Deployment " + record.getRuntimeName()));
+                }
+            }
+        });
+    }
+
+    public void undeployDeployment(final DeploymentRecord record, final SimpleCallback<Boolean> callback) {
+        final PopupPanel loading = Feedback.loading(Console.CONSTANTS.common_label_plaseWait(),
+            Console.CONSTANTS.common_label_requestProcessed(), new Feedback.LoadingCallback() {
+                @Override
+                public void onCancel() {
+
+                }
+            });
+
+        deploymentFederationStore.undeploy(record, new SimpleCallback<DMRResponse>() {
+
+            @Override
+            public void onSuccess(DMRResponse response) {
+                loading.hide();
+
+                ModelNode result = response.get();
+
+                if (result.isFailure()) {
+                    Console.error("Could not undeploy the deployment " + record
+                        .getName() + ". Make sure it is deployed and check the logs.");
+                    Console.error(Console.MESSAGES.modificationFailed("Deployment " + record.getRuntimeName()),
+                        result.getFailureDescription());
+                    callback.onSuccess(false);
+                } else {
+                    Console.info(Console.MESSAGES.modified("Deployment " + record.getRuntimeName()));
+                    callback.onSuccess(true);
                 }
             }
         });

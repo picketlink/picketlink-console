@@ -197,23 +197,28 @@ public class FederationManager {
      * @param serviceProvider
      */
     public void onRemoveServiceProvider(final ServiceProvider serviceProvider) {
-        this.federationStore.deleteServiceProvider(presenter.getCurrentFederation(), serviceProvider,
-                new SimpleCallback<Boolean>() {
-                    @Override
-                    public void onSuccess(Boolean success) {
-                        if (success) {
+        this.deploymentManager.undeployDeployment(serviceProvider, new SimpleCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean result) {
+                federationStore.deleteServiceProvider(presenter.getCurrentFederation(), serviceProvider,
+                    new SimpleCallback<Boolean>() {
+                        @Override
+                        public void onSuccess(Boolean success) {
                             loadAllFederations();
-                            Console.info(Console.MESSAGES.deleted(uiConstants
-                                .common_label_serviceProvider() + " ")
-                                + serviceProvider.getName());
-                        } else {
-                            Console.error(Console.MESSAGES.deletionFailed(uiConstants
+                            if (success) {
+                                Console.info(Console.MESSAGES.deleted(uiConstants
                                     .common_label_serviceProvider() + " ")
                                     + serviceProvider.getName());
+                            } else {
+                                Console.error(Console.MESSAGES.deletionFailed(uiConstants
+                                    .common_label_serviceProvider() + " ")
+                                    + serviceProvider.getName());
+                            }
                         }
-                    }
-                });
-        this.eventBus.fireEvent(new RemoveServiceProviderEvent(serviceProvider));
+                    });
+                eventBus.fireEvent(new RemoveServiceProviderEvent(serviceProvider));
+            }
+        });
     }
 
     public void onCreateIdentityProvider(final IdentityProvider identityProvider) {
@@ -256,23 +261,28 @@ public class FederationManager {
      * @param identityProvider
      */
     public void onRemoveIdentityProvider(final IdentityProvider identityProvider) {
-        this.federationStore.deleteIdentityProvider(presenter.getCurrentFederation(), identityProvider,
-                new SimpleCallback<Boolean>() {
-                    @Override
-                    public void onSuccess(Boolean success) {
-                        if (success) {
+        this.deploymentManager.undeployDeployment(identityProvider, new SimpleCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean result) {
+                federationStore.deleteIdentityProvider(presenter.getCurrentFederation(), identityProvider,
+                    new SimpleCallback<Boolean>() {
+                        @Override
+                        public void onSuccess(Boolean success) {
                             loadAllFederations();
-                            Console.info(Console.MESSAGES.deleted(uiConstants
+                            if (success) {
+                                Console.info(Console.MESSAGES.deleted(uiConstants
                                     .common_label_identityProvider() + " ")
                                     + identityProvider.getName());
-                        } else {
-                            Console.error(Console.MESSAGES.deletionFailed(uiConstants
-                                .common_label_identityProvider() + " ")
-                                + identityProvider.getName());
+                            } else {
+                                Console.error(Console.MESSAGES.deletionFailed(uiConstants
+                                    .common_label_identityProvider() + " ")
+                                    + identityProvider.getName());
+                            }
                         }
-                    }
-                });
-        this.eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
+                    });
+                eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
+            }
+        });
     }
 
     /**

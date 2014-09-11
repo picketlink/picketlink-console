@@ -90,8 +90,6 @@ public class SAMLConfigurationDetails {
                     form.clearValues();
                     hasSAMLConfiguration = false;
                     form.edit(presenter.getBeanFactory().samlConfiguration().as());
-                } else {
-                    Window.alert("You must save before removing.");
                 }
             }
         });

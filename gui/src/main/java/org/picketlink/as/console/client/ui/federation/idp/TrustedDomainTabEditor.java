@@ -24,13 +24,10 @@ package org.picketlink.as.console.client.ui.federation.idp;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.widgets.ContentDescription;
-import org.jboss.ballroom.client.widgets.forms.Form;
-import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.jboss.ballroom.client.widgets.tools.ToolButton;
 import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.Feedback;
@@ -46,7 +43,6 @@ import org.picketlink.as.console.client.ui.federation.FederationPresenter;
  */
 public class TrustedDomainTabEditor {
 
-    private Form<TrustDomain> trustDomainForm;
     private TrustDomainTable trustDomainTable;
     private FederationPresenter presenter;
     private IdentityProvider identityProvider;
@@ -69,7 +65,6 @@ public class TrustedDomainTabEditor {
 
         trustDomainsHeader.setStyleName("fill-layout-width");
 
-        addTrustDomainForm(trustDomainsHeader);
         addTrustDomainActions(trustDomainsHeader);
         addTrustDomainTable(trustDomainsHeader);
 
@@ -82,6 +77,7 @@ public class TrustedDomainTabEditor {
 
     private void addTrustDomainActions(VerticalPanel trustDomainsHeader) {
         ToolStrip trustDomainTools = new ToolStrip();
+        final TrustedDomainTabEditor editor = this;
 
         addTrustedDomainBtn = new ToolButton(Console.CONSTANTS.common_label_add());
 
@@ -89,21 +85,7 @@ public class TrustedDomainTabEditor {
 
             @Override
             public void onClick(ClickEvent event) {
-                if (identityProvider == null) {
-                    Window.alert(uiMessages.identityProviderNotConfigured());
-                } else {
-                    TrustDomain newTrustedDomain = trustDomainForm.getUpdatedEntity();
-                    
-                    if (newTrustedDomain != null
-                            && !newTrustedDomain.getName().trim().isEmpty()) {
-                        presenter.getFederationManager().onCreateTrustDomain(identityProvider, newTrustedDomain);
-                        getTrustDomainTable().getDataProvider().getList().add(newTrustedDomain);
-                    } else {
-                        Window.alert(uiMessages.invalidTrustedDomain());
-                    }
-                    
-                    trustDomainForm.clearValues();
-                }
+                new NewTrustDomainWizard(editor, presenter, uiConstants).launchWizard();
             }
         });
 
@@ -129,8 +111,6 @@ public class TrustedDomainTabEditor {
                                 }
                             }
                         });
-                
-                trustDomainForm.clearValues();
             }
         });
 
@@ -141,20 +121,6 @@ public class TrustedDomainTabEditor {
         trustDomainsHeader.add(trustDomainTools);
 
         trustDomainsHeader.add(new ContentDescription(""));
-    }
-
-    /**
-     * @param trustDomainsHeader
-     */
-    private void addTrustDomainForm(VerticalPanel trustDomainsHeader) {
-        this.trustDomainForm = new Form<TrustDomain>(TrustDomain.class);
-
-        TextBoxItem domainName = new TextBoxItem("name", uiConstants.common_label_domainName());
-        domainName.setRequired(true);
-
-        this.trustDomainForm.setFields(domainName);
-
-        trustDomainsHeader.add(this.trustDomainForm.asWidget());
     }
 
     public TrustDomainTable getTrustDomainTable() {
@@ -170,11 +136,9 @@ public class TrustedDomainTabEditor {
      */
     public void setIdentityProvider(IdentityProvider identityProvider) {
         if (identityProvider == null || identityProvider.isExternal()) {
-            this.trustDomainForm.setEnabled(false);
             this.addTrustedDomainBtn.setEnabled(false);
             this.removeTrustedDomainBtn.setEnabled(false);
         } else {
-            this.trustDomainForm.setEnabled(true);
             this.addTrustedDomainBtn.setEnabled(true);
             this.removeTrustedDomainBtn.setEnabled(true);
         }
@@ -182,4 +146,7 @@ public class TrustedDomainTabEditor {
         this.identityProvider = identityProvider;
     }
 
+    public IdentityProvider getIdentityProvider() {
+        return identityProvider;
+    }
 }

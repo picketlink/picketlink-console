@@ -22,8 +22,8 @@
 
 package org.picketlink.as.console.client.ui.federation.sp;
 
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.TabPanel;
+import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
@@ -127,7 +127,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
     @Override
     protected boolean onLunchWizard() {
         if (this.getPresenter().getIdentityProvider() == null) {
-            Window.alert("Please, configure an Identity Provider first.");
+            Console.error("Please, configure an Identity Provider first.");
             return false;
         }
         

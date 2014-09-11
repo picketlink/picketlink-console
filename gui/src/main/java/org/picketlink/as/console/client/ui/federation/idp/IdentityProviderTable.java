@@ -28,7 +28,6 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.user.client.Window;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.as.console.client.widgets.tables.TextLinkCell;
@@ -97,7 +96,7 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
                             presenter.loadDeployments();
                             presenter.getFederationManager().loadAllFederations();
                         } else {
-                            Window.alert("You can restart only hosted Identity providers.");
+                            Console.info("You can not restart external Identity Providers.");
                         }
                     }
                 })) {

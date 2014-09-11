@@ -21,17 +21,21 @@ public class AsyncHelpText implements SecurityDomainsPresenter.DescriptionCallBa
 
     private final VerticalPanel layout;
     private boolean isDialogue;
-    private String type;
+    private String[] type;
     private String[] attributesNames;
     private FederationPresenter presenter;
 
-    public AsyncHelpText(String type, String[] attributesNames, FederationPresenter presenter, VerticalPanel layout, boolean isDialogue) {
+    public AsyncHelpText(String[] type, String[] attributesNames, FederationPresenter presenter, VerticalPanel layout, boolean isDialogue) {
         this.layout = layout;
         this.type = type;
         this.attributesNames = attributesNames;
         this.presenter = presenter;
         getDescription(this.type, this);
         this.isDialogue = isDialogue;
+    }
+
+    public AsyncHelpText(String type, String[] attributesNames, FederationPresenter presenter, VerticalPanel layout, boolean isDialogue) {
+        this(new String[] {type}, attributesNames, presenter, layout, isDialogue);
     }
 
     @Override
@@ -60,10 +64,13 @@ public class AsyncHelpText implements SecurityDomainsPresenter.DescriptionCallBa
         layout.insert(helpPanel.asWidget(), isDialogue ? 0 : 1);
     }
     
-    private void getDescription(String type, final DescriptionCallBack callback) {
+    private void getDescription(String[] types, final DescriptionCallBack callback) {
         ModelNode operation = createOperation(ModelDescriptionConstants.READ_RESOURCE_DESCRIPTION_OPERATION);
         operation.get(ModelDescriptionConstants.ADDRESS).add("federation", "*");
-        operation.get(ModelDescriptionConstants.ADDRESS).add(type, "*");
+
+        for (String type : types) {
+            operation.get(ModelDescriptionConstants.ADDRESS).add(type, "*");
+        }
 
         this.presenter.getDispatchAsync().execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
             @Override
