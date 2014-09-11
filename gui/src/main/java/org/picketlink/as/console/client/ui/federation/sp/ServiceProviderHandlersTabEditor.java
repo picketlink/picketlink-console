@@ -105,9 +105,7 @@ public class ServiceProviderHandlersTabEditor {
 
             @Override
             public void onClick(ClickEvent event) {
-                if (serviceProvider == null) {
-                    Window.alert(uiMessages.identityProviderNotConfigured());
-                } else {
+                if (serviceProvider != null) {
                     ServiceProviderHandler newTrustedDomain = handlerForm.getUpdatedEntity();
                     
                     if (newTrustedDomain != null
@@ -143,7 +141,6 @@ public class ServiceProviderHandlersTabEditor {
                                     presenter.getFederationManager().onRemoveServiceProviderHandler(serviceProvider.getServiceProvider(), removedTrustedDomain);
                                     getHandlerTable().getDataProvider().getList().remove(removedTrustedDomain);
                                     getHandlerParameterTable().getDataProvider().getList().clear();
-//                                    showRestartDialog();
                                 }
                             }
                         });

@@ -169,8 +169,6 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
 
     public void updateServiceProviders(FederationWrapper federation) {
         if (federation != null) {
-            getBottomTabs().selectTab(0);
-
             if (federation.getIdentityProvider() == null && !federation.getServiceProviders().isEmpty()) {
                 addErrorMessage("You have Service Providers configured but there is no IDP for them.");
             } else {

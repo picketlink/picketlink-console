@@ -22,6 +22,11 @@
 
 package org.picketlink.as.console.client.ui.federation.idp;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.jboss.as.console.client.Console;
 import org.jboss.as.console.client.widgets.ContentDescription;
 import org.jboss.ballroom.client.widgets.ContentHeaderLabel;
@@ -32,16 +37,14 @@ import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.Feedback;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerWrapper;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -54,7 +57,7 @@ public class IdentityProviderHandlersTabEditor {
     private Form<IdentityProviderHandlerParameter> handlerParameterForm;
     private IdentityProviderHandlerParameterTable handlerParameterTable;
     private FederationPresenter presenter;
-    private IdentityProvider identityProvider;
+    private IdentityProviderWrapper identityProvider;
     private ToolButton removeHandlerBtn;
     private ToolButton addHandlerBtn;
     private ToolButton removeHandlerParameterBtn;
@@ -104,14 +107,12 @@ public class IdentityProviderHandlersTabEditor {
 
             @Override
             public void onClick(ClickEvent event) {
-                if (identityProvider == null) {
-                    Window.alert(uiMessages.identityProviderNotConfigured());
-                } else {
+                if (identityProvider != null) {
                     IdentityProviderHandler newTrustedDomain = handlerForm.getUpdatedEntity();
                     
                     if (newTrustedDomain != null
                             && !newTrustedDomain.getClassName().trim().isEmpty()) {
-                        presenter.getFederationManager().onCreateIdentityProviderHandler(identityProvider, newTrustedDomain);
+                        presenter.getFederationManager().onCreateIdentityProviderHandler(identityProvider.getIdentityProvider(), newTrustedDomain);
                         getHandlerTable().getDataProvider().getList().add(newTrustedDomain);
                     } else {
                         Window.alert(uiMessages.invalidTrustedDomain());
@@ -139,7 +140,7 @@ public class IdentityProviderHandlersTabEditor {
                             @Override
                             public void onConfirmation(boolean isConfirmed) {
                                 if (isConfirmed) {
-                                    presenter.getFederationManager().onRemoveIdentityProviderHandler(identityProvider, removedTrustedDomain);
+                                    presenter.getFederationManager().onRemoveIdentityProviderHandler(identityProvider.getIdentityProvider(), removedTrustedDomain);
                                     getHandlerTable().getDataProvider().getList().remove(removedTrustedDomain);
                                     getHandlerParameterTable().getDataProvider().getList().clear();
                                 }
@@ -175,7 +176,7 @@ public class IdentityProviderHandlersTabEditor {
                     
                     if (newHandlerParameter != null
                             && !newHandlerParameter.getName().trim().isEmpty()) {
-                        presenter.getFederationManager().onCreateIdentityProviderHandlerParameter(identityProvider, getHandlerTable().getSelectedHandler(), newHandlerParameter);
+                        presenter.getFederationManager().onCreateIdentityProviderHandlerParameter(identityProvider.getIdentityProvider(), getHandlerTable().getSelectedHandler(), newHandlerParameter);
                         getHandlerParameterTable().getDataProvider().getList().add(newHandlerParameter);
                     } else {
                         Window.alert("Invalid Handler Parameter");
@@ -203,7 +204,7 @@ public class IdentityProviderHandlersTabEditor {
                             @Override
                             public void onConfirmation(boolean isConfirmed) {
                                 if (isConfirmed) {
-                                    presenter.getFederationManager().onRemoveIdentityProviderHandlerParameter(identityProvider, getHandlerTable().getSelectedHandler(), removedHandlerParameter);
+                                    presenter.getFederationManager().onRemoveIdentityProviderHandlerParameter(identityProvider.getIdentityProvider(), getHandlerTable().getSelectedHandler(), removedHandlerParameter);
                                     getHandlerParameterTable().getDataProvider().getList().remove(removedHandlerParameter);
                                 }
                             }
@@ -253,6 +254,7 @@ public class IdentityProviderHandlersTabEditor {
             this.handlerTable = new IdentityProviderHandlerTable();
             this.handlerTable.setParametersTable(this.getHandlerParameterTable());
             this.handlerTable.setPresenter(this.presenter);
+            this.handlerTable.setHandlersTabEditor(this);
         }
 
         return this.handlerTable;
@@ -268,12 +270,12 @@ public class IdentityProviderHandlersTabEditor {
 
     private void showRestartDialog() {
         if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
-            presenter.getDeploymentManager().restartIdentityProvider(identityProvider);
+            presenter.getDeploymentManager().restartIdentityProvider(identityProvider.getIdentityProvider());
         }        
     }
     
-    public void setIdentityProvider(IdentityProvider identityProvider) {
-        if (identityProvider == null || identityProvider.isExternal()) {
+    public void setIdentityProvider(IdentityProviderWrapper identityProvider) {
+        if (identityProvider == null || identityProvider.getIdentityProvider().isExternal()) {
             this.handlerForm.setEnabled(false);
             this.addHandlerBtn.setEnabled(false);
             this.removeHandlerBtn.setEnabled(false);
@@ -284,6 +286,22 @@ public class IdentityProviderHandlersTabEditor {
         }
         
         this.identityProvider = identityProvider;
+        getHandlerTable().setSelectedIdentityProvider(this.identityProvider);
+    }
+
+    public void doUpdateSelection(IdentityProviderHandler selectedHandler) {
+        List<IdentityProviderHandlerWrapper> handlers = this.identityProvider.getHandlers();
+        ArrayList<IdentityProviderHandlerParameter> parameters = new ArrayList<IdentityProviderHandlerParameter>();
+
+        for (IdentityProviderHandlerWrapper handlerWrapper : handlers) {
+            if (handlerWrapper.getHandler().getClassName().equals(selectedHandler.getClassName())) {
+                for (IdentityProviderHandlerParameter serviceProviderHandlerParameter : handlerWrapper.getParameters()) {
+                    parameters.add(serviceProviderHandlerParameter);
+                }
+            }
+        }
+
+        getHandlerParameterTable().getDataProvider().setList(parameters);
     }
 
 }

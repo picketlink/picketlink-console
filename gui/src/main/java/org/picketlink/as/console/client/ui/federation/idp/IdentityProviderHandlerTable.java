@@ -22,19 +22,19 @@
 
 package org.picketlink.as.console.client.ui.federation.idp;
 
-import java.util.List;
-
-import org.jboss.as.console.client.Console;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerWrapper;
-import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
-import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
-import org.picketlink.as.console.client.ui.federation.FederationPresenter;
-
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.google.gwt.view.client.SingleSelectionModel;
+import org.jboss.as.console.client.Console;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerWrapper;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
+import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
+import org.picketlink.as.console.client.ui.federation.FederationPresenter;
+
+import java.util.List;
 
 /**
  * <p>
@@ -49,7 +49,9 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
     private IdentityProviderHandler selectedHandler;
     private IdentityProviderHandlerParameterTable parametersTable;
     private FederationPresenter presenter;
-    
+    private IdentityProviderHandlersTabEditor handlersTabEditor;
+    private IdentityProviderWrapper selectedIdentityProvider;
+
     /*
      * (non-Javadoc)
      * 
@@ -84,13 +86,15 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
             public void onSelectionChange(com.google.gwt.view.client.SelectionChangeEvent event) {
                 SingleSelectionModel<IdentityProviderHandler> selection = (SingleSelectionModel<IdentityProviderHandler>) event.getSource();
                 selectedHandler = selection.getSelectedObject();
-                List<IdentityProviderHandlerWrapper> handlers = presenter.getIdentityProvider().getHandlers();
+                List<IdentityProviderHandlerWrapper> handlers = selectedIdentityProvider.getHandlers();
                 
                 for (IdentityProviderHandlerWrapper handlerWrapper : handlers) {
                     if (handlerWrapper.getHandler().getClassName().equals(selectedHandler.getClassName())) {
                         parametersTable.getDataProvider().setList(handlerWrapper.getParameters());
                     }
                 }
+
+                handlersTabEditor.doUpdateSelection(selectedHandler);
             }
 
         };
@@ -123,5 +127,13 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
     
     public void setPresenter(FederationPresenter presenter) {
         this.presenter = presenter;
+    }
+
+    public void setHandlersTabEditor(IdentityProviderHandlersTabEditor handlersTabEditor) {
+        this.handlersTabEditor = handlersTabEditor;
+    }
+
+    public void setSelectedIdentityProvider(IdentityProviderWrapper selectedIdentityProvider) {
+        this.selectedIdentityProvider = selectedIdentityProvider;
     }
 }

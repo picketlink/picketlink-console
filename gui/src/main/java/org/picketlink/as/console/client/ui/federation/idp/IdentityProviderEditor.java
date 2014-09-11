@@ -29,6 +29,7 @@ import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
@@ -52,6 +53,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     private IdentityProviderHandlersTabEditor handlersTabEditor;
     private PicketLinkUIConstants uiConstants;
     private PicketLinkUIMessages uiMessages;
+    private IdentityProviderWrapper selectedIdentityProvider;
 
     public IdentityProviderEditor(FederationPresenter presenter,
             final PicketLinkUIConstants uiConstants, final PicketLinkUIMessages uiMessages) {
@@ -152,8 +154,23 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
      * @see org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor#doUpdateSelection(org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity)
      */
     @Override
-    protected void doUpdateSelection(IdentityProvider policy) {
-        getTrustedDomainTabEditor().setIdentityProvider(policy);
+    protected void doUpdateSelection(IdentityProvider identityProvider) {
+        updateSelectedIdentityProvider(identityProvider);
+        getTrustedDomainTabEditor().setIdentityProvider(identityProvider);
+        getHandlerTabEditor().setIdentityProvider(this.selectedIdentityProvider);
+
+        if (this.selectedIdentityProvider != null) {
+            ArrayList<IdentityProviderHandler> handlersList = new ArrayList<>();
+
+            for (IdentityProviderHandlerWrapper handler : this.selectedIdentityProvider.getHandlers()) {
+                handlersList.add(handler.getHandler());
+            }
+
+            getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
+            getSignatureSupportTabEditor().setEntity(this.selectedIdentityProvider.getIdentityProvider());
+        }
+
+        getHandlerTabEditor().getHandlerParameterTable().getDataProvider().setList(new ArrayList<IdentityProviderHandlerParameter>());
     }
     
     /*
@@ -183,8 +200,6 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
     public void updateIdentityProviders(FederationWrapper federation) {
         if (federation != null) {
-            getBottomTabs().selectTab(0);
-
             List<IdentityProvider> identityProviders = new ArrayList<IdentityProvider>();
 
             for (IdentityProviderWrapper identityProviderWrapper : federation.getIdentityProviders()) {
@@ -210,28 +225,18 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
             }
 
             updateTrustedDomains(federation);
-            updateHandlers(federation);
+            updateHandlers(this.selectedIdentityProvider);
         }
     }
 
-    private void updateHandlers(FederationWrapper federation) {
+    private void updateHandlers(IdentityProviderWrapper identityProvider) {
         List<IdentityProviderHandler> handlers = new ArrayList<IdentityProviderHandler>();
-        
-        for (IdentityProviderWrapper identityProvider : federation.getIdentityProviders()) {
-            for (IdentityProviderHandlerWrapper wrapper : identityProvider.getHandlers()) {
-                handlers.add(wrapper.getHandler());    
-            }
-            
+
+        for (IdentityProviderHandlerWrapper wrapper : identityProvider.getHandlers()) {
+            handlers.add(wrapper.getHandler());
         }
 
         this.getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlers);
-        
-        IdentityProvider identityProvider = null;
-        
-        if (federation.getIdentityProvider() != null) {
-            identityProvider = federation.getIdentityProvider().getIdentityProvider();
-        }
-        
         this.getHandlerTabEditor().setIdentityProvider(identityProvider);
     }
 
@@ -259,6 +264,15 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     public void updateDeployments(List<DeploymentRecord> deployments) {
         if (getWizard() != null) {
             ((NewIdentityProviderWizard) getWizard()).updateNameItems();
+        }
+    }
+
+    private void updateSelectedIdentityProvider(IdentityProvider identityProvider) {
+        for (IdentityProviderWrapper identityProviderWrapper : getPresenter().getCurrentFederation().getIdentityProviders()) {
+            if (identityProviderWrapper.getIdentityProvider().getName().equals(identityProvider.getName())) {
+                this.selectedIdentityProvider = identityProviderWrapper;
+                break;
+            }
         }
     }
 
