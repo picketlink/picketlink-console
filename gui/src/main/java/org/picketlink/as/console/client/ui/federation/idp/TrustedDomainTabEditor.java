@@ -152,10 +152,7 @@ public class TrustedDomainTabEditor {
         TextBoxItem domainName = new TextBoxItem("name", uiConstants.common_label_domainName());
         domainName.setRequired(true);
 
-        TextBoxItem certAliasName = new TextBoxItem("certAlias", "Certificate Alias");
-        certAliasName.setRequired(false);
-
-        this.trustDomainForm.setFields(domainName, certAliasName);
+        this.trustDomainForm.setFields(domainName);
 
         trustDomainsHeader.add(this.trustDomainForm.asWidget());
     }
