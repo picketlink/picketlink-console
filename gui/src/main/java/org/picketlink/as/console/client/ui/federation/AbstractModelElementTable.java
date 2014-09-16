@@ -123,4 +123,7 @@ public abstract class AbstractModelElementTable<T> {
         this.getDataProvider().setList(items);
     }
 
+    public DefaultCellTable<T> getDataTable() {
+        return this.dataTable;
+    }
 }

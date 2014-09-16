@@ -22,21 +22,6 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.List;
-import java.util.Map;
-
-import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.widgets.ContentDescription;
-import org.jboss.ballroom.client.widgets.ContentGroupLabel;
-import org.jboss.ballroom.client.widgets.ContentHeaderLabel;
-import org.jboss.ballroom.client.widgets.tables.DefaultPager;
-import org.jboss.ballroom.client.widgets.tools.ToolButton;
-import org.jboss.ballroom.client.widgets.tools.ToolStrip;
-import org.jboss.ballroom.client.widgets.window.DefaultWindow;
-import org.jboss.ballroom.client.widgets.window.Feedback;
-import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
-
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -49,6 +34,20 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SingleSelectionModel;
+import org.jboss.as.console.client.Console;
+import org.jboss.as.console.client.widgets.ContentDescription;
+import org.jboss.ballroom.client.widgets.ContentGroupLabel;
+import org.jboss.ballroom.client.widgets.ContentHeaderLabel;
+import org.jboss.ballroom.client.widgets.tables.DefaultPager;
+import org.jboss.ballroom.client.widgets.tools.ToolButton;
+import org.jboss.ballroom.client.widgets.tools.ToolStrip;
+import org.jboss.ballroom.client.widgets.window.DefaultWindow;
+import org.jboss.ballroom.client.widgets.window.Feedback;
+import org.picketlink.as.console.client.shared.subsys.model.Federation;
+import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -61,6 +60,7 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
     private final AbstractModelElementTable<T> table;
 
     private ToolButton addModule;
+    private ToolButton removeButton;
     private DefaultWindow window;
     private ContentHeaderLabel headerLabel;
 
@@ -245,28 +245,29 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
         });
         addModule.ensureDebugId(Console.DEBUG_CONSTANTS.debug_label_add_abstractDomainDetailEditor());
         tableTools.addToolButtonRight(addModule);
-        tableTools.addToolButtonRight(new ToolButton(Console.CONSTANTS.common_label_delete(), new ClickHandler() {
+        this.removeButton = new ToolButton(Console.CONSTANTS.common_label_delete(), new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
 
                 final T currentSelection = getCurrentSelection();
-                
+
                 if (currentSelection != null) {
                     Feedback.confirm(Console.MESSAGES.deleteTitle(doGetEntityName()),
-                            Console.MESSAGES.deleteConfirm(currentSelection.getName()), new Feedback.ConfirmationHandler() {
-                                @Override
-                                public void onConfirmation(boolean isConfirmed) {
-                                    if (isConfirmed) {
-                                        table.getDataProvider().getList().remove(currentSelection);
-                                        table.getCellTable().getSelectionModel().setSelected(null, true);
-                                        doDelete(currentSelection);
-                                        wizard.clearValues();
-                                    }
+                        Console.MESSAGES.deleteConfirm(currentSelection.getName()), new Feedback.ConfirmationHandler() {
+                            @Override
+                            public void onConfirmation(boolean isConfirmed) {
+                                if (isConfirmed) {
+                                    table.getDataProvider().getList().remove(currentSelection);
+                                    table.getCellTable().getSelectionModel().setSelected(null, true);
+                                    doDelete(currentSelection);
+                                    wizard.clearValues();
                                 }
-                            });
+                            }
+                        });
                 }
             }
-        }));
+        });
+        tableTools.addToolButtonRight(removeButton);
 
         errorMessage = new HTML();
         
@@ -393,6 +394,14 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
      */
     protected void disableAddButton() {
         this.addModule.setEnabled(false);
+    }
+
+    protected void disableRemoveButton() {
+        this.removeButton.setEnabled(false);
+    }
+
+    protected void enableRemoveButton() {
+        this.removeButton.setEnabled(true);
     }
 
     /**

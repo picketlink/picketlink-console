@@ -29,11 +29,13 @@ import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.google.gwt.view.client.SingleSelectionModel;
 import org.jboss.as.console.client.Console;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
+import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -95,6 +97,7 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
                 }
 
                 handlersTabEditor.doUpdateSelection(selectedHandler);
+                handlersTabEditor.enableDisableHandlerParameterActions(true);
             }
 
         };
@@ -135,5 +138,10 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
 
     public void setSelectedIdentityProvider(IdentityProviderWrapper selectedIdentityProvider) {
         this.selectedIdentityProvider = selectedIdentityProvider;
+
+        if (this.selectedIdentityProvider == null) {
+            this.parametersTable.getDataProvider().setList(new ArrayList<IdentityProviderHandlerParameter>());
+            handlersTabEditor.enableDisableHandlerParameterActions(false);
+        }
     }
 }

@@ -169,9 +169,16 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
 
     public void updateServiceProviders(FederationWrapper federation) {
         if (federation != null) {
-            if (federation.getIdentityProvider() == null && !federation.getServiceProviders().isEmpty()) {
-                addErrorMessage("You have Service Providers configured but there is no IDP for them.");
+            if (federation.getIdentityProvider() == null) {
+                if (!federation.getServiceProviders().isEmpty()) {
+                    addErrorMessage("You have Service Providers configured but there is no IDP for them.");
+                } else {
+                    removeErrorMessage();
+                }
+
+                disableAddButton();
             } else {
+                enableAddButton();
                 removeErrorMessage();
             }
 
@@ -179,6 +186,12 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
 
             for (ServiceProviderWrapper serviceProviderWrapper : federation.getServiceProviders()) {
                 serviceProviders.add(serviceProviderWrapper.getServiceProvider());
+            }
+
+            if (serviceProviders.isEmpty()) {
+                disableRemoveButton();
+            } else {
+                enableRemoveButton();
             }
 
             setData(federation, serviceProviders);
@@ -195,6 +208,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
                 }
 
                 getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
+                getHandlerTabEditor().getHandlerTable().getDataTable().selectDefaultEntity();
             }
         }
     }
@@ -215,6 +229,11 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
             }
             
             getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
+
+            if (handlersList.isEmpty()) {
+                getHandlerTabEditor().enableDisableHandlerParameterActions(false);
+            }
+
             getSignatureSupportTabEditor().setEntity(this.selectedServiceProvider.getServiceProvider());
         }
         

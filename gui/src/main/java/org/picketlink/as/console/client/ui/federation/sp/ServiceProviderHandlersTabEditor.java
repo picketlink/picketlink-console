@@ -239,9 +239,20 @@ public class ServiceProviderHandlersTabEditor {
         }
         
         getHandlerParameterTable().getDataProvider().setList(parameters);
+        enableDisableHandlerParameterActions(true);
     }
 
     public ServiceProviderWrapper getServiceProvider() {
         return serviceProvider;
     }
+
+    public void enableDisableHandlerParameterActions(boolean enable) {
+        this.addHandlerParameterBtn.setEnabled(enable);
+        this.removeHandlerParameterBtn.setEnabled(enable);
+
+        if (getHandlerParameterTable().getDataProvider().getList().isEmpty()) {
+            this.removeHandlerParameterBtn.setEnabled(false);
+        }
+    }
+
 }

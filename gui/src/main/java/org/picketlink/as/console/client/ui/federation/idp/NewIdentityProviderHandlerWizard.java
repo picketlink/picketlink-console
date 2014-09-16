@@ -40,11 +40,11 @@ public class NewIdentityProviderHandlerWizard extends AbstractWizard<IdentityPro
     }
 
     @Override
-    protected void doSaveWizard(IdentityProviderHandler newTrustedDomain) {
-        if (newTrustedDomain != null && !newTrustedDomain.getClassName().trim().isEmpty()) {
+    protected void doSaveWizard(IdentityProviderHandler newHandler) {
+        if (newHandler != null && !newHandler.getClassName().trim().isEmpty()) {
             getPresenter().getFederationManager().onCreateIdentityProviderHandler(this.editor.getIdentityProvider()
-                .getIdentityProvider(), newTrustedDomain);
-            this.editor.getHandlerTable().getDataProvider().getList().add(newTrustedDomain);
+                .getIdentityProvider(), newHandler);
+            this.editor.getHandlerTable().getDataProvider().getList().add(newHandler);
         }
     }
 

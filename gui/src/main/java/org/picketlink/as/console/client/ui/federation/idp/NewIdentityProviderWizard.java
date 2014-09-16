@@ -51,7 +51,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
     private CheckBoxItem strictPostBinding;
     private ComboBoxItem securityDomainsItem;
     private PicketLinkUIConstants uiConstants;
-
+    private TextBoxItem url;
 
     public NewIdentityProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
             String type, PicketLinkUIConstants uiConstants) {
@@ -83,7 +83,9 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
         strictPostBinding = new CheckBoxItem("strictPostBinding", "Strict Post Binding");
         strictPostBinding.setEnabled(true);
-        
+
+        this.url = new TextBoxItem("url", uiConstants.common_label_URL(), false);
+
         if (isDialogue()) {
             externalIDP = new CheckBoxItem("external", "Is external?") {
                 @Override
@@ -95,6 +97,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
                         securityDomainsItem.setRequired(false);
                         strictPostBinding.setEnabled(false);
                         strictPostBinding.setRequired(false);
+                        url.setRequired(true);
                     } else {
                         getAliasItem().setEnabled(true);
                         getAliasItem().setRequired(true);
@@ -102,15 +105,16 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
                         securityDomainsItem.setRequired(true);
                         strictPostBinding.setEnabled(true);
                         strictPostBinding.setRequired(true);
+                        url.setRequired(false);
                     }
                 }
             };
 
-            formItems = new FormItem<?>[] { externalIDP, nameItem, securityDomainsItem, new TextBoxItem("url", uiConstants.common_label_URL(), false)};
+            formItems = new FormItem<?>[] { externalIDP, nameItem, securityDomainsItem, url};
         } else {
             editNameItem = new TextItem("name", "Name");
             editNameItem.setEnabled(false);
-            formItems = new FormItem<?>[] {editNameItem, securityDomainsItem, new TextBoxItem("url", uiConstants.common_label_URL(), true), strictPostBinding};
+            formItems = new FormItem<?>[] {editNameItem, securityDomainsItem, url, strictPostBinding};
         }
 
         return formItems;

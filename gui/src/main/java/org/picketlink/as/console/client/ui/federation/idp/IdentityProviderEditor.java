@@ -167,6 +167,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
             }
 
             getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlersList);
+            getHandlerTabEditor().getHandlerTable().getDataTable().selectDefaultEntity();
             getSignatureSupportTabEditor().setEntity(this.selectedIdentityProvider.getIdentityProvider());
         }
 
@@ -211,8 +212,11 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
             // disables the add button since we already have a idp configuration
             if (!identityProviders.isEmpty()) {
                 disableAddButton();
+                enableRemoveButton();
             } else {
                 enableAddButton();
+                disableRemoveButton();
+                this.selectedIdentityProvider = null;
             }
 
             if (!identityProviders.isEmpty()) {
@@ -236,10 +240,15 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
             for (IdentityProviderHandlerWrapper wrapper : identityProvider.getHandlers()) {
                 handlers.add(wrapper.getHandler());
             }
-
-            this.getHandlerTabEditor().setIdentityProvider(identityProvider);
         }
+
         this.getHandlerTabEditor().getHandlerTable().getDataProvider().setList(handlers);
+
+        if (handlers.isEmpty()) {
+            getHandlerTabEditor().enableDisableHandlerParameterActions(false);
+        }
+
+        this.getHandlerTabEditor().setIdentityProvider(identityProvider);
 
     }
 

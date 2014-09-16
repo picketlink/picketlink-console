@@ -147,6 +147,8 @@ public class IdentityProviderHandlersTabEditor {
 
         addHandlerParameterBtn = new ToolButton(Console.CONSTANTS.common_label_add());
 
+        this.addHandlerParameterBtn.setEnabled(false);
+
         addHandlerParameterBtn.addClickHandler(new ClickHandler() {
 
             @Override
@@ -158,6 +160,8 @@ public class IdentityProviderHandlersTabEditor {
         trustDomainTools.addToolButtonRight(addHandlerParameterBtn);
 
         removeHandlerParameterBtn = new ToolButton(Console.CONSTANTS.common_label_delete());
+
+        this.removeHandlerParameterBtn.setEnabled(false);
 
         removeHandlerParameterBtn.addClickHandler(new ClickHandler() {
 
@@ -229,6 +233,11 @@ public class IdentityProviderHandlersTabEditor {
 
     public void doUpdateSelection(IdentityProviderHandler selectedHandler) {
         List<IdentityProviderHandlerWrapper> handlers = this.identityProvider.getHandlers();
+
+        if (handlers.isEmpty()) {
+            enableDisableHandlerParameterActions(false);
+        }
+
         ArrayList<IdentityProviderHandlerParameter> parameters = new ArrayList<IdentityProviderHandlerParameter>();
 
         for (IdentityProviderHandlerWrapper handlerWrapper : handlers) {
@@ -244,5 +253,14 @@ public class IdentityProviderHandlersTabEditor {
 
     public IdentityProviderWrapper getIdentityProvider() {
         return identityProvider;
+    }
+
+    public void enableDisableHandlerParameterActions(boolean enable) {
+        this.addHandlerParameterBtn.setEnabled(enable);
+        this.removeHandlerParameterBtn.setEnabled(enable);
+
+        if (getHandlerParameterTable().getDataProvider().getList().isEmpty()) {
+            this.removeHandlerParameterBtn.setEnabled(false);
+        }
     }
 }
