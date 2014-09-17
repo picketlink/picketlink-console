@@ -356,10 +356,10 @@ public class FederationManager {
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         loadAllFederations();
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added("Handler" + newHandler.getClassName()));
+                            Console.info(Console.MESSAGES.added("Handler " + newHandler.getClassName()));
                         } else
                             Console.error(
-                                    Console.MESSAGES.addingFailed("Handler" + newHandler.getClassName()), result.getResponse().toString());
+                                    Console.MESSAGES.addingFailed("Handler " + newHandler.getClassName()), result.getResponse().toString());
                     }
                 });
     }
@@ -375,9 +375,9 @@ public class FederationManager {
                     public void onSuccess(Boolean success) {
                         loadAllFederations();
                         if (success) {
-                            Console.info(Console.MESSAGES.deleted("Handler" + removedTrustedDomain.getClassName()));
+                            Console.info(Console.MESSAGES.deleted("Handler " + removedTrustedDomain.getClassName()));
                         } else {
-                            Console.error(Console.MESSAGES.deletionFailed("Handler" + removedTrustedDomain.getClassName()));
+                            Console.error(Console.MESSAGES.deletionFailed("Handler " + removedTrustedDomain.getClassName()));
                         }
                     }
                 });
@@ -392,10 +392,10 @@ public class FederationManager {
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         loadAllFederations();
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added("Handler Parameter" + newHandlerParameter.getName()));
+                            Console.info(Console.MESSAGES.added("Handler Parameter " + newHandlerParameter.getName()));
                         } else
                             Console.error(
-                                    Console.MESSAGES.addingFailed("Handler Parameter" + newHandlerParameter.getName()), result.getResponse().toString());
+                                    Console.MESSAGES.addingFailed("Handler Parameter " + newHandlerParameter.getName()), result.getResponse().toString());
                     }
                 });
     }
@@ -413,7 +413,7 @@ public class FederationManager {
                             Console.error(Console.MESSAGES.deletionFailed("Handler Parameter" + removedHandlerParameter.getName()));
                         }
                     }
-                });        
+                });
     }
 
     public void onCreateServiceProviderHandler(ServiceProvider serviceProvider, final ServiceProviderHandler newTrustedDomain) {
@@ -424,10 +424,10 @@ public class FederationManager {
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         loadAllFederations();
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added("Handler" + newTrustedDomain.getClassName()));
+                            Console.info(Console.MESSAGES.added("Handler " + newTrustedDomain.getClassName()));
                         } else
                             Console.error(
-                                    Console.MESSAGES.addingFailed("Handler" + newTrustedDomain.getClassName()), result.getResponse().toString());
+                                    Console.MESSAGES.addingFailed("Handler " + newTrustedDomain.getClassName()), result.getResponse().toString());
                     }
                 });
     }
@@ -439,9 +439,9 @@ public class FederationManager {
                     public void onSuccess(Boolean success) {
                         loadAllFederations();
                         if (success) {
-                            Console.info(Console.MESSAGES.deleted("Handler" + removedTrustedDomain.getClassName()));
+                            Console.info(Console.MESSAGES.deleted("Handler " + removedTrustedDomain.getClassName()));
                         } else {
-                            Console.error(Console.MESSAGES.deletionFailed("Handler" + removedTrustedDomain.getClassName()));
+                            Console.error(Console.MESSAGES.deletionFailed("Handler " + removedTrustedDomain.getClassName()));
                         }
                     }
                 });
@@ -456,10 +456,10 @@ public class FederationManager {
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         loadAllFederations();
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added("Handler Parameter" + newHandlerParameter.getName()));
+                            Console.info(Console.MESSAGES.added("Handler Parameter " + newHandlerParameter.getName()));
                         } else
                             Console.error(
-                                    Console.MESSAGES.addingFailed("Handler Parameter" + newHandlerParameter.getName()), result.getResponse().toString());
+                                    Console.MESSAGES.addingFailed("Handler Parameter " + newHandlerParameter.getName()), result.getResponse().toString());
                     }
                 });
     }
