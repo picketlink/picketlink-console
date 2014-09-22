@@ -261,28 +261,48 @@ public class FederationManager {
      * @param identityProvider
      */
     public void onRemoveIdentityProvider(final IdentityProvider identityProvider) {
-        this.deploymentManager.undeployDeployment(identityProvider, new SimpleCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean result) {
-                federationStore.deleteIdentityProvider(presenter.getCurrentFederation(), identityProvider,
-                    new SimpleCallback<Boolean>() {
-                        @Override
-                        public void onSuccess(Boolean success) {
-                            loadAllFederations();
-                            if (success) {
-                                Console.info(Console.MESSAGES.deleted(uiConstants
-                                    .common_label_identityProvider() + " ")
-                                    + identityProvider.getName());
-                            } else {
-                                Console.error(Console.MESSAGES.deletionFailed(uiConstants
-                                    .common_label_identityProvider() + " ")
-                                    + identityProvider.getName());
-                            }
+        if (identityProvider.isExternal()) {
+            federationStore.deleteIdentityProvider(presenter.getCurrentFederation(), identityProvider,
+                new SimpleCallback<Boolean>() {
+                    @Override
+                    public void onSuccess(Boolean success) {
+                        loadAllFederations();
+                        if (success) {
+                            Console.info(Console.MESSAGES.deleted(uiConstants
+                                .common_label_identityProvider() + " ")
+                                + identityProvider.getName());
+                        } else {
+                            Console.error(Console.MESSAGES.deletionFailed(uiConstants
+                                .common_label_identityProvider() + " ")
+                                + identityProvider.getName());
                         }
-                    });
-                eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
-            }
-        });
+                    }
+                });
+            eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
+        } else {
+            this.deploymentManager.undeployDeployment(identityProvider, new SimpleCallback<Boolean>() {
+                @Override
+                public void onSuccess(Boolean result) {
+                    federationStore.deleteIdentityProvider(presenter.getCurrentFederation(), identityProvider,
+                        new SimpleCallback<Boolean>() {
+                            @Override
+                            public void onSuccess(Boolean success) {
+                                loadAllFederations();
+                                if (success) {
+                                    Console.info(Console.MESSAGES.deleted(uiConstants
+                                        .common_label_identityProvider() + " ")
+                                        + identityProvider.getName());
+                                } else {
+                                    Console.error(Console.MESSAGES.deletionFailed(uiConstants
+                                        .common_label_identityProvider() + " ")
+                                        + identityProvider.getName());
+                                }
+                            }
+                        });
+                    eventBus.fireEvent(new RemoveIdentityProviderEvent(identityProvider));
+                }
+            });
+        }
     }
 
     /**
