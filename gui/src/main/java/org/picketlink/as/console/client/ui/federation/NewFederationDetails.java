@@ -22,6 +22,9 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
+import java.util.List;
+import java.util.Map;
+
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -32,13 +35,11 @@ import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.FormAdapter;
 import org.jboss.ballroom.client.widgets.forms.FormCallback;
 import org.jboss.ballroom.client.widgets.forms.FormValidation;
+import org.jboss.ballroom.client.widgets.forms.FormValidator;
 import org.jboss.ballroom.client.widgets.forms.TextItem;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -164,6 +165,11 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     @Override
     public FormValidation validate() {
         return form.validate();
+    }
+
+    @Override
+    public void addFormValidator(final FormValidator formValidator) {
+        form.addFormValidator(formValidator);
     }
 
     @Override
