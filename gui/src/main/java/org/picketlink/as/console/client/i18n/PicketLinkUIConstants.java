@@ -49,6 +49,7 @@ public interface PicketLinkUIConstants extends Constants {
     String subsys_picketlink_identity_provider_desc();
     String subsys_picketlink_service_provider_desc();
     String subsys_picketlink_security_token_service_desc();
+    String subsys_picketlink_key_store_desc();
     String common_label_key();
     String common_label_key_host();
     String common_label_key_alias();

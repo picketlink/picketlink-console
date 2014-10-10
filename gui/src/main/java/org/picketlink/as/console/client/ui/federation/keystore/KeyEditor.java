@@ -20,14 +20,13 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.ui.federation;
+package org.picketlink.as.console.client.ui.federation.keystore;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.layout.FormLayout;
 import org.jboss.as.console.client.widgets.ContentDescription;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
@@ -36,6 +35,8 @@ import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.Feedback;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.Key;
+import org.picketlink.as.console.client.ui.federation.FederationPresenter;
+import org.picketlink.as.console.client.ui.federation.idp.NewTrustDomainWizard;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -62,7 +63,6 @@ public class KeyEditor {
 
         this.keyLayout.setStyleName("fill-layout-width");
 
-        addForm(this.keyLayout);
         addActions(this.keyLayout);
         addTable(this.keyLayout);
 
@@ -75,21 +75,14 @@ public class KeyEditor {
 
     private void addActions(VerticalPanel header) {
         ToolStrip tools = new ToolStrip();
-
+        final KeyEditor editor = this;
         addBtn = new ToolButton(Console.CONSTANTS.common_label_add());
 
         addBtn.addClickHandler(new ClickHandler() {
 
             @Override
             public void onClick(ClickEvent event) {
-                Key newKey = keyForm.getUpdatedEntity();
-
-                if (newKey != null && !newKey.getName().trim().isEmpty()) {
-                    presenter.getFederationManager().onCreateKey(presenter.getCurrentFederation(), newKey);
-                    getKeyTable().getDataProvider().getList().add(newKey);
-                }
-
-                keyForm.clearValues();
+                new NewKeyWizard(editor, presenter, uiConstants).launchWizard();
             }
         });
 
@@ -104,7 +97,7 @@ public class KeyEditor {
                 final Key removedKey = getKeyTable().getSelectedTrustedDomain();
 
                 Feedback.confirm(
-                    Console.MESSAGES.deleteTitle(uiConstants.common_label_trustDomain()),
+                    Console.MESSAGES.deleteTitle(uiConstants.common_label_key()),
                     Console.MESSAGES.deleteConfirm(removedKey.getName()),
                     new Feedback.ConfirmationHandler() {
                         @Override
@@ -155,6 +148,7 @@ public class KeyEditor {
     }
 
     public void setEnabled(boolean enabled) {
-        this.keyLayout.setVisible(enabled);
+        this.addBtn.setEnabled(enabled);
+        this.removeBtn.setEnabled(enabled);
     }
 }

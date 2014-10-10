@@ -123,7 +123,12 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
         getPresenter().getFederationManager().onCreateServiceProvider(serviceProvider);
         return true;
     }
-    
+
+    @Override
+    protected String doGetName(ServiceProvider currentSelection) {
+        return currentSelection.getName();
+    }
+
     @Override
     protected boolean onLunchWizard() {
         if (this.getPresenter().getIdentityProvider() == null) {

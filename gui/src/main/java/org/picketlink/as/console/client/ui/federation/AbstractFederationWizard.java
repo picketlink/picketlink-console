@@ -22,27 +22,25 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.Map;
-
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.Command;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.jboss.as.console.client.widgets.forms.FormToolStrip;
 import org.jboss.ballroom.client.widgets.forms.Form;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.FormValidation;
 import org.jboss.ballroom.client.widgets.window.DialogueOptions;
 import org.jboss.ballroom.client.widgets.window.WindowContentBuilder;
-import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 30, 2012
  */
-public abstract class AbstractFederationWizard<T extends GenericFederationEntity> implements Wizard<T> {
+public abstract class AbstractFederationWizard<T> implements Wizard<T> {
 
     private final AbstractFederationDetailEditor<T> editor;
     private final Class<T> entityClass;
@@ -53,6 +51,8 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
     private final String[] attributesNames;
 
     private boolean isDialogue = false;
+    private FormToolStrip<T> toolStrip;
+    private DialogueOptions options;
 
     public AbstractFederationWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
             String type, String... attributeNames) {
@@ -70,7 +70,9 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
 
     @Override
     public void clearValues() {
-        form.clearValues();
+        if (form != null) {
+            form.clearValues();
+        }
     }
 
     public Widget asWidget() {
@@ -93,10 +95,13 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
                         T original = form.getEditedEntity();
                         T edited = form.getUpdatedEntity();
                         
-                        original.setName(edited.getName());
+//                        original.setName(edited.getName());
 
                         editor.doUpdate(edited, form.getChangedValues());
-                        form.edit(edited);
+
+                        if (form != null) {
+                            form.edit(edited);
+                        }
                     } else {
                         T data = form.getUpdatedEntity();
                         editor.doSaveWizard(data);
@@ -109,7 +114,7 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
 
         // ----
         if (!isDialogue) {
-            FormToolStrip<T> toolStrip = new FormToolStrip<T>(form, new FormToolStrip.FormCallback<T>() {
+            this.toolStrip = new FormToolStrip<T>(form, new FormToolStrip.FormCallback<T>() {
                 @Override
                 public void onSave(Map<String, Object> changeset) {
                     saveCmd.execute();
@@ -123,9 +128,9 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
             });
 
             toolStrip.providesDeleteOp(false);
-            layout.add(toolStrip.asWidget());
+            Widget widget = toolStrip.asWidget();
 
-            form.setEnabled(false);
+            layout.add(widget);
             form.setNumColumns(2);
         }
 
@@ -137,7 +142,7 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
 
         layout.add(form.asWidget());
 
-        DialogueOptions options = new DialogueOptions(new ClickHandler() {
+        this.options = new DialogueOptions(new ClickHandler() {
             @Override
             public void onClick(ClickEvent event) {
                 saveCmd.execute();
@@ -149,7 +154,7 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
                 editor.closeWizard();
             }
         });
-        
+
         return isDialogue ? new WindowContentBuilder(layout, options).build() : layout;
     }
 
@@ -161,7 +166,9 @@ public abstract class AbstractFederationWizard<T extends GenericFederationEntity
      * @see org.picketlink.as.console.client.ui.federation.Wizard#edit(java.lang.Object)
      */
     public void edit(T object) {
-        form.edit(object);
+        if (form != null) {
+            form.edit(object);
+        }
     }
 
     /**

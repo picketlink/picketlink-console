@@ -50,7 +50,6 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     private final Form<Federation> form;
     private final FederationPresenter presenter;
     private final PicketLinkUIConstants uiConstants;
-    private DigitalCertificateDetails digitalCertificateDetails;
     private SAMLConfigurationDetails samlConfigurationDetails;
     private TabPanel tabPanel;
 
@@ -79,10 +78,6 @@ public class NewFederationDetails implements FormAdapter<Federation> {
 
         tabPanel.add(layout, "Attributes");
         
-        this.digitalCertificateDetails = new DigitalCertificateDetails(this.presenter, this.uiConstants);
-        
-        tabPanel.add(this.digitalCertificateDetails.asWidget(), "Digital Certificates");
-
         this.samlConfigurationDetails = new SAMLConfigurationDetails(this.presenter);
         
         tabPanel.add(this.samlConfigurationDetails.asWidget(), "SAML Configuration");
@@ -175,19 +170,12 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     @Override
     public void clearValues() {
         form.clearValues();
-        this.digitalCertificateDetails.setKeyStore(null);
         this.samlConfigurationDetails.setSAMLConfiguration(null);
     }
 
     public void updateTabs(FederationWrapper federation) {
         this.tabPanel.setVisible(federation != null);
 
-        if (federation != null && !federation.getKeyStores().isEmpty()) {
-            this.digitalCertificateDetails.setKeyStore(federation.getKeyStores().get(0));            
-        } else {
-            this.digitalCertificateDetails.setKeyStore(null);
-        }
-        
         if (federation != null) {
             this.samlConfigurationDetails.setSAMLConfiguration(federation.getSAMLConfiguration());
         } else {

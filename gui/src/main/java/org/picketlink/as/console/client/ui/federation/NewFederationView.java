@@ -47,6 +47,7 @@ import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.ui.federation.idp.IdentityProviderEditor;
+import org.picketlink.as.console.client.ui.federation.keystore.KeyStoreEditor;
 import org.picketlink.as.console.client.ui.federation.sp.ServiceProviderEditor;
 
 import java.util.EnumSet;
@@ -71,6 +72,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     private FederationTable federationsTable;
     private ServiceProviderEditor serviceProviderEditor;
     private NewFederationDetails federationDetails;
+    private KeyStoreEditor keyStoreEditor;
 
     @Inject
     public NewFederationView(ApplicationMetaData propertyMetaData, DispatchAsync dispatchAsync,
@@ -97,6 +99,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         pages.addPage(Console.CONSTANTS.common_label_back(), domainList);
         pages.addPage(getIdentityProviderEditor().doGetEntityName(), getIdentityProviderEditor().asWidget());
         pages.addPage(getServiceProviderEditor().doGetEntityName(), getServiceProviderEditor().asWidget());
+        pages.addPage(getKeyStoreEditor().doGetEntityName(), getKeyStoreEditor().asWidget());
 
         // default page
         pages.showPage(0);
@@ -124,7 +127,8 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     public void updateSelectedFederation(FederationWrapper federation) {
         this.federationDetails.updateTabs(federation);
         getIdentityProviderEditor().updateIdentityProviders(federation);    
-        getServiceProviderEditor().updateServiceProviders(federation);    
+        getServiceProviderEditor().updateServiceProviders(federation);
+        getKeyStoreEditor().updateKeyStore(federation);
     }
 
     private Widget createDomainList(String description) {
@@ -148,9 +152,6 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         getServiceProviderEditor().updateDeployments(deployments);
     }
 
-    /**
-     * @return
-     */
     private IdentityProviderEditor getIdentityProviderEditor() {
         if (this.identityProviderEditor == null) {
             this.identityProviderEditor = new IdentityProviderEditor(this.presenter, uiConstants, uiMessages);
@@ -165,6 +166,14 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         }
 
         return this.serviceProviderEditor;
+    }
+
+    private KeyStoreEditor getKeyStoreEditor() {
+        if (this.keyStoreEditor == null) {
+            this.keyStoreEditor = new KeyStoreEditor(this.presenter, uiConstants, uiMessages);
+        }
+
+        return this.keyStoreEditor;
     }
 
     /*

@@ -20,7 +20,7 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.ui.federation;
+package org.picketlink.as.console.client.ui.federation.keystore;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -29,6 +29,7 @@ import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.google.gwt.view.client.SingleSelectionModel;
 import org.jboss.as.console.client.Console;
 import org.picketlink.as.console.client.shared.subsys.model.Key;
+import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
 
 /**
  * <p>
@@ -56,12 +57,12 @@ public class KeyTable extends AbstractModelElementTable<Key> {
      * (non-Javadoc)
      * 
      * @see
-     * org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doAddConlumns(org.jboss.ballroom.client.widgets
+     * org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doAddColumns(org.jboss.ballroom.client.widgets
      * .tables.DefaultCellTable)
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected void doAddConlumns(CellTable table) {
+    protected void doAddColumns(CellTable table) {
         createNameColumn(table);
         createHostCollumn(table);
 

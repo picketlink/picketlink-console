@@ -97,6 +97,7 @@ public class FederationManager {
         this.federationStore.deleteKeyStore(presenter.getCurrentFederation(), keyStore, new SimpleCallback<Boolean>() {
             @Override
             public void onSuccess(Boolean success) {
+                loadAllFederations();
                 if (success) {
                     Console.info(Console.MESSAGES.deleted(uiConstants.common_label_key_store()));
                 } else {

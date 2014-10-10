@@ -20,28 +20,29 @@
  * 02110-1301 USA, or see the FSF site: http://www.fsf.org.
  */
 
-package org.picketlink.as.console.client.ui.federation.idp;
+package org.picketlink.as.console.client.ui.federation.keystore;
 
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
-import com.google.gwt.view.client.SingleSelectionModel;
-import org.jboss.as.console.client.Console;
-import org.picketlink.as.console.client.shared.subsys.model.TrustDomain;
+import org.picketlink.as.console.client.shared.subsys.model.KeyStore;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
+import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
 /**
  * <p>
- * A table widget to be used to show the trusted domains.
+ * A table widget to be used to show the identity providers.
  * </p>
  * 
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 19, 2012
  */
-public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
+public class KeyStoreTable extends AbstractModelElementTable<KeyStore> {
 
-    private TrustDomain selectedTrustedDomain;
+    private FederationPresenter presenter;
+
+    public KeyStoreTable(FederationPresenter presenter) {
+        this.presenter = presenter;
+    }
     
     /*
      * (non-Javadoc)
@@ -49,8 +50,8 @@ public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
      * @see org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doGetKey(java.lang.Object)
      */
     @Override
-    protected Object doGetKey(TrustDomain item) {
-        return item.getName();
+    protected Object doGetKey(KeyStore item) {
+        return item.getUrl();
     }
 
     /*
@@ -63,44 +64,31 @@ public class TrustDomainTable extends AbstractModelElementTable<TrustDomain> {
     @SuppressWarnings("unchecked")
     @Override
     protected void doAddColumns(CellTable table) {
-        createNameColumn(table);
-
-        this.getCellTable().setSelectionModel(createSelectionModel());
-    }
-
-    private SingleSelectionModel<TrustDomain> createSelectionModel() {
-        final SingleSelectionModel<TrustDomain> selectionModel = new SingleSelectionModel<TrustDomain>();
-
-        Handler selectionHandler = new SelectionChangeEvent.Handler() {
-
+        TextColumn<KeyStore> urlColumn = new TextColumn<KeyStore>() {
             @Override
-            public void onSelectionChange(com.google.gwt.view.client.SelectionChangeEvent event) {
-                SingleSelectionModel<TrustDomain> selection = (SingleSelectionModel<TrustDomain>) event.getSource();
-                
-                selectedTrustedDomain = selection.getSelectedObject();
-            }
-
-        };
-
-        selectionModel.addSelectionChangeHandler(selectionHandler);
-        return selectionModel;
-    }
-
-    private void createNameColumn(CellTable table) {
-        TextColumn<TrustDomain> nameColumn = new TextColumn<TrustDomain>() {
-            @Override
-            public String getValue(TrustDomain record) {
-                return record.getName();
+            public String getValue(KeyStore record) {
+                return record.getUrl();
             }
         };
 
-        table.addColumn(nameColumn, Console.CONSTANTS.common_label_name());
-    }
-    
-    /**
-     * @return the selectedTrustedDomain
-     */
-    public TrustDomain getSelectedTrustedDomain() {
-        return selectedTrustedDomain;
+        table.addColumn(urlColumn, "Url");
+
+        TextColumn<KeyStore> relativeToColumn = new TextColumn<KeyStore>() {
+            @Override
+            public String getValue(KeyStore record) {
+                return record.getRelativeTo();
+            }
+        };
+
+        table.addColumn(relativeToColumn, "Relative To");
+
+        TextColumn<KeyStore> signKeyColumn = new TextColumn<KeyStore>() {
+            @Override
+            public String getValue(KeyStore record) {
+                return record.getSignKeyAlias();
+            }
+        };
+
+        table.addColumn(signKeyColumn, "Sign Key");
     }
 }

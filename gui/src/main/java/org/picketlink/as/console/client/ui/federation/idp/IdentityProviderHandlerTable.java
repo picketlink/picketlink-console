@@ -68,12 +68,12 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
      * (non-Javadoc)
      * 
      * @see
-     * org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doAddConlumns(org.jboss.ballroom.client.widgets
+     * org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doAddColumns(org.jboss.ballroom.client.widgets
      * .tables.DefaultCellTable)
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected void doAddConlumns(CellTable table) {
+    protected void doAddColumns(CellTable table) {
         createNameColumn(table);
 
         this.getCellTable().setSelectionModel(createSelectionModel());
