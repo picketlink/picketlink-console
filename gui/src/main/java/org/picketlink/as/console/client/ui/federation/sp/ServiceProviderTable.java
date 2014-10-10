@@ -66,12 +66,12 @@ public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvi
      * (non-Javadoc)
      * 
      * @see
-     * org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doAddConlumns(org.jboss.ballroom.client.widgets
+     * org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doAddColumns(org.jboss.ballroom.client.widgets
      * .tables.DefaultCellTable)
      */
     @SuppressWarnings("unchecked")
     @Override
-    protected void doAddConlumns(CellTable table) {
+    protected void doAddColumns(CellTable table) {
         TextColumn<ServiceProvider> aliasColumn = new TextColumn<ServiceProvider>() {
             @Override
             public String getValue(ServiceProvider record) {

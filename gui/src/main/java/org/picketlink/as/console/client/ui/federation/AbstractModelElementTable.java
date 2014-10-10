@@ -77,7 +77,7 @@ public abstract class AbstractModelElementTable<T> {
                             return doGetKey(item);
                         }
                     });
-            doAddConlumns(this.dataTable);
+            doAddColumns(this.dataTable);
         }
 
         return this.dataTable;
@@ -100,7 +100,7 @@ public abstract class AbstractModelElementTable<T> {
      * 
      * @param federationTable
      */
-    protected abstract void doAddConlumns(CellTable federationTable);
+    protected abstract void doAddColumns(CellTable federationTable);
 
     /**
      * Returns a instance of {@link ListDataProvider} to be used to manipulate table items.

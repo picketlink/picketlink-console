@@ -107,6 +107,11 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
         return true;
     }
 
+    @Override
+    protected String doGetName(IdentityProvider currentSelection) {
+        return currentSelection.getName();
+    }
+
     /* (non-Javadoc)
      * @see org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor#addTabs(com.google.gwt.user.client.ui.TabPanel)
      */

@@ -44,7 +44,6 @@ import org.jboss.ballroom.client.widgets.tools.ToolStrip;
 import org.jboss.ballroom.client.widgets.window.DefaultWindow;
 import org.jboss.ballroom.client.widgets.window.Feedback;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
-import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
 
 import java.util.List;
 import java.util.Map;
@@ -53,7 +52,7 @@ import java.util.Map;
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 30, 2012
  */
-public abstract class AbstractFederationDetailEditor<T extends GenericFederationEntity> {
+public abstract class AbstractFederationDetailEditor<T> {
 
     private final Class<T> entityClass;
     private final FederationPresenter presenter;
@@ -215,12 +214,16 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
 
         wizard = doCreateWizard();
 
-        bottomTabs.add(wizard.asWidget(), "Attributes");
+        doCreateAttributesTab(bottomTabs);
 
         addDetailsSectionTabs(bottomTabs);
 
         vpanel.add(bottomTabs);
         bottomTabs.selectTab(0);
+    }
+
+    protected void doCreateAttributesTab(TabPanel bottomTabs) {
+        bottomTabs.add(wizard.asWidget(), "Attributes");
     }
 
     /**
@@ -253,7 +256,7 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
 
                 if (currentSelection != null) {
                     Feedback.confirm(Console.MESSAGES.deleteTitle(doGetEntityName()),
-                        Console.MESSAGES.deleteConfirm(currentSelection.getName()), new Feedback.ConfirmationHandler() {
+                        Console.MESSAGES.deleteConfirm(doGetName(currentSelection)), new Feedback.ConfirmationHandler() {
                             @Override
                             public void onConfirmation(boolean isConfirmed) {
                                 if (isConfirmed) {
@@ -278,7 +281,9 @@ public abstract class AbstractFederationDetailEditor<T extends GenericFederation
         
         vpanel.add(horizontalPanel);
     }
-    
+
+    protected abstract String doGetName(T currentSelection);
+
     /**
      * <p>
      * Subclasses can override this method to do something when the Add button is called.
