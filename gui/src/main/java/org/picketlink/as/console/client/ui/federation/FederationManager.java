@@ -429,9 +429,9 @@ public class FederationManager {
                     public void onSuccess(Boolean success) {
                         loadAllFederations();
                         if (success) {
-                            Console.info(Console.MESSAGES.deleted("Handler Parameter" + removedHandlerParameter.getName()));
+                            Console.info(Console.MESSAGES.deleted("Handler Parameter " + removedHandlerParameter.getName()));
                         } else {
-                            Console.error(Console.MESSAGES.deletionFailed("Handler Parameter" + removedHandlerParameter.getName()));
+                            Console.error(Console.MESSAGES.deletionFailed("Handler Parameter " + removedHandlerParameter.getName()));
                         }
                     }
                 });
@@ -493,9 +493,9 @@ public class FederationManager {
                     public void onSuccess(Boolean success) {
                         loadAllFederations();
                         if (success) {
-                            Console.info(Console.MESSAGES.deleted("Handler Parameter" + removedHandlerParameter.getName()));
+                            Console.info(Console.MESSAGES.deleted("Handler Parameter " + removedHandlerParameter.getName()));
                         } else {
-                            Console.error(Console.MESSAGES.deletionFailed("Handler Parameter" + removedHandlerParameter.getName()));
+                            Console.error(Console.MESSAGES.deletionFailed("Handler Parameter " + removedHandlerParameter.getName()));
                         }
                     }
                 });        
