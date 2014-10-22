@@ -209,8 +209,8 @@ public abstract class AbstractFederationDetailEditor<T> {
 
         // adds the tabs for the details section
         bottomTabs = new TabPanel();
-
-        bottomTabs.setStyleName("rhs-content-panel");
+        bottomTabs.setStyleName("default-tabpanel");
+        bottomTabs.addStyleName("master_detail-detail");
 
         wizard = doCreateWizard();
 

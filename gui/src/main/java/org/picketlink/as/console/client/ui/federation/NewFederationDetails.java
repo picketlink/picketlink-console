@@ -62,12 +62,11 @@ public class NewFederationDetails implements FormAdapter<Federation> {
     @Override
     public Widget asWidget() {
         this.tabPanel = new TabPanel();
-
-        tabPanel.setStyleName("rhs-content-panel");
+        tabPanel.setStyleName("default-tabpanel");
+        tabPanel.addStyleName("master_detail-detail");
 
         VerticalPanel layout = new VerticalPanel();
 
-        tabPanel.setStyleName("rhs-content-panel");
 
         final TextItem aliasItem = new TextItem("name", uiConstants.common_label_federationName());
 
