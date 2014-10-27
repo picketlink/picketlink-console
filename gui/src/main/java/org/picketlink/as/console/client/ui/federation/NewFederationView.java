@@ -28,8 +28,8 @@ import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.EventBus;
 import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.jboss.as.console.client.shared.viewframework.AbstractEntityView;
 import org.jboss.as.console.client.shared.viewframework.EntityEditor;
 import org.jboss.as.console.client.shared.viewframework.EntityToDmrBridge;
@@ -51,7 +51,6 @@ import org.picketlink.as.console.client.ui.federation.keystore.KeyStoreEditor;
 import org.picketlink.as.console.client.ui.federation.sp.ServiceProviderEditor;
 
 import java.util.EnumSet;
-import java.util.List;
 
 /**
  * <p>
@@ -63,6 +62,7 @@ import java.util.List;
  */
 public class NewFederationView extends AbstractEntityView<Federation> implements FederationPresenter.MyView {
 
+    private final EventBus eventBus;
     private EntityToDmrBridgeImpl<Federation> bridge;
     private FederationPresenter presenter;
     private PicketLinkUIConstants uiConstants;
@@ -76,7 +76,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     @Inject
     public NewFederationView(ApplicationMetaData propertyMetaData, DispatchAsync dispatchAsync,
-            PicketLinkUIConstants uiConstants, PicketLinkUIMessages uiMessages) {
+            PicketLinkUIConstants uiConstants, PicketLinkUIMessages uiMessages, EventBus eventBus) {
         super(Federation.class, propertyMetaData, EnumSet.of(FrameworkButton.EDIT_SAVE));
         this.bridge = new EntityToDmrBridgeImpl<Federation>(propertyMetaData, Federation.class, this, dispatchAsync) {
             @Override
@@ -87,6 +87,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         };
         this.uiConstants = uiConstants;
         this.uiMessages = uiMessages;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -147,14 +148,9 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         return scrollPanel;
     }
 
-    public void updateDeployments(List<DeploymentRecord> deployments) {
-        getIdentityProviderEditor().updateDeployments(deployments);
-        getServiceProviderEditor().updateDeployments(deployments);
-    }
-
     private IdentityProviderEditor getIdentityProviderEditor() {
         if (this.identityProviderEditor == null) {
-            this.identityProviderEditor = new IdentityProviderEditor(this.presenter, uiConstants, uiMessages);
+            this.identityProviderEditor = new IdentityProviderEditor(this.presenter, uiConstants, uiMessages, this.eventBus);
         }
 
         return this.identityProviderEditor;
@@ -162,7 +158,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     private ServiceProviderEditor getServiceProviderEditor() {
         if (this.serviceProviderEditor == null) {
-            this.serviceProviderEditor = new ServiceProviderEditor(this.presenter, uiConstants, uiMessages);
+            this.serviceProviderEditor = new ServiceProviderEditor(this.presenter, uiConstants, uiMessages, this.eventBus);
         }
 
         return this.serviceProviderEditor;

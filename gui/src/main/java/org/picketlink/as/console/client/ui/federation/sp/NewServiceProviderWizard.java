@@ -22,18 +22,20 @@
 
 package org.picketlink.as.console.client.ui.federation.sp;
 
-import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
+import com.google.web.bindery.event.shared.EventBus;
+import org.jboss.as.console.client.shared.subsys.security.model.SecurityDomain;
 import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEntity;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationDetailEditor;
 import org.picketlink.as.console.client.ui.federation.AbstractFederationWizard;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.Wizard;
+import org.picketlink.as.console.client.ui.federation.event.UpdateSecurityDomainEvent;
+import org.picketlink.as.console.client.ui.federation.event.UpdateSecurityDomainHandler;
 
 import java.util.List;
 
@@ -43,45 +45,44 @@ import java.util.List;
  */
 public class NewServiceProviderWizard<T extends GenericFederationEntity> extends AbstractFederationWizard<T> implements Wizard<T> {
 
-    private ComboBoxItem nameItem;
-    private ComboBoxItem deploymentsItem;
+    private final EventBus eventBus;
+    private TextBoxItem nameItem;
+    private TextBoxItem deploymentsItem;
     private ComboBoxItem securityDomainsItem;
     private CheckBoxItem strictPostBinding;
     private PicketLinkUIConstants uiConstants;
 
     public NewServiceProviderWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter, String type,
-            PicketLinkUIConstants uiConstants) {
+            PicketLinkUIConstants uiConstants, EventBus eventBus) {
         super(editor, cls, presenter, type, "security-domain", "url", "post-binding", "strict-post-binding", "error-page", "logout-page");
         this.uiConstants = uiConstants;
+        this.eventBus = eventBus;
     }
 
     @Override
     protected FormItem<?>[] doGetCustomFields() {
-        ComboBoxItem nameItem = null;
+        TextBoxItem nameItem = null;
         
         if (!isDialogue()) {
-            this.deploymentsItem = new ComboBoxItem("name", "Name");
+            this.deploymentsItem = new TextBoxItem("name", "Name");
             nameItem = this.deploymentsItem;
-            updateAliasComboBox(nameItem, this.getPresenter().getAllDeployments());
             nameItem.setEnabled(false);
             nameItem.setRequired(false);
         } else {
             nameItem = getAliasItem();
             nameItem.setRequired(true);
-            updateAliasItems();
         }
         
         this.securityDomainsItem =  new ComboBoxItem("securityDomain", "Security Domain");
-        
-        if (this.getPresenter().getSecurityDomains() != null) {
-            String[] securityDomains = new String[this.getPresenter().getSecurityDomains().size()];
 
-            for (int i = 0; i < this.getPresenter().getSecurityDomains().size(); i++) {
-                securityDomains[i] = this.getPresenter().getSecurityDomains().get(i).getName();
+        eventBus.addHandler(UpdateSecurityDomainEvent.TYPE, new UpdateSecurityDomainHandler() {
+            @Override
+            public void onUpdateSecurityDomain(List<SecurityDomain> securityDomains) {
+                updateSecurityDomains(securityDomains);
             }
-            
-            securityDomainsItem.setValueMap(securityDomains);
-        }
+        });
+
+        updateSecurityDomains(getPresenter().getSecurityDomains());
         
         strictPostBinding = new CheckBoxItem("strictPostBinding", "Strict Post Binding");
         strictPostBinding.setEnabled(true);
@@ -97,7 +98,6 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
 
         FormItem<?>[] formItems = null;
 
-        
         if (!isDialogue()) {
             formItems = new FormItem<?>[] { nameItem, securityDomainsItem,
                     new TextBoxItem("url", uiConstants.common_label_URL(), true),
@@ -110,74 +110,34 @@ public class NewServiceProviderWizard<T extends GenericFederationEntity> extends
         return formItems;
     }
 
-    /**
-     * @param result
-     */
-    public void setServiceProviders(List<ServiceProvider> result) {
-        updateAliasItems();
-        updateSecurityDomains();
-    }
-
-    /**
-     * @return
-     */
-    private ComboBoxItem getAliasItem() {
+    private TextBoxItem getAliasItem() {
         if (this.nameItem == null) {
-            this.nameItem = new ComboBoxItem("name", "Name");
+            this.nameItem = new TextBoxItem("name", "Name");
         }
 
         return this.nameItem;
-    }
-
-    public void updateAliasItems() {
-        if (this.deploymentsItem != null) {
-            updateAliasComboBox(this.deploymentsItem, this.getPresenter().getAllDeployments());            
-        }
-        updateAliasComboBox(getAliasItem(), this.getPresenter().getAvailableDeployments());
-        updateSecurityDomains();
-    }
-
-    private void updateAliasComboBox(ComboBoxItem nameItem, List<DeploymentRecord> deployments) {
-        if (getPresenter().getAllDeployments() == null) {
-            return;
-        }
-        
-        String[] names = new String[deployments.size()];
-        
-        for (int i = 0; i < deployments.size(); i++) {
-            names[i] = deployments.get(i).getName();
-        }
-
-        nameItem.setValueMap(names);
-        
-        if (!isDialogue()) {
-            if (this.getServiceProviderEditor().getCurrentSelection() != null) {
-                nameItem.setValue(this.getServiceProviderEditor().getCurrentSelection().getName());
-            }
-        }
     }
 
     public ServiceProviderEditor getServiceProviderEditor() {
         return (ServiceProviderEditor) this.getEditor();
     }
     
-    private void updateSecurityDomains() {
-        if (this.getPresenter().getSecurityDomains() != null && this.securityDomainsItem != null) {
-            String[] securityDomains = new String[this.getPresenter().getSecurityDomains().size()];
+    private void updateSecurityDomains(List<SecurityDomain> securityDomains) {
+        if (securityDomains != null) {
+            String[] securityDomainsNames = new String[securityDomains.size()];
 
-            for (int i = 0; i < this.getPresenter().getSecurityDomains().size(); i++) {
-                securityDomains[i] = this.getPresenter().getSecurityDomains().get(i).getName();
+            for (int i = 0; i < securityDomains.size(); i++) {
+                securityDomainsNames[i] = securityDomains.get(i).getName();
             }
-            
-            securityDomainsItem.setValueMap(securityDomains);
-        }
-        
-        if (!isDialogue()) {
-            if (this.getServiceProviderEditor().getCurrentSelection() != null) {
-                securityDomainsItem.setValue(this.getServiceProviderEditor().getCurrentSelection().getSecurityDomain());
-            }
-        }
 
+            securityDomainsItem.setValueMap(securityDomainsNames);
+
+            if (!isDialogue()) {
+                if (this.getServiceProviderEditor().getCurrentSelection() != null) {
+                    securityDomainsItem.setValue(this.getServiceProviderEditor().getCurrentSelection().getSecurityDomain());
+                }
+            }
+        }
     }
 
 }
