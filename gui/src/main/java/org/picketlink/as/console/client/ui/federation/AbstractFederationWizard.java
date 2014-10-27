@@ -132,6 +132,8 @@ public abstract class AbstractFederationWizard<T> implements Wizard<T> {
 
             layout.add(widget);
             form.setNumColumns(2);
+
+            this.form.setEnabled(false);
         }
 
         // ----
