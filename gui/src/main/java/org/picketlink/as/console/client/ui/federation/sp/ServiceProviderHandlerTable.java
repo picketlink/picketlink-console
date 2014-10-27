@@ -22,20 +22,18 @@
 
 package org.picketlink.as.console.client.ui.federation.sp;
 
-import java.util.List;
-
-import org.jboss.as.console.client.Console;
+import com.google.gwt.user.cellview.client.CellTable;
+import com.google.gwt.user.cellview.client.TextColumn;
+import com.google.gwt.view.client.SelectionChangeEvent;
+import com.google.gwt.view.client.SelectionChangeEvent.Handler;
+import com.google.gwt.view.client.SingleSelectionModel;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.TextColumn;
-import com.google.gwt.view.client.SelectionChangeEvent;
-import com.google.gwt.view.client.SelectionChangeEvent.Handler;
-import com.google.gwt.view.client.SingleSelectionModel;
+import java.util.List;
 
 /**
  * <p>
@@ -112,7 +110,7 @@ public class ServiceProviderHandlerTable extends AbstractModelElementTable<Servi
             }
         };
 
-        table.addColumn(nameColumn, Console.CONSTANTS.common_label_name());
+        table.addColumn(nameColumn, "Class Name");
     }
     
     /**

@@ -117,7 +117,7 @@ public class IdentityProviderHandlersTabEditor {
                 final IdentityProviderHandler removedTrustedDomain = getHandlerTable().getSelectedHandler();
                 
                 Feedback.confirm(
-                        Console.MESSAGES.deleteTitle(uiConstants.common_label_trustDomain()),
+                        Console.MESSAGES.deleteTitle("SAML Handler"),
                         Console.MESSAGES.deleteConfirm(removedTrustedDomain.getClassName()),
                         new Feedback.ConfirmationHandler() {
                             @Override
