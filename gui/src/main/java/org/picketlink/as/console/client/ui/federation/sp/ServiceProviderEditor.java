@@ -23,8 +23,8 @@
 package org.picketlink.as.console.client.ui.federation.sp;
 
 import com.google.gwt.user.client.ui.TabPanel;
+import com.google.web.bindery.event.shared.EventBus;
 import org.jboss.as.console.client.Console;
-import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
@@ -48,6 +48,7 @@ import java.util.Map;
  */
 public class ServiceProviderEditor extends AbstractFederationDetailEditor<ServiceProvider> {
 
+    private final EventBus eventBus;
     private SignatureSupportTabEditor signatureSupportTabEditor;
     private ServiceProviderHandlersTabEditor handlersTabEditor;
     private ServiceProviderWrapper selectedServiceProvider;
@@ -55,10 +56,11 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
     private PicketLinkUIMessages uiMessages;
 
     public ServiceProviderEditor(FederationPresenter presenter,
-            PicketLinkUIConstants uiConstants, PicketLinkUIMessages uiMessages) {
+            PicketLinkUIConstants uiConstants, PicketLinkUIMessages uiMessages, EventBus eventBus) {
         super(presenter, new ServiceProviderTable(presenter), ServiceProvider.class);
         this.uiConstants = uiConstants;
         this.uiMessages = uiMessages;
+        this.eventBus = eventBus;
     }
 
     /* (non-Javadoc)
@@ -163,13 +165,7 @@ public class ServiceProviderEditor extends AbstractFederationDetailEditor<Servic
      */
     @Override
     public Wizard<ServiceProvider> doCreateWizard() {
-        return new NewServiceProviderWizard(this, getEntityClass(), getPresenter(), "service-provider", uiConstants);
-    }
-
-    public void updateDeployments(List<DeploymentRecord> deployments) {
-        if (getWizard() != null) {
-            ((NewServiceProviderWizard) getWizard()).updateAliasItems();
-        }
+        return new NewServiceProviderWizard(this, getEntityClass(), getPresenter(), "service-provider", uiConstants, this.eventBus);
     }
 
     public void updateServiceProviders(FederationWrapper federation) {

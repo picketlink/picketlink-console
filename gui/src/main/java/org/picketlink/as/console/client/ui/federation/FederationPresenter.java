@@ -45,11 +45,9 @@ import org.picketlink.as.console.client.PicketlinkBeanFactory;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
-import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
+import org.picketlink.as.console.client.ui.federation.event.UpdateSecurityDomainEvent;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map.Entry;
 
 /**
  * <p>
@@ -68,8 +66,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         void initialLoad();
 
         void selectFederation(FederationWrapper federation);
-
-        void updateDeployments(List<DeploymentRecord> deployments);
 
         void updateSelectedFederation(FederationWrapper selectedFederationConfig);
     }
@@ -166,6 +162,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         super.onReset();
         getView().initialLoad();
         getView().selectFederation(this.getFederationManager().getFederations().get(this.selectedFederation));
+        loadSecurityDomains();
     }
 
     /**
@@ -218,43 +215,6 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
         
         // updates the deployments list
         this.allDeployments = deployments;
-        
-        // updates the available deployments list 
-        updateAvailableDeployments();
-    }
-
-    /**
-     * <p>
-     * Updates the deployments that can be used as idps and sps.
-     * If an deployment is already configured it is removed from the list.
-     * </p>
-     */
-    private void updateAvailableDeployments() {
-        this.availableDeployments = new ArrayList<DeploymentRecord>(this.allDeployments);
-        
-        for (Entry<String, FederationWrapper> entry : this.federationManager.getFederations().entrySet()) {
-            FederationWrapper federation = entry.getValue();
-            
-            for (DeploymentRecord deploymentRecord : new ArrayList<DeploymentRecord>(this.availableDeployments)) {
-                for (IdentityProviderWrapper identityProvider : federation.getIdentityProviders()) {
-                    if (deploymentRecord.getName().equals(identityProvider.getIdentityProvider().getName())) {
-                        identityProvider.getIdentityProvider().setEnabled(deploymentRecord.isEnabled());
-                        this.availableDeployments.remove(deploymentRecord);
-                    }
-                }
-            }
-            
-            for (DeploymentRecord deploymentRecord : new ArrayList<DeploymentRecord>(this.availableDeployments)) {
-                for (ServiceProviderWrapper serviceProvider : federation.getServiceProviders()) {
-                    if (deploymentRecord.getName().equals(serviceProvider.getServiceProvider().getName())) {
-                        serviceProvider.getServiceProvider().setEnabled(deploymentRecord.isEnabled());
-                        this.availableDeployments.remove(deploymentRecord);
-                    }
-                }
-            }
-        }
-        
-        getView().updateDeployments(this.availableDeployments);
     }
 
     /**
@@ -314,6 +274,7 @@ public class FederationPresenter extends Presenter<FederationPresenter.MyView, F
 
     public void onLoadSecurityDomains(List<SecurityDomain> result) {
         this.securityDomains = result;
+        getEventBus().fireEvent(new UpdateSecurityDomainEvent(result));
     }
 
     public List<SecurityDomain> getSecurityDomains() {

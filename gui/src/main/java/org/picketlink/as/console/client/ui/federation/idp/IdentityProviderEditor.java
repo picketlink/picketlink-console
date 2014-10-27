@@ -23,7 +23,7 @@
 package org.picketlink.as.console.client.ui.federation.idp;
 
 import com.google.gwt.user.client.ui.TabPanel;
-import org.jboss.as.console.client.shared.deployment.model.DeploymentRecord;
+import com.google.web.bindery.event.shared.EventBus;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
@@ -47,6 +47,7 @@ import java.util.Map;
  */
 public class IdentityProviderEditor extends AbstractFederationDetailEditor<IdentityProvider> {
 
+    private final EventBus eventBus;
     private TrustedDomainTabEditor trustedDomainTabEditor;
     private SignatureSupportTabEditor signatureSupportTabEditor;
     private EncryptionSupportTabEditor encryptionSupportTabEditor;
@@ -56,10 +57,11 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
     private IdentityProviderWrapper selectedIdentityProvider;
 
     public IdentityProviderEditor(FederationPresenter presenter,
-            final PicketLinkUIConstants uiConstants, final PicketLinkUIMessages uiMessages) {
+            final PicketLinkUIConstants uiConstants, final PicketLinkUIMessages uiMessages, EventBus eventBus) {
         super(presenter, new IdentityProviderTable(presenter), IdentityProvider.class);
         this.uiConstants = uiConstants;
         this.uiMessages = uiMessages;
+        this.eventBus = eventBus;
     }
 
     /* (non-Javadoc)
@@ -201,7 +203,7 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
 
     @Override
     public Wizard<IdentityProvider> doCreateWizard() {
-        return new NewIdentityProviderWizard(this, getEntityClass(), getPresenter(), "identity-provider", uiConstants);
+        return new NewIdentityProviderWizard(this, getEntityClass(), getPresenter(), "identity-provider", uiConstants, this.eventBus);
     }
 
     public void updateIdentityProviders(FederationWrapper federation) {
@@ -276,12 +278,6 @@ public class IdentityProviderEditor extends AbstractFederationDetailEditor<Ident
         }
         
         this.getTrustedDomainTabEditor().setIdentityProvider(identityProvider);
-    }
-
-    public void updateDeployments(List<DeploymentRecord> deployments) {
-        if (getWizard() != null) {
-            ((NewIdentityProviderWizard) getWizard()).updateNameItems();
-        }
     }
 
     private void updateSelectedIdentityProvider(IdentityProvider identityProvider) {
