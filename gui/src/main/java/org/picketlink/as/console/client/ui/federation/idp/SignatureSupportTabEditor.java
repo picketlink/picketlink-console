@@ -22,8 +22,9 @@
 
 package org.picketlink.as.console.client.ui.federation.idp;
 
-import java.util.Map;
-
+import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.VerticalPanel;
+import com.google.gwt.user.client.ui.Widget;
 import org.jboss.as.console.client.widgets.forms.FormToolStrip;
 import org.jboss.ballroom.client.widgets.forms.CheckBoxItem;
 import org.jboss.ballroom.client.widgets.forms.Form;
@@ -32,13 +33,11 @@ import org.picketlink.as.console.client.shared.subsys.model.GenericFederationEnt
 import org.picketlink.as.console.client.ui.federation.AsyncHelpText;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
-import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.VerticalPanel;
-import com.google.gwt.user.client.ui.Widget;
+import java.util.Map;
 
 /**
  * <p>Abstract class for creating a tab with signature support configurations.</p>
- * 
+ *
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 31, 2012
  */
@@ -47,7 +46,7 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
     private Form<P> form;
     private FederationPresenter presenter;
     private PicketLinkUIConstants uiConstants;
-    
+
     private CheckBoxItem supportsSignatures;
     private P entity;
     private HTML errorMessage;
@@ -56,14 +55,14 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
         this.presenter = presenter;
         this.uiConstants = uiConstants;
     }
-    
+
     public Widget asWidget() {
         VerticalPanel panel = new VerticalPanel();
 
         panel.setStyleName("fill-layout-width");
-        
+
         new AsyncHelpText("identity-provider", new String[] {"support-signatures"}, this.presenter, panel, false);
-        
+
         addForm(panel);
 
         return panel;
@@ -74,20 +73,20 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
      */
     private void addForm(VerticalPanel panel) {
         this.form = new Form<P>(getEntityClass());
-        
+
         errorMessage = new HTML();
-        
+
         errorMessage.setStyleName("error-panel");
-        
+
         panel.add(errorMessage);
-        
+
         FormToolStrip<P> toolStrip = new FormToolStrip<P>(this.form, new FormToolStrip.FormCallback<P>() {
             @Override
             public void onSave(Map<String, Object> changeset) {
                 P updatedIdentityProvider = form.getUpdatedEntity();
-                
+
                 entity.setSupportsSignatures(updatedIdentityProvider.isSupportsSignatures());
-                
+
                 doUpdateEntity(changeset);
             }
 
@@ -97,7 +96,7 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
         });
 
         toolStrip.providesDeleteOp(false);
-        
+
         panel.add(toolStrip.asWidget());
 
         this.form.setEnabled(false);
@@ -106,7 +105,7 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
                 doGetSupportsSignatureLabel());
 
         this.form.setFields(supportsSignatures);
-        
+
         panel.add(this.form.asWidget());
     }
 
@@ -121,15 +120,9 @@ public abstract class SignatureSupportTabEditor<P extends GenericFederationEntit
     private void enableDisableSignatureSupportFields() {
         if (getPresenter().getCurrentFederation() != null) {
             if (getPresenter().getCurrentFederation().getKeyStores().isEmpty()) {
-                errorMessage.setHTML("This configuration is disabled because the current federation does not support signatures.");
+                errorMessage.setHTML("You must create a key store configuration in order to properly support signatures and encryption.");
             } else {
                 errorMessage.setHTML("");
-            }
-            
-            if (getPresenter().getCurrentFederation().getKeyStores().isEmpty()) {
-                this.supportsSignatures.setEnabled(false);
-            } else {
-                this.supportsSignatures.setEnabled(true);
             }
         }
     }
