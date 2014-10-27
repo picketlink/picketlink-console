@@ -1,12 +1,11 @@
 package org.picketlink.as.console.client.ui.federation.sp;
 
-import java.util.Map;
-
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
-import org.picketlink.as.console.client.i18n.PicketLinkUIMessages;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 import org.picketlink.as.console.client.ui.federation.idp.SignatureSupportTabEditor;
+
+import java.util.Map;
 
 public class ServiceProviderSignatureSupportEditor extends SignatureSupportTabEditor<ServiceProvider> {
 
