@@ -27,7 +27,6 @@ import com.google.gwt.user.cellview.client.TextColumn;
 import com.google.gwt.view.client.SelectionChangeEvent;
 import com.google.gwt.view.client.SelectionChangeEvent.Handler;
 import com.google.gwt.view.client.SingleSelectionModel;
-import org.jboss.as.console.client.Console;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerParameter;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerWrapper;
@@ -114,7 +113,7 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
             }
         };
 
-        table.addColumn(nameColumn, Console.CONSTANTS.common_label_name());
+        table.addColumn(nameColumn, "Class Name");
     }
     
     /**
