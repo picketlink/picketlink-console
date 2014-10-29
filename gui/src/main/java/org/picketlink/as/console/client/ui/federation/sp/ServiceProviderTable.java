@@ -88,9 +88,13 @@ public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvi
                 "Restart", new ActionCell.Delegate<ServiceProvider>() {
                     @Override
                     public void execute(ServiceProvider serviceProvider) {
-                        presenter.getDeploymentManager().restartServiceProvider(serviceProvider);
-                        presenter.loadDeployments();
-                        presenter.getFederationManager().loadAllFederations();
+                        if (serviceProvider.isEnabled()) {
+                            presenter.getDeploymentManager().restartServiceProvider(serviceProvider);
+                            presenter.loadDeployments();
+                            presenter.getFederationManager().loadAllFederations();
+                        } else {
+                            Console.info("The deployment is disabled. Please, enable it first.");
+                        }
                     }
                 })) {
             @Override

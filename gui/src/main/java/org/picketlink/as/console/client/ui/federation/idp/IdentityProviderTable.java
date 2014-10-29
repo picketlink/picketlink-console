@@ -93,12 +93,16 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
                 "Restart", new ActionCell.Delegate<IdentityProvider>() {
                     @Override
                     public void execute(IdentityProvider identityProvider) {
-                        if (!identityProvider.isExternal()) {
-                            presenter.getDeploymentManager().restartIdentityProvider(identityProvider);
-                            presenter.loadDeployments();
-                            presenter.getFederationManager().loadAllFederations();
-                        } else {
+                        if (identityProvider.isExternal()) {
                             Console.info("You can not restart external Identity Providers.");
+                        } else {
+                            if (identityProvider.isEnabled()) {
+                                presenter.getDeploymentManager().restartIdentityProvider(identityProvider);
+                                presenter.loadDeployments();
+                                presenter.getFederationManager().loadAllFederations();
+                            } else {
+                                Console.info("The deployment is disabled. Please, enable it first.");
+                            }
                         }
                     }
                 })) {
