@@ -36,6 +36,8 @@ import org.picketlink.as.console.client.shared.subsys.model.IdentityProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
+import java.util.List;
+
 /**
  * <p>
  * A table widget to be used to show the identity providers.
@@ -114,17 +116,17 @@ public class IdentityProviderTable extends AbstractModelElementTable<IdentityPro
 
             @Override
             public ImageResource getValue(DeploymentRecord deployment) {
-                IdentityProvider idp = (IdentityProvider) deployment;
-                
-                ImageResource res = null;
+                List<DeploymentRecord> allDeployments = presenter.getAllDeployments();
 
-                if (idp.isEnabled() || idp.isExternal()) {
-                    res = Icons.INSTANCE.status_good();
-                } else {
-                    res = Icons.INSTANCE.status_bad();
+                for (DeploymentRecord deploymentRecord : allDeployments) {
+                    if (deploymentRecord.getName().equals(deployment.getName())) {
+                        if (deploymentRecord.isEnabled()) {
+                            return Icons.INSTANCE.status_good();
+                        }
+                    }
                 }
 
-                return res;
+                return Icons.INSTANCE.status_bad();
             }
         };
     }

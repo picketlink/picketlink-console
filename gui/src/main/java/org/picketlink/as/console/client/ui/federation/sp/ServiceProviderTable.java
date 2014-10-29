@@ -36,6 +36,8 @@ import org.picketlink.as.console.client.shared.subsys.model.ServiceProvider;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
+import java.util.List;
+
 /**
  * <p>
  * A table widget to be used to show the trusted domains.
@@ -105,16 +107,17 @@ public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvi
 
             @Override
             public ImageResource getValue(DeploymentRecord deployment) {
+                List<DeploymentRecord> allDeployments = presenter.getAllDeployments();
 
-                ImageResource res = null;
-
-                if (deployment.isEnabled()) {
-                    res = Icons.INSTANCE.status_good();
-                } else {
-                    res = Icons.INSTANCE.status_bad();
+                for (DeploymentRecord deploymentRecord : allDeployments) {
+                    if (deploymentRecord.getName().equals(deployment.getName())) {
+                        if (deploymentRecord.isEnabled()) {
+                            return Icons.INSTANCE.status_good();
+                        }
+                    }
                 }
 
-                return res;
+                return Icons.INSTANCE.status_bad();
             }
         };
     }
