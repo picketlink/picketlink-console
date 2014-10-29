@@ -112,6 +112,7 @@ public class ServiceProviderTable extends AbstractModelElementTable<ServiceProvi
                 for (DeploymentRecord deploymentRecord : allDeployments) {
                     if (deploymentRecord.getName().equals(deployment.getName())) {
                         if (deploymentRecord.isEnabled()) {
+                            deployment.setEnabled(true);
                             return Icons.INSTANCE.status_good();
                         }
                     }

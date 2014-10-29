@@ -22,9 +22,6 @@
 
 package org.picketlink.as.console.client.ui.federation;
 
-import java.util.List;
-import java.util.Map;
-
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.client.ui.TabPanel;
 import com.google.gwt.user.client.ui.VerticalPanel;
@@ -40,6 +37,9 @@ import org.jboss.ballroom.client.widgets.forms.TextItem;
 import org.picketlink.as.console.client.i18n.PicketLinkUIConstants;
 import org.picketlink.as.console.client.shared.subsys.model.Federation;
 import org.picketlink.as.console.client.shared.subsys.model.FederationWrapper;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
@@ -66,7 +66,6 @@ public class NewFederationDetails implements FormAdapter<Federation> {
         tabPanel.addStyleName("master_detail-detail");
 
         VerticalPanel layout = new VerticalPanel();
-
 
         final TextItem aliasItem = new TextItem("name", uiConstants.common_label_federationName());
 

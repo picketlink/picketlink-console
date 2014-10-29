@@ -45,7 +45,7 @@ public class NewKeyStoreWizard<T extends KeyStore> extends AbstractFederationWiz
 
     public NewKeyStoreWizard(AbstractFederationDetailEditor<T> editor, Class<T> cls, FederationPresenter presenter,
         String type, PicketLinkUIConstants uiConstants) {
-        super(editor, cls, presenter, type, "external", "security-domain", "url", "strict-post-binding");
+        super(editor, cls, presenter, type, "file", "relative-to", "password", "sign-key-alias", "sign-key-password");
         this.uiConstants = uiConstants;
     }
 

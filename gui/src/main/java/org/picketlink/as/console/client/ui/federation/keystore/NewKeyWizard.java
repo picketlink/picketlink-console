@@ -37,7 +37,7 @@ public class NewKeyWizard extends AbstractWizard<Key> {
     private final PicketLinkUIConstants uiConstants;
 
     public NewKeyWizard(KeyEditor editor, FederationPresenter presenter, PicketLinkUIConstants uiConstants) {
-        super(Key.class, presenter, new String[] {"federation","key-store", "key"}, "name", "host");
+        super(Key.class, presenter, new String[] {"key-store","key"}, "host");
         this.editor = editor;
         this.uiConstants = uiConstants;
     }
