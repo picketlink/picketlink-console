@@ -98,6 +98,7 @@ public class KeyStoreEditor extends AbstractFederationDetailEditor<KeyStore> {
 
     @Override
     protected void addDetailsSectionTabs(TabPanel bottomTabs) {
+        bottomTabs.add(getKeyEditor().asWidget(), "Host Keys");
     }
 
     @Override
@@ -145,11 +146,6 @@ public class KeyStoreEditor extends AbstractFederationDetailEditor<KeyStore> {
     @Override
     public Wizard<KeyStore> doCreateWizard() {
         return new NewKeyStoreWizard(this, getEntityClass(), getPresenter(), "key-store", uiConstants);
-    }
-
-    @Override
-    protected void doCreateAttributesTab(TabPanel bottomTabs) {
-        bottomTabs.add(getKeyEditor().asWidget(), "Host Keys");
     }
 
     private KeyEditor getKeyEditor() {
