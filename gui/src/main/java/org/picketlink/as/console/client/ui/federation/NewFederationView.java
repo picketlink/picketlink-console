@@ -141,7 +141,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         entityEditor = makeEntityEditor();
         entityEditor.setDescription(description);
 
-        Widget editorWidget = entityEditor.setIncludeTools(false).asWidget();
+        Widget editorWidget = entityEditor.setIncludeTools(true).asWidget();
 
         panel.add(editorWidget);
 
@@ -202,7 +202,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
     @Override
     protected EntityEditor<Federation> makeEntityEditor() {
         this.address = null;
-        return super.makeEntityEditor().setIncludeTools(false);
+        return super.makeEntityEditor().setIncludeTools(true);
     }
 
     @Override

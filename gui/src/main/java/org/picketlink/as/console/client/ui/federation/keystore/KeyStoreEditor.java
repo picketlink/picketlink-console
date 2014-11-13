@@ -118,10 +118,15 @@ public class KeyStoreEditor extends AbstractFederationDetailEditor<KeyStore> {
             HashMap<String, Object> changedValues = new HashMap<String, Object>();
 
             changedValues.put("supportsSignatures", "false");
+            changedValues.put("encrypt", "false");
 
             presenter.getFederationManager().onUpdateIdentityProvider(currentFederation.getIdentityProvider().getIdentityProvider(), changedValues);
 
             List<ServiceProviderWrapper> serviceProviders = currentFederation.getServiceProviders();
+
+            changedValues = new HashMap<>();
+
+            changedValues.put("supportsSignatures", "false");
 
             for (ServiceProviderWrapper serviceProvider : serviceProviders) {
                 presenter.getFederationManager().onUpdateServiceProvider(serviceProvider.getServiceProvider(), changedValues);
