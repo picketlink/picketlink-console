@@ -141,7 +141,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
         entityEditor = makeEntityEditor();
         entityEditor.setDescription(description);
 
-        Widget editorWidget = entityEditor.setIncludeTools(true).asWidget();
+        Widget editorWidget = entityEditor.setIncludeTools(false).asWidget();
 
         panel.add(editorWidget);
 
@@ -201,9 +201,11 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
      */
     @Override
     protected EntityEditor<Federation> makeEntityEditor() {
-        return super.makeEntityEditor().setIncludeTools(true);
+        this.address = null;
+        return super.makeEntityEditor().setIncludeTools(false);
     }
 
+    @Override
     protected FormAdapter<Federation> makeEditEntityDetailsForm() {
         if (this.federationDetails == null) {
             this.federationDetails = new NewFederationDetails(this.presenter, uiConstants);
@@ -214,7 +216,7 @@ public class NewFederationView extends AbstractEntityView<Federation> implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.jboss.as.console.client.shared.viewframework.AbstractEntityView#makeEntityTable()
      */
     @Override

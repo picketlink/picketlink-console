@@ -35,7 +35,7 @@ public class NewServiceProviderHandlerWizard extends AbstractWizard<ServiceProvi
     private final ServiceProviderHandlersTabEditor editor;
 
     public NewServiceProviderHandlerWizard(ServiceProviderHandlersTabEditor editor, FederationPresenter presenter) {
-        super(ServiceProviderHandler.class, presenter, new String[] {"service-provider", "handler"}, "className");
+        super(ServiceProviderHandler.class, presenter, new String[] {"service-provider", "handler"}, "class-name");
         this.editor = editor;
     }
 

@@ -93,7 +93,9 @@ public class SAMLConfigurationDetails {
                 }
             }
         });
-        
+
+        new AsyncHelpText("saml", new String[] {"token-timeout", "clock-skew"}, this.presenter, layout, false);
+
         form.edit(this.presenter.getBeanFactory().samlConfiguration().as());
 
         layout.add(toolStrip.asWidget());

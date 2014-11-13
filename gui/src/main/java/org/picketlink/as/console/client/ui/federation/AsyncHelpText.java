@@ -66,27 +66,22 @@ public class AsyncHelpText implements SecurityDomainsPresenter.DescriptionCallBa
     
     private void getDescription(String[] types, final DescriptionCallBack callback) {
         ModelNode operation = createOperation(ModelDescriptionConstants.READ_RESOURCE_DESCRIPTION_OPERATION);
-        operation.get(ModelDescriptionConstants.ADDRESS).add("federation", "*");
+        operation.get(ModelDescriptionConstants.ADDRESS).add("federation", "federation");
 
         for (String type : types) {
-            operation.get(ModelDescriptionConstants.ADDRESS).add(type, "*");
+            operation.get(ModelDescriptionConstants.ADDRESS).add(type, type);
         }
 
         this.presenter.getDispatchAsync().execute(new DMRAction(operation), new SimpleCallback<DMRResponse>() {
             @Override
             public void onSuccess(DMRResponse result) {
                 ModelNode response = result.get();
-                ModelNode responseResult = response.get(ModelDescriptionConstants.RESULT);
-                
-                if (!responseResult.isDefined()) {
+
+                if (!response.hasDefined(ModelDescriptionConstants.RESULT)) {
                     return;
                 }
-                
-                List<ModelNode> resList = responseResult.asList();
-                if (resList.size() == 0)
-                    return;
 
-                callback.setDescription(resList.get(0).get(ModelDescriptionConstants.RESULT));
+                callback.setDescription(response.get(ModelDescriptionConstants.RESULT));
             }
         });
     }
@@ -95,8 +90,7 @@ public class AsyncHelpText implements SecurityDomainsPresenter.DescriptionCallBa
         ModelNode operation = new ModelNode();
         operation.get(ModelDescriptionConstants.OP).set(operator);
         operation.get(ModelDescriptionConstants.ADDRESS).set(Baseadress.get());
-        operation.get(ModelDescriptionConstants.ADDRESS).add(ModelDescriptionConstants.SUBSYSTEM, "picketlink-federation")
-                .add("federation");
+        operation.get(ModelDescriptionConstants.ADDRESS).add(ModelDescriptionConstants.SUBSYSTEM, "picketlink-federation");
         return operation;
     }
     

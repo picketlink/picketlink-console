@@ -77,7 +77,7 @@ public class NewFederationDetails implements FormAdapter<Federation> {
         tabPanel.add(layout, "Attributes");
         
         this.samlConfigurationDetails = new SAMLConfigurationDetails(this.presenter);
-        
+
         tabPanel.add(this.samlConfigurationDetails.asWidget(), "SAML Configuration");
 
         tabPanel.selectTab(0);

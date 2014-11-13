@@ -35,7 +35,7 @@ public class NewIdentityProviderHandlerWizard extends AbstractWizard<IdentityPro
     private final IdentityProviderHandlersTabEditor editor;
 
     public NewIdentityProviderHandlerWizard(IdentityProviderHandlersTabEditor editor, FederationPresenter presenter) {
-        super(IdentityProviderHandler.class, presenter, new String[] {"identity-provider", "handler"}, "className");
+        super(IdentityProviderHandler.class, presenter, new String[] {"identity-provider", "handler"}, "class-name");
         this.editor = editor;
     }
 
