@@ -67,7 +67,7 @@ public class ServiceProviderHandlersTabEditor {
         this.uiConstants = uiConstants;
         this.uiMessages = uiMessages;
     }
-    
+
     public Widget asWidget() {
         // adds the trust domain section
         VerticalPanel trustDomainsHeader = new VerticalPanel();
@@ -77,7 +77,7 @@ public class ServiceProviderHandlersTabEditor {
         trustDomainsHeader.add(new ContentHeaderLabel("Handler"));
         addHandlerActions(trustDomainsHeader);
         addHandlerTable(trustDomainsHeader);
-        
+
         trustDomainsHeader.add(new ContentHeaderLabel("Handler Parameters"));
         addHandlerParameterActions(trustDomainsHeader);
         trustDomainsHeader.add(getHandlerParameterTable().asWidget());
@@ -112,7 +112,7 @@ public class ServiceProviderHandlersTabEditor {
             @Override
             public void onClick(ClickEvent event) {
                 final ServiceProviderHandler removedTrustedDomain = getHandlerTable().getSelectedHandler();
-                
+
                 Feedback.confirm(
                         Console.MESSAGES.deleteTitle("SAML Handler"),
                         Console.MESSAGES.deleteConfirm(removedTrustedDomain.getClassName()),
@@ -160,7 +160,7 @@ public class ServiceProviderHandlersTabEditor {
             @Override
             public void onClick(ClickEvent event) {
                 final ServiceProviderHandlerParameter removedHandlerParameter = getHandlerParameterTable().getSelectedHandlerParameter();
-                
+
                 Feedback.confirm(
                         Console.MESSAGES.deleteTitle("Handler Parameter"),
                         Console.MESSAGES.deleteConfirm(removedHandlerParameter.getName()),
@@ -189,7 +189,6 @@ public class ServiceProviderHandlersTabEditor {
         if (this.handlerTable == null) {
             this.handlerTable = new ServiceProviderHandlerTable();
             this.handlerTable.setParametersTable(this.getHandlerParameterTable());
-            this.handlerTable.setPresenter(this.presenter);
             this.handlerTable.setHandlersTabEditor(this);
         }
 
@@ -207,9 +206,9 @@ public class ServiceProviderHandlersTabEditor {
     private void showRestartDialog() {
         if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
             presenter.getDeploymentManager().restartServiceProvider(serviceProvider.getServiceProvider());
-        }        
+        }
     }
-    
+
     /**
      * @param selectedServiceProvider
      */
@@ -221,7 +220,7 @@ public class ServiceProviderHandlersTabEditor {
             this.addHandlerBtn.setEnabled(true);
             this.removeHandlerBtn.setEnabled(true);
         }
-        
+
         this.serviceProvider = selectedServiceProvider;
         getHandlerTable().setSelectedServiceProvider(this.serviceProvider);
     }
@@ -229,7 +228,7 @@ public class ServiceProviderHandlersTabEditor {
     public void doUpdateSelection(ServiceProviderHandler selectedHandler) {
         List<ServiceProviderHandlerWrapper> handlers = this.serviceProvider.getHandlers();
         ArrayList<ServiceProviderHandlerParameter> parameters = new ArrayList<ServiceProviderHandlerParameter>();
-        
+
         for (ServiceProviderHandlerWrapper handlerWrapper : handlers) {
             if (handlerWrapper.getHandler().getClassName().equals(selectedHandler.getClassName())) {
                 for (ServiceProviderHandlerParameter serviceProviderHandlerParameter : handlerWrapper.getParameters()) {
@@ -237,7 +236,7 @@ public class ServiceProviderHandlersTabEditor {
                 }
             }
         }
-        
+
         getHandlerParameterTable().getDataProvider().setList(parameters);
         enableDisableHandlerParameterActions(true);
     }

@@ -31,7 +31,6 @@ import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandl
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderHandlerWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.ServiceProviderWrapper;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
-import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
 import java.util.List;
 
@@ -39,7 +38,7 @@ import java.util.List;
  * <p>
  * A table widget to be used to show the trusted domains.
  * </p>
- * 
+ *
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 19, 2012
  */
@@ -48,12 +47,11 @@ public class ServiceProviderHandlerTable extends AbstractModelElementTable<Servi
     private ServiceProviderWrapper selectedServiceProvider;
     private ServiceProviderHandler selectedHandler;
     private ServiceProviderHandlerParameterTable parametersTable;
-    private FederationPresenter presenter;
     private ServiceProviderHandlersTabEditor handlersTabEditor;
-    
+
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doGetKey(java.lang.Object)
      */
     @Override
@@ -63,7 +61,7 @@ public class ServiceProviderHandlerTable extends AbstractModelElementTable<Servi
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doAddColumns(org.jboss.ballroom.client.widgets
      * .tables.DefaultCellTable)
@@ -71,9 +69,37 @@ public class ServiceProviderHandlerTable extends AbstractModelElementTable<Servi
     @SuppressWarnings("unchecked")
     @Override
     protected void doAddColumns(CellTable table) {
-        createNameColumn(table);
-
+        addNameColumn(table);
+        addTypeColumn(table);
         this.getCellTable().setSelectionModel(createSelectionModel());
+    }
+
+    private void addTypeColumn(CellTable table) {
+        TextColumn<ServiceProviderHandler> codeColumn = new TextColumn<ServiceProviderHandler>() {
+            @Override
+            public String getValue(ServiceProviderHandler record) {
+                String code = record.getCode();
+
+                if (code != null && !code.trim().isEmpty()) {
+                    return code + " (Code)";
+                }
+
+                return record.getClassName();
+            }
+        };
+
+        table.addColumn(codeColumn, "Type");
+    }
+
+    private void addNameColumn(CellTable table) {
+        TextColumn<ServiceProviderHandler> nameColumn = new TextColumn<ServiceProviderHandler>() {
+            @Override
+            public String getValue(ServiceProviderHandler record) {
+                return record.getName();
+            }
+        };
+
+        table.addColumn(nameColumn, "Name");
     }
 
     private SingleSelectionModel<ServiceProviderHandler> createSelectionModel() {
@@ -86,13 +112,13 @@ public class ServiceProviderHandlerTable extends AbstractModelElementTable<Servi
                 SingleSelectionModel<ServiceProviderHandler> selection = (SingleSelectionModel<ServiceProviderHandler>) event.getSource();
                 selectedHandler = selection.getSelectedObject();
                 List<ServiceProviderHandlerWrapper> handlers = selectedServiceProvider.getHandlers();
-                
+
                 for (ServiceProviderHandlerWrapper handlerWrapper : handlers) {
                     if (handlerWrapper.getHandler().getClassName().equals(selectedHandler.getClassName())) {
                         parametersTable.getDataProvider().setList(handlerWrapper.getParameters());
                     }
                 }
-                
+
                 handlersTabEditor.doUpdateSelection(selectedHandler);
             }
 
@@ -102,36 +128,18 @@ public class ServiceProviderHandlerTable extends AbstractModelElementTable<Servi
         return selectionModel;
     }
 
-    private void createNameColumn(CellTable table) {
-        TextColumn<ServiceProviderHandler> nameColumn = new TextColumn<ServiceProviderHandler>() {
-            @Override
-            public String getValue(ServiceProviderHandler record) {
-                return record.getClassName();
-            }
-        };
-
-        table.addColumn(nameColumn, "Class Name");
-    }
-    
-    /**
-     * @return the selectedTrustedDomain
-     */
     public ServiceProviderHandler getSelectedHandler() {
         return selectedHandler;
     }
-    
+
     public void setParametersTable(ServiceProviderHandlerParameterTable parametersTable) {
         this.parametersTable = parametersTable;
     }
-    
-    public void setPresenter(FederationPresenter presenter) {
-        this.presenter = presenter;
-    }
-    
+
     public void setSelectedServiceProvider(ServiceProviderWrapper selectedServiceProvider) {
         this.selectedServiceProvider = selectedServiceProvider;
     }
-    
+
     public void setHandlersTabEditor(ServiceProviderHandlersTabEditor handlersTabEditor) {
         this.handlersTabEditor = handlersTabEditor;
     }

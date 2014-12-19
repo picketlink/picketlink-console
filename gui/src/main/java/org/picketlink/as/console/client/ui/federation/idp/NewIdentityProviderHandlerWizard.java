@@ -21,11 +21,16 @@
  */
 package org.picketlink.as.console.client.ui.federation.idp;
 
+import org.jboss.ballroom.client.widgets.forms.ComboBoxItem;
 import org.jboss.ballroom.client.widgets.forms.FormItem;
 import org.jboss.ballroom.client.widgets.forms.TextBoxItem;
+import org.picketlink.as.console.client.shared.subsys.model.HandlerTypeEnum;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandler;
 import org.picketlink.as.console.client.ui.federation.AbstractWizard;
 import org.picketlink.as.console.client.ui.federation.FederationPresenter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Pedro Igor
@@ -33,28 +38,74 @@ import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 public class NewIdentityProviderHandlerWizard extends AbstractWizard<IdentityProviderHandler> {
 
     private final IdentityProviderHandlersTabEditor editor;
+    private TextBoxItem className;
+    private ComboBoxItem code;
 
     public NewIdentityProviderHandlerWizard(IdentityProviderHandlersTabEditor editor, FederationPresenter presenter) {
-        super(IdentityProviderHandler.class, presenter, new String[] {"identity-provider", "handler"}, "class-name");
+        super(IdentityProviderHandler.class, presenter, new String[] {"identity-provider", "handler"}, "class-name", "code");
         this.editor = editor;
     }
 
     @Override
     protected void doSaveWizard(IdentityProviderHandler newHandler) {
-        if (newHandler != null && !newHandler.getClassName().trim().isEmpty()) {
+        String code = newHandler.getCode();
+        String className = newHandler.getClassName();
+
+        if (!code.trim().isEmpty() || !className.trim().isEmpty()) {
+            if (HandlerTypeEnum.find(code) == null) {
+                newHandler.setCode(null);
+            } else {
+                newHandler.setClassName(null);
+            }
+
             getPresenter().getFederationManager().onCreateIdentityProviderHandler(this.editor.getIdentityProvider()
-                .getIdentityProvider(), newHandler);
+                    .getIdentityProvider(), newHandler);
+
             this.editor.getHandlerTable().getDataProvider().getList().add(newHandler);
         }
     }
 
     @Override
     protected FormItem<?>[] doGetCustomFields() {
-        TextBoxItem className = new TextBoxItem("className", "Class Name");
+        TextBoxItem name = new TextBoxItem("name", "Name");
+
+        name.setRequired(true);
+
+        this.className = new TextBoxItem("className", "Class Name") {
+            @Override
+            public void setUndefined(boolean undefined) {
+                code.setEnabled(undefined);
+                code.setRequired(undefined);
+
+                if (!undefined) {
+                    code.setValue("");
+                }
+            }
+        };
 
         className.setRequired(true);
 
-        return new FormItem<?>[] {className};
+        this.code = new ComboBoxItem("code", "Code") {
+            @Override
+            public void setUndefined(boolean undefined) {
+                className.setEnabled(undefined);
+                className.setRequired(undefined);
+
+                if (!undefined) {
+                    className.setValue("");
+                }
+            }
+        };
+
+        List<String> handlerTypes = new ArrayList<>();
+
+        for (HandlerTypeEnum handlerType : HandlerTypeEnum.values()) {
+            handlerTypes.add(handlerType.getAlias());
+        }
+
+        code.setValueMap(handlerTypes);
+
+        return new FormItem<?>[] {name, code, className};
     }
 
     @Override

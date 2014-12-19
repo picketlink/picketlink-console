@@ -67,7 +67,7 @@ public class IdentityProviderHandlersTabEditor {
         this.uiConstants = uiConstants;
         this.uiMessages = uiMessages;
     }
-    
+
     public Widget asWidget() {
         // adds the trust domain section
         VerticalPanel trustDomainsHeader = new VerticalPanel();
@@ -77,7 +77,7 @@ public class IdentityProviderHandlersTabEditor {
         trustDomainsHeader.add(new ContentHeaderLabel("Handler"));
         addHandlerActions(trustDomainsHeader);
         addHandlerTable(trustDomainsHeader);
-        
+
         trustDomainsHeader.add(new ContentHeaderLabel("Handler Parameters"));
         addHandlerParameterActions(trustDomainsHeader);
         trustDomainsHeader.add(getHandlerParameterTable().asWidget());
@@ -115,7 +115,7 @@ public class IdentityProviderHandlersTabEditor {
             @Override
             public void onClick(ClickEvent event) {
                 final IdentityProviderHandler removedTrustedDomain = getHandlerTable().getSelectedHandler();
-                
+
                 Feedback.confirm(
                         Console.MESSAGES.deleteTitle("SAML Handler"),
                         Console.MESSAGES.deleteConfirm(removedTrustedDomain.getClassName()),
@@ -168,7 +168,7 @@ public class IdentityProviderHandlersTabEditor {
             @Override
             public void onClick(ClickEvent event) {
                 final IdentityProviderHandlerParameter removedHandlerParameter = getHandlerParameterTable().getSelectedHandlerParameter();
-                
+
                 Feedback.confirm(
                         Console.MESSAGES.deleteTitle("Handler Parameter"),
                         Console.MESSAGES.deleteConfirm(removedHandlerParameter.getName()),
@@ -197,7 +197,6 @@ public class IdentityProviderHandlersTabEditor {
         if (this.handlerTable == null) {
             this.handlerTable = new IdentityProviderHandlerTable();
             this.handlerTable.setParametersTable(this.getHandlerParameterTable());
-            this.handlerTable.setPresenter(this.presenter);
             this.handlerTable.setHandlersTabEditor(this);
         }
 
@@ -215,9 +214,9 @@ public class IdentityProviderHandlersTabEditor {
     private void showRestartDialog() {
         if (Window.confirm("Changes would be applied after a restart. Do you want to do it now ?")) {
             presenter.getDeploymentManager().restartIdentityProvider(identityProvider.getIdentityProvider());
-        }        
+        }
     }
-    
+
     public void setIdentityProvider(IdentityProviderWrapper identityProvider) {
         if (identityProvider == null || identityProvider.getIdentityProvider().isExternal()) {
             this.addHandlerBtn.setEnabled(false);
@@ -226,7 +225,7 @@ public class IdentityProviderHandlersTabEditor {
             this.addHandlerBtn.setEnabled(true);
             this.removeHandlerBtn.setEnabled(true);
         }
-        
+
         this.identityProvider = identityProvider;
         getHandlerTable().setSelectedIdentityProvider(this.identityProvider);
     }

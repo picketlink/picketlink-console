@@ -32,7 +32,6 @@ import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHand
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderHandlerWrapper;
 import org.picketlink.as.console.client.shared.subsys.model.IdentityProviderWrapper;
 import org.picketlink.as.console.client.ui.federation.AbstractModelElementTable;
-import org.picketlink.as.console.client.ui.federation.FederationPresenter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,7 @@ import java.util.List;
  * <p>
  * A table widget to be used to show the trusted domains.
  * </p>
- * 
+ *
  * @author <a href="mailto:psilva@redhat.com">Pedro Silva</a>
  * @since Mar 19, 2012
  */
@@ -49,13 +48,12 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
 
     private IdentityProviderHandler selectedHandler;
     private IdentityProviderHandlerParameterTable parametersTable;
-    private FederationPresenter presenter;
     private IdentityProviderHandlersTabEditor handlersTabEditor;
     private IdentityProviderWrapper selectedIdentityProvider;
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doGetKey(java.lang.Object)
      */
     @Override
@@ -65,7 +63,7 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.picketlink.as.console.client.ui.federation.AbstractModelElementTable#doAddColumns(org.jboss.ballroom.client.widgets
      * .tables.DefaultCellTable)
@@ -73,9 +71,37 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
     @SuppressWarnings("unchecked")
     @Override
     protected void doAddColumns(CellTable table) {
-        createNameColumn(table);
-
+        addNameColumn(table);
+        addTypeColumn(table);
         this.getCellTable().setSelectionModel(createSelectionModel());
+    }
+
+    private void addTypeColumn(CellTable table) {
+        TextColumn<IdentityProviderHandler> codeColumn = new TextColumn<IdentityProviderHandler>() {
+            @Override
+            public String getValue(IdentityProviderHandler record) {
+                String code = record.getCode();
+
+                if (code != null && !code.trim().isEmpty()) {
+                    return code + " (Code)";
+                }
+
+                return record.getClassName();
+            }
+        };
+
+        table.addColumn(codeColumn, "Type");
+    }
+
+    private void addNameColumn(CellTable table) {
+        TextColumn<IdentityProviderHandler> nameColumn = new TextColumn<IdentityProviderHandler>() {
+            @Override
+            public String getValue(IdentityProviderHandler record) {
+                return record.getName();
+            }
+        };
+
+        table.addColumn(nameColumn, "Name");
     }
 
     private SingleSelectionModel<IdentityProviderHandler> createSelectionModel() {
@@ -88,7 +114,7 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
                 SingleSelectionModel<IdentityProviderHandler> selection = (SingleSelectionModel<IdentityProviderHandler>) event.getSource();
                 selectedHandler = selection.getSelectedObject();
                 List<IdentityProviderHandlerWrapper> handlers = selectedIdentityProvider.getHandlers();
-                
+
                 for (IdentityProviderHandlerWrapper handlerWrapper : handlers) {
                     if (handlerWrapper.getHandler().getClassName().equals(selectedHandler.getClassName())) {
                         parametersTable.getDataProvider().setList(handlerWrapper.getParameters());
@@ -105,30 +131,15 @@ public class IdentityProviderHandlerTable extends AbstractModelElementTable<Iden
         return selectionModel;
     }
 
-    private void createNameColumn(CellTable table) {
-        TextColumn<IdentityProviderHandler> nameColumn = new TextColumn<IdentityProviderHandler>() {
-            @Override
-            public String getValue(IdentityProviderHandler record) {
-                return record.getClassName();
-            }
-        };
-
-        table.addColumn(nameColumn, "Class Name");
-    }
-    
     /**
      * @return the selectedTrustedDomain
      */
     public IdentityProviderHandler getSelectedHandler() {
         return selectedHandler;
     }
-    
+
     public void setParametersTable(IdentityProviderHandlerParameterTable parametersTable) {
         this.parametersTable = parametersTable;
-    }
-    
-    public void setPresenter(FederationPresenter presenter) {
-        this.presenter = presenter;
     }
 
     public void setHandlersTabEditor(IdentityProviderHandlersTabEditor handlersTabEditor) {

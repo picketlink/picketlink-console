@@ -90,7 +90,7 @@ public class FederationManager {
      * <p>
      * Removes the selected keystore instance from the subsystem.
      * </p>
-     * 
+     *
      * @param keyStore
      */
     public void onRemoveKeyStore(KeyStore keyStore) {
@@ -350,7 +350,7 @@ public class FederationManager {
      * <p>
      * Updates an identity provider instance fiven a federation.
      * </p>
-     * 
+     *
      * @param changedValues
      */
     public void onUpdateIdentityProvider(final IdentityProvider identityProvider, final Map<String, Object> changedValues) {
@@ -417,28 +417,28 @@ public class FederationManager {
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         loadAllFederations();
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added("Handler " + newHandler.getClassName()));
+                            Console.info(Console.MESSAGES.added("Handler " + newHandler.getName()));
                         } else
                             Console.error(
-                                    Console.MESSAGES.addingFailed("Handler " + newHandler.getClassName()), result.getResponse().toString());
+                                    Console.MESSAGES.addingFailed("Handler " + newHandler.getName()), result.getResponse().toString());
                     }
                 });
     }
 
     /**
      * @param identityProvider
-     * @param removedTrustedDomain
+     * @param removedHandler
      */
-    public void onRemoveIdentityProviderHandler(IdentityProvider identityProvider, final IdentityProviderHandler removedTrustedDomain) {
-        this.federationStore.deleteIdentityProviderHandler(presenter.getCurrentFederation(), identityProvider, removedTrustedDomain,
+    public void onRemoveIdentityProviderHandler(IdentityProvider identityProvider, final IdentityProviderHandler removedHandler) {
+        this.federationStore.deleteIdentityProviderHandler(presenter.getCurrentFederation(), identityProvider, removedHandler,
                 new SimpleCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
                         loadAllFederations();
                         if (success) {
-                            Console.info(Console.MESSAGES.deleted("Handler " + removedTrustedDomain.getClassName()));
+                            Console.info(Console.MESSAGES.deleted("Handler " + removedHandler.getName()));
                         } else {
-                            Console.error(Console.MESSAGES.deletionFailed("Handler " + removedTrustedDomain.getClassName()));
+                            Console.error(Console.MESSAGES.deletionFailed("Handler " + removedHandler.getName()));
                         }
                     }
                 });
@@ -477,32 +477,32 @@ public class FederationManager {
                 });
     }
 
-    public void onCreateServiceProviderHandler(ServiceProvider serviceProvider, final ServiceProviderHandler newTrustedDomain) {
-        this.federationStore.createServiceProviderHandler(this.presenter.getCurrentFederation(), serviceProvider, newTrustedDomain,
+    public void onCreateServiceProviderHandler(ServiceProvider serviceProvider, final ServiceProviderHandler newHandler) {
+        this.federationStore.createServiceProviderHandler(this.presenter.getCurrentFederation(), serviceProvider, newHandler,
                 new SimpleCallback<ResponseWrapper<Boolean>>() {
 
                     @Override
                     public void onSuccess(ResponseWrapper<Boolean> result) {
                         loadAllFederations();
                         if (result.getUnderlying()) {
-                            Console.info(Console.MESSAGES.added("Handler " + newTrustedDomain.getClassName()));
+                            Console.info(Console.MESSAGES.added("Handler " + newHandler.getName()));
                         } else
                             Console.error(
-                                    Console.MESSAGES.addingFailed("Handler " + newTrustedDomain.getClassName()), result.getResponse().toString());
+                                    Console.MESSAGES.addingFailed("Handler " + newHandler.getName()), result.getResponse().toString());
                     }
                 });
     }
 
-    public void onRemoveServiceProviderHandler(ServiceProvider serviceProvider, final ServiceProviderHandler removedTrustedDomain) {
-        this.federationStore.deleteServiceProviderHandler(presenter.getCurrentFederation(), serviceProvider, removedTrustedDomain,
+    public void onRemoveServiceProviderHandler(ServiceProvider serviceProvider, final ServiceProviderHandler removedHandler) {
+        this.federationStore.deleteServiceProviderHandler(presenter.getCurrentFederation(), serviceProvider, removedHandler,
                 new SimpleCallback<Boolean>() {
                     @Override
                     public void onSuccess(Boolean success) {
                         loadAllFederations();
                         if (success) {
-                            Console.info(Console.MESSAGES.deleted("Handler " + removedTrustedDomain.getClassName()));
+                            Console.info(Console.MESSAGES.deleted("Handler " + removedHandler.getName()));
                         } else {
-                            Console.error(Console.MESSAGES.deletionFailed("Handler " + removedTrustedDomain.getClassName()));
+                            Console.error(Console.MESSAGES.deletionFailed("Handler " + removedHandler.getName()));
                         }
                     }
                 });
@@ -538,7 +538,7 @@ public class FederationManager {
                             Console.error(Console.MESSAGES.deletionFailed("Handler Parameter " + removedHandlerParameter.getName()));
                         }
                     }
-                });        
+                });
     }
 
     public void onCreateSAMLConfiguration(SAMLConfiguration updatedEntity) {
