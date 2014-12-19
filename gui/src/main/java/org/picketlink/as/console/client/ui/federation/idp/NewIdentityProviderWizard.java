@@ -88,7 +88,7 @@ public class NewIdentityProviderWizard<T extends GenericFederationEntity> extend
 
             externalIDP = new CheckBoxItem("external", "Is external?") {
                 @Override
-                protected void doValueChange() {
+                public void setModified(boolean undefined) {
                     if (getValue() != null && getValue()) {
                         nameItem.setEnabled(false);
                         nameItem.setRequired(false);

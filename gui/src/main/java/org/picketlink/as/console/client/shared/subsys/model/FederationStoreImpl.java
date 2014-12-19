@@ -914,7 +914,7 @@ public class FederationStoreImpl implements FederationStore {
             IdentityProviderHandler newHandler, final SimpleCallback<ResponseWrapper<Boolean>> callback) {
         AddressBinding address = identityProviderHandlerMetaData.getAddress();
         ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), identityProvider.getName(),
-                newHandler.getClassName());
+                newHandler.getName());
 
         ModelNode operation = identityProviderHandlerAdapter.fromEntity(newHandler);
         operation.get(OP).set(ADD);
@@ -942,12 +942,12 @@ public class FederationStoreImpl implements FederationStore {
      */
     @Override
     public void deleteIdentityProviderHandler(FederationWrapper federation, IdentityProvider identityProvider,
-            IdentityProviderHandler removedTrustedDomain, final SimpleCallback<Boolean> callback) {
+            IdentityProviderHandler removedHandler, final SimpleCallback<Boolean> callback) {
         AddressBinding address = this.identityProviderHandlerMetaData.getAddress();
         ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), identityProvider.getName(),
-                removedTrustedDomain.getClassName());
+                removedHandler.getName());
 
-        ModelNode operation = identityProviderHandlerAdapter.fromEntity(removedTrustedDomain);
+        ModelNode operation = identityProviderHandlerAdapter.fromEntity(removedHandler);
         operation.get(OP).set(REMOVE);
         operation.get(ADDRESS).set(addressModel.get(ADDRESS));
 
@@ -975,7 +975,7 @@ public class FederationStoreImpl implements FederationStore {
             IdentityProviderHandlerParameter newHandlerParameter, final SimpleCallback<ResponseWrapper<Boolean>> callback) {
         AddressBinding address = identityProviderHandlerParameterMetaData.getAddress();
         ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), identityProvider.getName(),
-                handler.getClassName(), newHandlerParameter.getName());
+                handler.getName(), newHandlerParameter.getName());
 
         ModelNode operation = identityProviderHandlerParameterAdapter.fromEntity(newHandlerParameter);
         operation.get(OP).set(ADD);
@@ -1005,7 +1005,7 @@ public class FederationStoreImpl implements FederationStore {
     public void deleteIdentityProviderHandlerParameter(FederationWrapper federation, IdentityProvider identityProvider,IdentityProviderHandler handler,
             IdentityProviderHandlerParameter removedHandlerParameter, final SimpleCallback<Boolean> callback) {
         AddressBinding address = this.identityProviderHandlerParameterMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), identityProvider.getName(), handler.getClassName(),
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), federation.getName(), identityProvider.getName(), handler.getName(),
                 removedHandlerParameter.getName());
 
         ModelNode operation = identityProviderHandlerParameterAdapter.fromEntity(removedHandlerParameter);
@@ -1030,12 +1030,13 @@ public class FederationStoreImpl implements FederationStore {
 
     @Override
     public void createServiceProviderHandler(FederationWrapper currentFederation, ServiceProvider serviceProvider,
-            ServiceProviderHandler newTrustedDomain, final SimpleCallback<ResponseWrapper<Boolean>> callback) {
+            ServiceProviderHandler newHandler, final SimpleCallback<ResponseWrapper<Boolean>> callback) {
         AddressBinding address = serviceProviderHandlerMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), serviceProvider.getName(),
-                newTrustedDomain.getClassName());
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(),
+                serviceProvider.getName(),
+                newHandler.getName());
 
-        ModelNode operation = serviceProviderHandlerAdapter.fromEntity(newTrustedDomain);
+        ModelNode operation = serviceProviderHandlerAdapter.fromEntity(newHandler);
         operation.get(OP).set(ADD);
         operation.get(ADDRESS).set(addressModel.get(ADDRESS));
 
@@ -1061,12 +1062,13 @@ public class FederationStoreImpl implements FederationStore {
      */
     @Override
     public void deleteServiceProviderHandler(FederationWrapper currentFederation, ServiceProvider serviceProvider,
-            ServiceProviderHandler removedTrustedDomain, final SimpleCallback<Boolean> callback) {
+            ServiceProviderHandler removedHandler, final SimpleCallback<Boolean> callback) {
         AddressBinding address = this.serviceProviderHandlerMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), serviceProvider.getName(),
-                removedTrustedDomain.getClassName());
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(),
+                serviceProvider.getName(),
+                removedHandler.getName());
 
-        ModelNode operation = serviceProviderHandlerAdapter.fromEntity(removedTrustedDomain);
+        ModelNode operation = serviceProviderHandlerAdapter.fromEntity(removedHandler);
         operation.get(OP).set(REMOVE);
         operation.get(ADDRESS).set(addressModel.get(ADDRESS));
 
@@ -1092,7 +1094,7 @@ public class FederationStoreImpl implements FederationStore {
             final SimpleCallback<ResponseWrapper<Boolean>> callback) {
         AddressBinding address = serviceProviderHandlerParameterMetaData.getAddress();
         ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), serviceProvider.getName(),
-                selectedHandler.getClassName(), newHandlerParameter.getName());
+                selectedHandler.getName(), newHandlerParameter.getName());
 
         ModelNode operation = serviceProviderHandlerParameterAdapter.fromEntity(newHandlerParameter);
         operation.get(OP).set(ADD);
@@ -1120,7 +1122,7 @@ public class FederationStoreImpl implements FederationStore {
             ServiceProviderHandler selectedHandler, ServiceProviderHandlerParameter removedHandlerParameter,
             final SimpleCallback<Boolean> callback) {
         AddressBinding address = this.serviceProviderHandlerParameterMetaData.getAddress();
-        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), serviceProvider.getName(), selectedHandler.getClassName(),
+        ModelNode addressModel = address.asResource(baseadress.getAdress(), currentFederation.getName(), serviceProvider.getName(), selectedHandler.getName(),
                 removedHandlerParameter.getName());
 
         ModelNode operation = serviceProviderHandlerParameterAdapter.fromEntity(removedHandlerParameter);

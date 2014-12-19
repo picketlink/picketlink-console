@@ -22,6 +22,7 @@
 
 package org.picketlink.as.console.client.shared.subsys.model;
 
+import org.jboss.as.console.client.shared.viewframework.NamedEntity;
 import org.jboss.as.console.client.widgets.forms.Address;
 import org.jboss.as.console.client.widgets.forms.Binding;
 
@@ -33,9 +34,13 @@ import org.jboss.as.console.client.widgets.forms.Binding;
  * @since Mar 14, 2012
  */
 @Address("/subsystem=picketlink-federation/federation={0}/identity-provider={1}/handler={2}")
-public interface IdentityProviderHandler {
+public interface IdentityProviderHandler extends NamedEntity {
 
-    @Binding(key = true, detypedName="class-name")
+    @Binding(detypedName="class-name")
     String getClassName();
-    void setClassName(String name);
+    void setClassName(String className);
+
+    @Binding(detypedName="code")
+    String getCode();
+    void setCode(String code);
 }
